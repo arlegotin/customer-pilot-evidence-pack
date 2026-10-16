@@ -47,7 +47,10 @@ def _read(path: Path) -> JsonObject:
 
 
 def _bytes(value: JsonObject) -> bytes:
-    return (json.dumps(value, sort_keys=True, indent=2, ensure_ascii=False, allow_nan=False) + '\n').encode('utf-8')
+    try:
+        return (json.dumps(value, sort_keys=True, indent=2, ensure_ascii=False, allow_nan=False) + '\n').encode('utf-8')
+    except (ValueError, TypeError) as error:
+        _fail('Expected finite JSON values: ' + str(error))
 
 
 def _validate(evaluation: JsonObject, verdict: JsonObject) -> None:

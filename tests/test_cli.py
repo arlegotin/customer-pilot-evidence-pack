@@ -212,7 +212,8 @@ class CliTests(unittest.TestCase):
         before = {p.name: p.read_bytes() for p in self.out.iterdir()}
         valid = (self.out / 'evaluation.json').read_text()
         for text in ['{', '{"pairs":[],"pairs":[]}', valid.replace('"schema_version": 1', '"schema_version": NaN'),
-                     valid.replace('"schema_version": 1', '"schema_version": 1e999')]:
+                     valid.replace('"schema_version": 1', '"schema_version": 1e999'),
+                     valid.replace('"latency_ms": 0', '"latency_ms": 1e999')]:
             path = self.base / 'bad.json'
             path.write_text(text)
             for out in (self.out, self.base / 'fresh'):

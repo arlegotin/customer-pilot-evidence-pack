@@ -249,3 +249,13 @@ Implementation verification used only synthetic software fixtures:
 Those checks establish software behavior on declared synthetic logs only.
 There are still no observed operator minutes, authorized reviewers, operating
 requirements, or fresh operational holdout results.
+
+## Method references
+
+[NIST usability testing](https://www.nist.gov/programs-projects/usability-testing)
+supports representative users/tasks and measurement of effectiveness, time and
+errors. It supplies no universal operational threshold. The actual requirements
+and practical effects for this tool still need a sourced operating workflow.
+The [information-retrieval evaluation framework](https://nlp.stanford.edu/IR-book/html/htmledition/information-retrieval-system-evaluation-1.html)
+informs separation of tuning from final evaluation and retrieval evidence from
+broader task quality; query counts are not a usability sample-size rule.

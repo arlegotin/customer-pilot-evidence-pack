@@ -87,3 +87,11 @@ symlink in the original path. Existing lock and rollback semantics are retained;
 regressions also reject a final symlink pointing at a valid complete report.
 The earlier clean candidate pass is retained as intermediate evidence, followed
 by a fresh committed-candidate replay after this correction.
+
+Malformed JSON, duplicate keys, explicit nonfinite literals and overflowing
+nested numbers all produce `INVALID_REPORT_INPUT`/exit 2 before publication.
+The overflow regression preserves its initial plain-diagnostic failure; the
+failure was diagnostic classification, with no false publication.
+The [CWE-345 description](https://cwe.mitre.org/data/definitions/345.html) is
+conceptual context for insufficient verification, not a vulnerability rating
+or a requirement for cryptographic signing.
