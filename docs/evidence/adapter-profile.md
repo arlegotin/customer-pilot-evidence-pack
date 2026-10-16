@@ -170,3 +170,90 @@ selection, cohort compatibility, native metric support or comparative gates.
 control with two equal-text tasks, four assignments, one physical request,
 known no-cap settings, unknown archive settings/history, and an evidenced
 zero cost. The earlier `ten-assignments` reference fixture remains unchanged.
+
+## Product ingestion and frozen provenance
+
+`pilotpack.ingest` implements the observed archive profile independently of
+`reference.prepare_packet`. `freeze` accepts the explicit selection config,
+protocol and source registry paths. A plain packet selection config carries
+no implicit repository root or policy lookup. Direct `import_needle_scholar`
+callers supply the reserved runtime context
+`config['_context'] = {'protocol': loaded_protocol, 'sources': loaded_registry,
+'source_root': provenance_root}`. This context is supplied by `freeze` from
+its explicit arguments. Runtime roots never enter content identity.
+`import_canonical` instead validates the input directory's contained protocol,
+source inventory and canonical records; `freeze` requires them to agree with
+its explicit protocol/source inputs. Source task, assignment and source IDs
+are preserved. Direct adapters return normalized records; publication performs
+strict canonical schema, retained-fragment and ledger verification.
+
+The production archive join uses all raw gold rows and the full documented
+query/group/bucket tuple. Duplicate IDs/tuples, orphan terminal rows and
+result-count mismatches abort. Versioned co-archival evidence and the packet's
+protocol-pinned source hashes are required for reconstructed assignments.
+An absent terminal row for an evidenced intended assignment becomes an
+explicit `unobserved` / `unknown` outcome, with no physical attempt inference.
+Frozen `raw/reconciliation.json` identifies that inference and its original
+assignment evidence. Intended counts are checked against assignment rows.
+For new canonical runs, the original pre-dispatch assignment-manifest bytes
+are retained and checked against `assignment_manifest_sha256`; schema
+validation also checks that the frozen timestamp precedes dispatch.
+
+A freeze copies the selected A source artifacts, A inventory, and required
+baseline parents only. Protected B artifacts are absent from A's retained
+source set. B's checked-in config was prepared from the reserved source IDs,
+run inventory and precommitted selector; its provider outcomes remain unread.
+All 384 A tasks remain in unchanged raw gold; every excluded PMID task and
+original source line is recorded in `raw/exclusions.json`. The original
+all-engine `ultimate` remains in the retained slim summary and creates no
+real-provider assignment.
+
+The frozen source inventory includes `baseline-native`, `baseline-oracle`,
+`baseline-check`, and their pinned `needle-source` parent. Downstream readers
+locate these through source IDs and run-relative paths in `sources.json`,
+not repository-relative files. The sidecars are original hashed baseline
+bytes, with their acquisition commands and parent IDs retained. The product
+runtime remains standard-library-only; it does not import the independent
+reference exporter or native scorer.
+
+`raw/normalization-input.json` binds the logical selection config and every
+authoritative derived manifest field, including origin/basis, actual settings,
+intended counts, limits and cohort/profile selection. Its bytes are inventoried
+as a derived source and included in the prescribed raw/canonical/source/policy
+content map. `verify_run` requires exact agreement with `packet.json`, so valid
+manifest-only edits are detected even though `packet.json` is excluded from
+`content_id`. Hashes and content/digest fields are excluded from this snapshot
+to avoid cycles. Generated source timestamps use an explicitly labeled fixed
+serialization marker, with no claim about collection time.
+
+Canonical object keys are sorted and compact; records sort by identity and
+result order is preserved. JSON is UTF-8 with escaped non-ASCII characters,
+finite values and a final LF. Incoming JSONL separates physical records on LF
+(and accepts CRLF), preserving literal Unicode separators inside JSON strings.
+The content identity hashes the sorted relative-path/byte-SHA256 map of raw
+inputs, canonical JSONL, optional identifier map, sources and protocol; SQLite,
+`packet.json`, and derived output are excluded. Protocol bytes retain their
+explicit supplied identity. Canonical record reordering leaves content and
+normalized SQL identities unchanged.
+
+Before publication, every ordinary source reference is resolved to a retained
+physical line or an existing JSON object/array path. Escaping symlinks and
+traversal are rejected before canonical core decoding. All source bytes and
+hashes, canonical records, reconciliation rows, SQL records and normalized
+digest are verified in a sibling staging directory. An exclusive empty
+reservation followed by directory rename publishes the completed run on the
+supported local POSIX filesystem; an existing destination is refused. Failed
+staging is removed. `verify_run` uses read-only SQLite access and writes no
+run bytes or metadata.
+
+Baseline linkage is explicit: the selection config's `baseline_source_ids`
+object maps `native`, `oracle`, and `check` to source IDs. The same map is
+frozen at `packet.json.extensions.baseline_source_ids`; a consumer resolves
+those IDs in the run's source inventory. Source parents are copied recursively.
+A's map is `native=baseline-native`, `oracle=baseline-oracle`,
+`check=baseline-check`. There are no packet-A filename defaults in the adapter.
+B's reserved config has an empty baseline map until independently generated,
+provenanced B sidecars are available. The generic mapping can select them
+without product code changes. `extensions.native_profile` names the replayed
+denominator profile; `extensions.exclusions_source_id` identifies the retained
+excluded-task manifest; `extensions.selection` records cohort ID and selector.

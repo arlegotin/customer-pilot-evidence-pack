@@ -1,0 +1,68 @@
+{
+  "adapter_profile": "needle-scholar-2026-10-14-v1",
+  "run_id": "packet-b",
+  "archive_run_id": "2026-10-15T1453Z",
+  "cohort_id": "2026-10-15-arxiv",
+  "gold_path": "scholar.jsonl",
+  "summary_path": "scholar.json",
+  "arms": [
+    "bing",
+    "keenable",
+    "perplexity"
+  ],
+  "gold_namespace_required": "arxiv",
+  "actual_settings": {
+    "bing": {
+      "provider": "bing",
+      "mode": null,
+      "endpoint": null,
+      "query_parameters": null,
+      "requested_num_results": 10,
+      "k": 10,
+      "snippet_chars": 2000,
+      "retry_policy": null,
+      "timeout_s": null,
+      "concurrency": null,
+      "run_window": null,
+      "matching_profile": "needle-scholar-73c7f810"
+    },
+    "keenable": {
+      "provider": "keenable",
+      "mode": null,
+      "endpoint": null,
+      "query_parameters": null,
+      "requested_num_results": 10,
+      "k": 10,
+      "snippet_chars": 2000,
+      "retry_policy": null,
+      "timeout_s": null,
+      "concurrency": null,
+      "run_window": null,
+      "matching_profile": "needle-scholar-73c7f810"
+    },
+    "perplexity": {
+      "provider": "perplexity",
+      "mode": null,
+      "endpoint": null,
+      "query_parameters": null,
+      "requested_num_results": 10,
+      "k": 10,
+      "snippet_chars": 2000,
+      "retry_policy": null,
+      "timeout_s": null,
+      "concurrency": null,
+      "run_window": null,
+      "matching_profile": "needle-scholar-73c7f810"
+    }
+  },
+  "assignment_evidence": {
+    "kind": "coarchived-gold-exact-tuple",
+    "gold_source_id": "packet-b-gold",
+    "summary_source_id": "packet-b-summary",
+    "revision": "fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4"
+  },
+  "auxiliary_source_ids": [
+    "metadata-packet-b-inventory.json"
+  ],
+  "baseline_source_ids": {}
+}

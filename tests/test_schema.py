@@ -294,3 +294,28 @@ class SchemaTests(unittest.TestCase):
         self.mutate('outcomes.jsonl', lambda x: x.pop())
         packet = validate_packet(self.root)
         self.assertTrue(any(d['code'] == 'MISSING_OUTCOME' and d['severity'] == 'block' for d in packet.diagnostics))
+
+
+class JsonlPhysicalLineTests(unittest.TestCase):
+    def test_literal_unicode_separators_are_inside_one_record(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'unicode.jsonl'
+            row = {'text': 'left\u2028middle\u0085right'}
+            path.write_text(json.dumps(row, ensure_ascii=False) + '\n', encoding='utf-8')
+            self.assertEqual(load_jsonl(path), (row,))
+
+    def test_physical_lf_crlf_empty_and_optional_final_newline(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'physical.jsonl'
+            for raw, expected in [(b'', ()), (b'{}', ({},)), (b'{}\n', ({},)),
+                                  (b'{}\r\n{}\r\n', ({}, {}))]:
+                with self.subTest(raw=raw):
+                    path.write_bytes(raw)
+                    self.assertEqual(load_jsonl(path), expected)
+            for raw, line in [(b'\n', 1), (b'{}\n\n', 2), (b'{}\n \n', 2)]:
+                with self.subTest(raw=raw):
+                    path.write_bytes(raw)
+                    with self.assertRaises(ValidationError) as caught:
+                        load_jsonl(path)
+                    self.assertEqual(caught.exception.diagnostics[0]['code'], 'INVALID_JSON')
+                    self.assertIn(f':{line}:$', caught.exception.diagnostics[0]['scope'])

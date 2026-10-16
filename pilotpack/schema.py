@@ -84,7 +84,10 @@ def load_json(path: Path) -> JsonObject:
 
 def load_jsonl(path: Path) -> tuple[JsonObject, ...]:
     try:
-        lines = path.read_text(encoding='utf-8').splitlines()
+        text = path.read_bytes().decode('utf-8')
+        lines = text.split('\n')
+        if lines[-1] == '':
+            lines.pop()
     except (OSError, UnicodeError) as error:
         _fail(f'{path}:$', str(error), 'INVALID_JSON')
     return tuple(_decode(line, f'{path}:{n}:$') for n, line in enumerate(lines, 1))
