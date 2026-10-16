@@ -15,13 +15,15 @@ historical local machine paths and failure records retain their original
 meaning. The repository contains no provider credentials or installed
 environments.
 
-The optional offline-baselines asset contains the exact pinned NEEDLE source
+The offline-baselines asset contains the exact pinned NEEDLE source
 tar and seven original dependency wheels at the relative paths expected by
 `sources.json` and `reference/retention-manifest.json`. Its notices accompany
 the bundle; original wheel license files remain inside each wheel. Extract it
-into a Git checkout for the guarded offline replay. A source archive is enough
-to run the product, but the full replay procedure uses Git to make a clean
-export and therefore starts from a clone.
+into the checkout before real-packet imports: the original tar is required
+provenance even without executing native code. The wheels are needed only for
+native checks. Synthetic canonical inputs need no external assets. A source
+archive can run product commands; the full replay procedure uses Git to make a
+clean export and therefore starts from a clone.
 
 The reports asset contains both packets' static HTML, evaluation/verdict JSON,
 and the applicable notices. These are qualified descriptive reports. Both

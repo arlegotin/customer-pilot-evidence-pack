@@ -28,6 +28,9 @@ jobs:
           raw = urllib.request.urlopen(source['source_uri'], timeout=60).read()
           assert len(raw) == source['bytes']
           assert hashlib.sha256(raw).hexdigest() == source['sha256']
+          retained = Path(source['local_path'])
+          retained.parent.mkdir(parents=True, exist_ok=True)
+          retained.write_bytes(raw)
           checkout = Path('.cache/needle-pinned')
           checkout.mkdir(parents=True)
           with tarfile.open(fileobj=io.BytesIO(raw)) as archive:

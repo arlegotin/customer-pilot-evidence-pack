@@ -12,9 +12,14 @@ Two real packets cover **649 distinct queries and 160 source groups**. Supported
 
 ## Try it
 
+Download the retained evidence files once; evaluation and reporting run offline.
+
 ```sh
 git clone https://github.com/arlegotin/customer-pilot-evidence-pack.git
 cd customer-pilot-evidence-pack
+curl -fL -o /tmp/pilotpack-baselines.tar.gz \
+  https://github.com/arlegotin/customer-pilot-evidence-pack/releases/download/v0.1.0/pilotpack-v0.1.0-offline-baselines.tar.gz
+tar -xzf /tmp/pilotpack-baselines.tar.gz -C .
 python -m pilotpack freeze --adapter needle-scholar \
   --input fixtures/real/packet-a --config fixtures/config/packet-a.json \
   --protocol protocol.json --sources sources.json --out runs/demo-a
@@ -23,7 +28,7 @@ python -m pilotpack report --run runs/demo-a \
   --evaluation build/demo-a/evaluation.json --out build/demo-a
 ```
 
-Open `build/demo-a/report.html`. For this packet, `evaluate` and `report` intentionally exit **3**: the files were written, but the requested comparison is blocked. `freeze` needs a new destination. No installation or API keys are required.
+Open `build/demo-a/report.html`. For this packet, `evaluate` and `report` intentionally exit **3**: the files were written, but the requested comparison is blocked. `freeze` needs a new destination. No Python package installation or API keys are required.
 
 [Usage and JSONL inputs](docs/usage.md) · [Validation](docs/evidence/validation.md) · [Offline reproduction](docs/evidence/reproduction.md) · [Latest release](https://github.com/arlegotin/customer-pilot-evidence-pack/releases/latest)
 

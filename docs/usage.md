@@ -1,7 +1,8 @@
 # Usage
 
 Run from the checkout with Python 3.11+. Product commands need no installation,
-third-party runtime packages, network, paid APIs or model judge.
+third-party runtime packages, paid APIs or model judge. Acquire source evidence
+first; evaluation and reporting make no network calls.
 
 ## Inputs and outputs
 
@@ -74,10 +75,13 @@ python -m unittest discover -s tests -v
 python reference/oracle.py --run runs/demo-a
 ```
 
-A plain clone runs product checks; the native-replay test explicitly skips
-without its isolated environment. Release verification runs all 202 tests
-with zero skips. For the unchanged native baseline and guarded clean replay,
-follow [offline reproduction](evidence/reproduction.md). The optional release
-offline-baselines asset supplies the exact source archive and seven wheels;
-replay makes no provider or judgment requests. Original failed validation and
-separately reserved v2 evidence remain in [validation](evidence/validation.md).
+Extract the offline-baselines release asset before real-packet commands or the
+full suite: provenance requires its original NEEDLE source tar even when no
+native code is executed. The synthetic example above needs no external assets.
+The native-replay test additionally needs its isolated environment and explicitly
+skips without one. Release verification runs all 202 tests with zero skips.
+For native setup and guarded clean replay, follow
+[offline reproduction](evidence/reproduction.md). The bundle supplies the exact
+source archive and seven wheels; replay makes no provider or judgment requests.
+Failed validation and separately reserved v2 remain in
+[validation](evidence/validation.md).
