@@ -1,0 +1,118 @@
+{
+  "browser_human_smoke": "unperformed",
+  "commands": [
+    {
+      "argv": [
+        "/Users/artemlegotin/anaconda3/bin/python",
+        "-m",
+        "pilotpack",
+        "evaluate",
+        "--run",
+        "runs/task9-packet-a",
+        "--out",
+        "build/final-fixes-packet-a"
+      ],
+      "exit": 3
+    },
+    {
+      "argv": [
+        "/Users/artemlegotin/anaconda3/bin/python",
+        "-m",
+        "pilotpack",
+        "report",
+        "--run",
+        "runs/task9-packet-a",
+        "--evaluation",
+        "build/final-fixes-packet-a/evaluation.json",
+        "--out",
+        "build/final-fixes-packet-a"
+      ],
+      "exit": 3
+    },
+    {
+      "argv": [
+        "/Users/artemlegotin/anaconda3/bin/python",
+        "-m",
+        "pilotpack",
+        "evaluate",
+        "--run",
+        "runs/task9-packet-b",
+        "--out",
+        "build/final-fixes-packet-b"
+      ],
+      "exit": 3
+    },
+    {
+      "argv": [
+        "/Users/artemlegotin/anaconda3/bin/python",
+        "-m",
+        "pilotpack",
+        "report",
+        "--run",
+        "runs/task9-packet-b",
+        "--evaluation",
+        "build/final-fixes-packet-b/evaluation.json",
+        "--out",
+        "build/final-fixes-packet-b"
+      ],
+      "exit": 3
+    }
+  ],
+  "full_suite": {
+    "exit": 0,
+    "skips": 0,
+    "tests": 202
+  },
+  "historical_hash_source": "docs/evidence/reproduction/results.json",
+  "implementation_revision": "2b9cd37cd70aebaaa1258bfa910f256469073816",
+  "note": "New implementation replay after final review; B configuration-only acceptance remains historical at 0da4f01/9474fdd.",
+  "packets": {
+    "a": {
+      "arm_decisions": "descriptive_only",
+      "byte_identical": true,
+      "content_id": "f521cf2886cd16badbaa7ba00a572bccac91d4e5de41becde4e2f0d85da81152",
+      "exact_attempt_counts": null,
+      "historical_output_sha256": {
+        "evaluation.json": "5331a387fe9d7e43aa424157b6f3842e287f99ab57d95f4b615c3cdfb6a2e4ab",
+        "report.html": "74c46c43e75e53fd394966c35944e81d26b4f5b5d75dde40c873be83301cf801",
+        "verdict.json": "99357ffc34dcd80448b0d9e4f3478b46b8c4c74e6ae64aabf800714260a849fe"
+      },
+      "new_output": "build/final-fixes-packet-a",
+      "original_output": "build/task9-packet-a",
+      "original_run_and_output_unchanged": true,
+      "reference_checks": "passed",
+      "replay_output_sha256": {
+        "evaluation.json": "5331a387fe9d7e43aa424157b6f3842e287f99ab57d95f4b615c3cdfb6a2e4ab",
+        "report.html": "74c46c43e75e53fd394966c35944e81d26b4f5b5d75dde40c873be83301cf801",
+        "verdict.json": "99357ffc34dcd80448b0d9e4f3478b46b8c4c74e6ae64aabf800714260a849fe"
+      },
+      "requested_comparison": "blocked",
+      "run": "runs/task9-packet-a",
+      "total_observed_costs": null
+    },
+    "b": {
+      "arm_decisions": "descriptive_only",
+      "byte_identical": true,
+      "content_id": "7173c4bba6b84b7ba1100776b448a8904eb5a8dae9ec65ec9c8fff9ceed65a97",
+      "exact_attempt_counts": null,
+      "historical_output_sha256": {
+        "evaluation.json": "4a740b9f583a253338c24294bf75d301e11f96d83fd0b7d187f20eb8583cca93",
+        "report.html": "91b374078bdbaf70cf7e1a380739aafb818ca56c267bdddc53697cfc1ae2fad9",
+        "verdict.json": "52876f61e422d053dee1607d08bff27ec253db92b40db2fa718747de3f1975db"
+      },
+      "new_output": "build/final-fixes-packet-b",
+      "original_output": "build/task9-packet-b",
+      "original_run_and_output_unchanged": true,
+      "reference_checks": "passed",
+      "replay_output_sha256": {
+        "evaluation.json": "4a740b9f583a253338c24294bf75d301e11f96d83fd0b7d187f20eb8583cca93",
+        "report.html": "91b374078bdbaf70cf7e1a380739aafb818ca56c267bdddc53697cfc1ae2fad9",
+        "verdict.json": "52876f61e422d053dee1607d08bff27ec253db92b40db2fa718747de3f1975db"
+      },
+      "requested_comparison": "blocked",
+      "run": "runs/task9-packet-b",
+      "total_observed_costs": null
+    }
+  },
+  "workflow_assessment": "neutral"
+}
