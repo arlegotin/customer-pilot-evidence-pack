@@ -34,7 +34,8 @@ def _extract(result, snippet_chars):
     # Rules are pinned to NEEDLE 73c7f810's scholar/ids.py and search/base.py.
     url = result.get('url') or ''
     snippet = result.get('snippet') or ''
-    text = ' '.join(p for p in (result.get('title'), snippet[:snippet_chars] if snippet_chars > 0 else snippet) if p)
+    supported_snippet = '' if snippet_chars is None else snippet[:snippet_chars] if snippet_chars > 0 else snippet
+    text = ' '.join(p for p in (result.get('title'), supported_snippet) if p)
     identity = r'(?:[a-z-]+/\d{7}|\d{4}\.\d{4,5})'
     arxiv = {m.group(1).lower() for pattern in (
         rf'arxiv\.org/(?:abs|pdf|html)/({identity})(?:v\d+)?',
@@ -58,9 +59,9 @@ def _matching(gold_ids, results, *, k, snippet_chars, identifier_map):
     missing_before = False
     for rank, result in enumerate(results[:k], 1):
         found = _extract(result, snippet_chars)
-        missing_here = False
+        missing_here = snippet_chars is None and bool(result.get('snippet'))
         if gold_ids.get('pmid') and found['pmcid'] and not found['pmid']:
-            missing_here = any(mapping.get(p) is None for p in found['pmcid'])
+            missing_here |= any(mapping.get(p) is None for p in found['pmcid'])
             found['pmid'].update(mapping[p] for p in found['pmcid'] if mapping.get(p) is not None)
         if any(set(ids) & found.get(namespace, set()) for namespace, ids in gold_ids.items()):
             return rank, not missing_before, missing_before or missing_here
@@ -73,10 +74,8 @@ def match_rank(gold_ids: dict[str, list[str]], results: list[JsonObject], *, k: 
     """First confirmed literal match; cached returned_ids/ranks never supply evidence.
 
     A null result alone does not establish a miss: score_run also checks map coverage.
-    Zero snippet_chars is uncapped, while an unknown budget cannot be scored.
+    Zero snippet_chars is uncapped. An unknown cap leaves URL/title matches usable.
     """
-    if snippet_chars is None:
-        return None
     return _matching(gold_ids, results, k=k, snippet_chars=snippet_chars,
                      identifier_map=identifier_map)[0]
 
@@ -183,11 +182,11 @@ def score_run(run: Path) -> JsonObject:
             delivery['source_refs'] = sorted(set(delivery['source_refs'] + [map_source + '#$']))
         rank, confirmed_rank, exact = None, None, True
         settings = manifest['actual_settings'][arm_id]
-        if delivery['classification'] == 'M':
-            if settings['snippet_chars'] is None or not task['gold_ids']:
+        if delivery['classification'] == 'M' and delivery['results']:
+            if not task['gold_ids']:
                 delivery.update(classification='U', unknown_reason='completed_unknown')
                 delivery['diagnostics'].append(_diagnostic('MISSING_MATCH_EVIDENCE', 'assignment:' + aid,
-                                                          'Matching budget or gold evidence is unavailable.', delivery['source_refs']))
+                                                          'Gold evidence is unavailable.', delivery['source_refs']))
             else:
                 confirmed_rank, exact, missing = _matching(task['gold_ids'], delivery['results'], k=settings['k'],
                                                          snippet_chars=settings['snippet_chars'], identifier_map=identifier_map)
@@ -198,7 +197,7 @@ def score_run(run: Path) -> JsonObject:
                     delivery.update(classification='U', unknown_reason='completed_unknown')
                 if missing:
                     delivery['diagnostics'].append(_diagnostic('MISSING_MATCH_EVIDENCE', 'assignment:' + aid,
-                                                              'Frozen PMC-to-PMID coverage is unavailable; affected match/rank is unsupported.', delivery['source_refs'],
+                                                              'Snippet budget or frozen PMC-to-PMID coverage is unavailable; affected match/rank is unsupported.', delivery['source_refs'],
                                                               severity='limitation' if confirmed_rank is not None else 'block'))
         reported_rank_present = (outcome.get('reported_hit_rank') is not None
                                  or profile == 'needle-scholar-all-rows-v1' and outcome['observation_kind'] == 'archive_logical')
@@ -235,12 +234,14 @@ def score_run(run: Path) -> JsonObject:
             diagnostics.append(_diagnostic('UNKNOWN_ASSIGNMENT_BASIS' if n is None else 'EMPTY_COHORT',
                                           'arm:' + arm_id, 'Intended-denominator metrics are undefined.', severity='limitation'))
         observed = sum(len(c['attempts']) for c in cohort)
-        lower_bound = sum(max(len(c['attempts']), int(c['terminal_status'] in ('completed', 'provider_error')
+        lower_bound = sum(max(len(c['attempts']), max((a['attempt_index'] for a in c['attempts']), default=0),
+                             int(c['terminal_status'] in ('completed', 'provider_error')
                                                      and c['observation_kind'] != 'not_dispatched')) for c in cohort)
-        complete = manifest['attempt_history'][arm_id] == 'complete' and lower_bound == observed
+        contiguous = all([a['attempt_index'] for a in c['attempts']] == list(range(1, len(c['attempts']) + 1)) for c in cohort)
+        complete = manifest['attempt_history'][arm_id] == 'complete' and lower_bound == observed and contiguous
         if manifest['attempt_history'][arm_id] == 'complete' and not complete:
             diagnostics.append(_diagnostic('UNKNOWN_ATTEMPT_HISTORY', 'arm:' + arm_id,
-                                          'Claimed complete physical history omits evidenced dispatches.',
+                                          'Claimed complete physical history has missing dispatches or attempt indices.',
                                           [ref for c in cohort for ref in c['source_refs']], severity='limitation'))
         arm['attempts'] = dict(observed_attempt_rows=observed, physical_attempt_count_lower_bound=lower_bound,
                                physical_attempt_count_exact=observed if complete else None,

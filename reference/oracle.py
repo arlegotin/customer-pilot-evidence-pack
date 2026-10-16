@@ -17,7 +17,11 @@ def _literal_ids(result: dict[str, Any], cap: int) -> dict[str, set[str]]:
     # Deliberately inspect URL/title/snippet, never cached returned_ids or hit flags.
     url = result.get('url') or ''
     snippet = result.get('snippet') or ''
-    text = (result.get('title') or '') + ' ' + (snippet[:cap] if cap > 0 else snippet)
+    if cap is None:
+        snippet = ''  # URL and title evidence is independent of an unknown snippet cap.
+    elif cap > 0:
+        snippet = snippet[:cap]
+    text = (result.get('title') or '') + ' ' + snippet
     arxiv = set()
     identity = r'([a-z-]+/\d{7}|\d{4}\.\d{4,5})'
     for pattern in (r'arxiv\.org/(?:abs|pdf|html)/' + identity,
@@ -117,15 +121,15 @@ def evaluate_run(root: Path) -> dict[str, Any]:
         rank = None
         physical = [row for row in attempts if row['assignment_id'] == aid]
         state, reason, response = _observation(outcome, physical)
-        if state == 'M':
+        if state == 'M' and response:
             gold = tasks[assignment['task_id']]['gold_ids']
-            if settings['snippet_chars'] is None or not gold:
+            if not gold:
                 state, reason = 'U', 'completed_unknown'
             else:
-                unresolved_conversion = False
+                unresolved_evidence = False
                 for position, result in enumerate(response[:settings['k']], 1):
                     found = _literal_ids(result, settings['snippet_chars'])
-                    missing = False
+                    missing = settings['snippet_chars'] is None and bool(result.get('snippet'))
                     if gold.get('pmid') and found['pmcid'] and not found['pmid']:
                         for pmc in found['pmcid']:
                             if mapping.get(pmc) is None:
@@ -134,13 +138,13 @@ def evaluate_run(root: Path) -> dict[str, Any]:
                                 found['pmid'].add(mapping[pmc])
                     if any(set(values) & found.get(namespace, set()) for namespace, values in gold.items()):
                         state = 'H'
-                        if unresolved_conversion:
+                        if unresolved_evidence:
                             arm['ranks_supported'] = False
                         else:
                             rank = position
                         break
-                    unresolved_conversion |= missing
-                if state != 'H' and unresolved_conversion:
+                    unresolved_evidence |= missing
+                if state != 'H' and unresolved_evidence:
                     state, reason = 'U', 'completed_unknown'
         arm[state] += 1
         if rank is not None:
@@ -159,17 +163,22 @@ def evaluate_run(root: Path) -> dict[str, Any]:
                                            r['assignment_id'] in {a['assignment_id'] for a in assignments if a['arm_id'] == arm_id}
                                            for r in attempts)
         arm['physical_attempt_count_lower_bound'] = 0
+        all_requests_present = True
         for assignment in assignments:
             if assignment['arm_id'] != arm_id:
                 continue
             aid = assignment['assignment_id']
-            observed_count = sum(row['assignment_id'] == aid for row in attempts)
+            request_indices = sorted(row['attempt_index'] for row in attempts if row['assignment_id'] == aid)
+            observed_count = len(request_indices)
+            all_requests_present &= request_indices == list(range(1, observed_count + 1))
             outcome = observations.get(aid)
             dispatch = (outcome and outcome['terminal_status'] in ('completed', 'provider_error')
                         and outcome['observation_kind'] != 'not_dispatched')
-            arm['physical_attempt_count_lower_bound'] += max(observed_count, int(bool(dispatch)))
+            arm['physical_attempt_count_lower_bound'] += max(observed_count, request_indices[-1] if request_indices else 0,
+                                                              int(bool(dispatch)))
         arm['physical_attempt_count_exact'] = (arm['observed_attempt_rows']
                                                if packet['attempt_history'][arm_id] == 'complete'
+                                               and all_requests_present
                                                and arm['observed_attempt_rows'] == arm['physical_attempt_count_lower_bound'] else None)
         # This profile's native eligible denominator was established by unchanged replay.
         profile = packet.get('extensions', {}).get('native_profile', packet.get('native_profile'))

@@ -242,9 +242,83 @@ class ScoreTests(unittest.TestCase):
     def test_unknown_snippet_budget_is_not_uncapped(self):
         def mutate(data, manifest, protocol):
             manifest['actual_settings']['a']['snippet_chars'] = None
+            data['attempts'] = []
+            for row in data['outcomes']:
+                row.update(observation_kind='archive_logical', selected_attempt_id=None, reported_hit_rank=None)
+                row['results'] = [result(snippet='See arXiv:1234.56789')]
         evaluation = score.score_run(self.freeze(mutate))
         self.assertEqual(evaluation['arms']['a']['U'], 2)
         self.assertEqual(evaluation['arms']['b']['H'], 2)
+
+    def test_review_internal_attempt_gap_invalidates_exact_physical_history(self):
+        def mutate(data, manifest, protocol):
+            manifest['attempt_history']['a'] = 'complete'
+            protocol['retry_selection'] = 'first_completed'
+            request = dict(data['attempts'][0], cost=dict(amount=None, currency=None, kind='missing',
+                           scope='attempt', source_ref=None), limitations=['MISSING_COST'])
+            data['attempts'] = [dict(request, attempt_id='gap-1', attempt_index=1, status='provider_error', results=[]),
+                                dict(request, attempt_id='gap-3', attempt_index=3),
+                                dict(request, assignment_id='a:t2', attempt_id='other-1', attempt_index=1)]
+            data['outcomes'][0]['selected_attempt_id'] = 'gap-3'
+            data['outcomes'][1].update(selected_attempt_id='other-1', observation_kind='attempt_backed')
+        run = self.freeze(mutate)
+        evaluation = score.score_run(run)
+        physical = evaluation['arms']['a']['attempts']
+        self.assertEqual(physical['observed_attempt_rows'], 3)
+        self.assertEqual(physical['physical_attempt_count_lower_bound'], 4)
+        self.assertIsNone(physical['physical_attempt_count_exact'])
+        self.assertIn('UNKNOWN_ATTEMPT_HISTORY', [d['code'] for d in evaluation['diagnostics'] if d['scope']=='arm:a'])
+        oracle = json.loads(subprocess.check_output([sys.executable, str(ROOT / 'reference/oracle.py'), '--run', str(run)], text=True))
+        self.assertEqual(oracle['arms']['a']['physical_attempt_count_lower_bound'], 4)
+        self.assertIsNone(oracle['arms']['a']['physical_attempt_count_exact'])
+        self.assertFalse(any(d['code']=='REFERENCE_MISMATCH' for d in evaluation['diagnostics']))
+
+    def test_review_empty_delivery_needs_no_snippet_budget_but_unknown_judgments_stay_unknown(self):
+        def mutate(data, manifest, protocol):
+            manifest['actual_settings']['a']['snippet_chars'] = None
+            data['attempts'] = []
+            for i, row in enumerate(data['outcomes']):
+                row.update(observation_kind='archive_logical', selected_attempt_id=None,
+                           reported_hit_rank=None, results=[], limitations=[])
+                if i==2:
+                    row['limitations'] = ['UNKNOWN_JUDGMENT']
+                if i==3:
+                    row.update(observation_kind='unobserved', terminal_status='unknown', limitations=['MISSING_OUTCOME'])
+        run = self.freeze(mutate)
+        evaluation = score.score_run(run)
+        self.assertEqual([evaluation['arms']['a'][k] for k in ('N','H','M','F','U')], [2,0,2,0,0])
+        self.assertEqual(evaluation['arms']['a']['missingness_range'], [0.0,0.0])
+        self.assertEqual([c['partition'] for c in evaluation['cases']], ['M','M','U','U'])
+        oracle = json.loads(subprocess.check_output([sys.executable, str(ROOT / 'reference/oracle.py'), '--run', str(run)], text=True))
+        self.assertEqual(oracle['arms']['a']['M'], 2)
+        self.assertEqual(oracle['arms']['a']['U'], 0)
+        self.assertFalse(any(d['code']=='REFERENCE_MISMATCH' for d in evaluation['diagnostics']))
+
+    def test_review_url_hit_survives_unknown_budget_with_rank_qualified_when_needed(self):
+        def mutate(data, manifest, protocol):
+            manifest['actual_settings']['a']['snippet_chars'] = None
+            manifest['extensions'] = {'native_profile':'needle-scholar-all-rows-v1'}
+            data['attempts'] = []
+            for row in data['outcomes']:
+                row.update(observation_kind='archive_logical', selected_attempt_id=None)
+            data['outcomes'][1].update(results=[result(snippet='arXiv:1234.56789'),
+                result('https://arxiv.org/abs/1234.56789', rank=2)], reported_hit_rank=None)
+        run = self.freeze(mutate)
+        evaluation = score.score_run(run)
+        first, later = evaluation['cases'][:2]
+        self.assertEqual(first['partition'], 'H')
+        self.assertEqual(first['first_hit_rank'], 1)
+        self.assertEqual(later['partition'], 'H')
+        self.assertEqual(later['confirmed_hit_rank'], 2)
+        self.assertIsNone(later['first_hit_rank'])
+        self.assertFalse(later['rank_supported'])
+        self.assertEqual(evaluation['native_metrics']['a']['recall_at_k'], 1.0)
+        self.assertIsNone(evaluation['native_metrics']['a']['mrr_at_k'])
+        oracle = json.loads(subprocess.check_output([sys.executable, str(ROOT / 'reference/oracle.py'), '--run', str(run)], text=True))
+        self.assertEqual(oracle['assignments']['a:t1']['first_hit_rank'], 1)
+        self.assertEqual(oracle['assignments']['a:t2']['partition'], 'H')
+        self.assertIsNone(oracle['assignments']['a:t2']['first_hit_rank'])
+        self.assertFalse(any(d['code']=='REFERENCE_MISMATCH' for d in evaluation['diagnostics']))
 
     def test_complete_history_without_request_rows_cannot_claim_exact_zero(self):
         def mutate(data, manifest, protocol):
