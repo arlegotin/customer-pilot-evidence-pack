@@ -99,7 +99,7 @@ Derived output goes to a separate `OUT/` directory containing `verdict.json`, `r
 
 Canonical schema version is integer `1`. JSONL is UTF-8, one JSON object per nonblank line; reject blank lines, duplicate JSON keys, NaN/Infinity, unknown core fields, and invalid types. Optional extension data lives under `extensions`. Error messages include relative file, line/JSON path, and stable diagnostic code. Reject a whole import transaction on structural corruption; do not skip rows or silently deduplicate.
 
-`packet.json` declares `run_id`, `schema_version`, `adapter_profile`, `origin` (`archive` or `new_run`), `assignment_basis` (`predeclared`, `reconstructed`, or `unreconstructable`), `intended_count` per arm when known, source-evidenced `actual_settings` per arm, `attempt_history` (`complete`, `partial`, or `unknown`) per arm, and hashes for canonical/raw files and the protocol. Claimed exact counts must be supported by complete request evidence. Reconstructed assignments require explicit evidence and a reconciliation note; their existence is not evidence of dispatch.
+`packet.json` declares `run_id`, `schema_version`, `adapter_profile`, `origin` (`archive` or `new_run`), `assignment_basis` (`predeclared`, `reconstructed`, or `unreconstructable`), `intended_count` per arm when known, source-evidenced `actual_settings` per arm, `attempt_history` (`complete`, `partial`, or `unknown`) per arm, and hashes for canonical/raw files and the protocol. New runs also declare `assignment_manifest_frozen_at` and the frozen assignment manifest hash. Claimed exact counts must be supported by complete request evidence. Reconstructed assignments require explicit evidence and a reconciliation note; their existence is not evidence of dispatch.
 
 | Record | Required core fields and rules |
 | --- | --- |
@@ -116,7 +116,11 @@ Arm settings include provider, exact mode/endpoint, query/operator parameters, r
 
 `sources.json` lists source IDs, artifact roles, source URI, immutable revision or documented absence, acquisition timestamp, relative local path, bytes, SHA-256, license, and transformation parents/commands. Every `source_ref` resolves to source ID plus line/object path; generated reconciliation rows identify the inference and its evidence. Resolve all paths under the run root and reject traversal, escaping symlinks, and duplicate IDs.
 
+Observed cost provenance must resolve to evidence for that amount, currency and request, not merely to any existing source ID. If an archive does not provide such evidence, cost is missing. A zero copied from a price default or an absent field is not observed cost.
+
 `protocol.json` fixes schema/profile versions, arm settings, cohort membership/selection, assignment basis, `k`, retry selection, matching and optional conversion-map hash, comparison window, bootstrap seed/replicates/interval, corruption manifest hash, and optional decision thresholds. Defaults proposed here are explicit protocol values, not hidden code defaults. Freeze it before protected evaluation; revisions create a new protocol identity. New-run assignments must be demonstrably frozen before the earliest dispatch. A hash only attests to the supplied bytes; it does not independently prove collection-time truth.
+
+For multiple packets, freeze a `packets` map keyed by packet ID with source/gold hashes, cohort selectors and allowed comparison windows. Packet-specific configuration chooses an entry and documented source paths; it cannot change scoring, retry, decision or gate policy. B's source/gold hashes can be reserved from inventory without inspecting provider outcomes. This permits a different B cohort without a post-evaluation protocol change.
 
 Compute `content_id` as SHA-256 of the sorted relative-path/byte-hash map for raw inputs, canonical JSONL, conversion map when present, sources and protocol. Exclude `packet.json`, SQLite and derived outputs to avoid self-referential hashes. `packet.json` carries this identity and the canonical normalized-table digest; verify the latter when opening SQLite. Stable serialization uses sorted object keys, compact separators, UTF-8, finite numbers, a final newline, and records sorted by their identity. Preserve original JSONL order in raw bytes and result order within records.
 
@@ -178,7 +182,7 @@ Use independent fields for evidence eligibility and decision:
 
 - Each pair has `comparison_status`: `eligible` or `blocked`, with scoped reasons.
 - Each arm has `decision_status`: `descriptive_only`, `not_evaluable`, `meets_criteria`, `fails_criteria`, or `indeterminate`. There is no run-wide decision status or automatic winner.
-- `protocol.decision_criteria` maps arm IDs to optional thresholds; absent/empty criteria mean descriptive reporting for that arm. Unknown arm IDs are invalid. An arm with unsupported accounting/scoring or an arm-level blocking gate is `not_evaluable` regardless of thresholds.
+- `protocol.decision_criteria` maps arm IDs to optional finite rate thresholds in [0, 1]; absent/null thresholds and empty criteria mean descriptive reporting for that arm. Unknown arm IDs are invalid. An arm with unsupported accounting/scoring or an arm-level blocking gate is `not_evaluable` regardless of thresholds.
 - Optional `min_delivered_hit_rate` is evaluated conservatively: lower bound at/above threshold meets; upper bound below threshold fails; overlap is indeterminate. Optional `max_provider_failure_rate` and `max_unknown_rate` use exact F/N and U/N. Combine an arm's criteria: any known failure fails; otherwise any unknown is indeterminate; all met means meets. Cost thresholds are outside v1.
 - A pair-only cohort/settings block prevents a comparative conclusion even if an arm independently meets its absolute criteria. Display that block alongside the arm decisions; never collapse these into a favorable combined verdict. A valid result with no thresholds is `descriptive_only` and is not a purchasing recommendation.
 
