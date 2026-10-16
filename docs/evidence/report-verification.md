@@ -62,3 +62,15 @@ observations and operational work savings are not established by these checks.
 Execution logs, code identity, machine verification cost and final review results
 are recorded separately in the investigation evidence; historical v1/v2 records
 are not overwritten.
+
+## Run-window compatibility
+
+A complete eligible canonical control confirmed that raw dictionary equality
+blocked equivalent `Z` / `+00:00` and other known-offset encodings. The two
+settings comparison sites now compare represented instants, preserving all
+accepted fractional digits. Raw settings, protocol bytes and provenance hashes
+are unchanged. RFC3339's `-00:00` unknown-local-offset convention remains distinct
+from known UTC; missing, genuinely different and out-of-window intervals still
+block. This follows the [RFC3339 offset distinction](https://www.rfc-editor.org/rfc/rfc3339.html#section-4.3)
+and changes no historical A/B meaning because their actual windows are missing.
+No general schema or temporal-policy redesign was performed.

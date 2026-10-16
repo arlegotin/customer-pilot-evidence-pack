@@ -20,11 +20,15 @@ are separate outcomes. A faster wrong answer is not a successful assessment.
 
 The baseline uses the existing reusable reference/native scripts and the
 operator's normal tools, with manual inspection, calculations, and controls
-allowed. The pack uses the same unchanged evidence and the same assessment
-questions. Both receive equivalent documentation, source access, training,
-hardware, and permitted assistance. Record actual tool versions and permitted
-normal tools in the final plan. Count baseline verification and manual work
-just as pack verification and correction; do not rebuild reusable baseline
+allowed. Compare the inspected product and any integrity-corrected candidate
+as separate workflows against that unchanged baseline. Add a manual/no-extra-
+pack control when confirmed actual practice makes it relevant; it is not a
+mandatory invented workflow. Each uses the same unchanged evidence and the
+same assessment questions. Give workflows equivalent documentation, source
+access, training, hardware, and permitted assistance. Record immutable code
+versions/digests, actual tool versions and permitted normal tools for each
+workflow in the frozen final plan. Count baseline verification and manual work
+just as product verification and correction; do not rebuild reusable baseline
 scripts for each packet or remove useful baseline tools to create a benefit.
 
 ## Prerequisites and freeze
@@ -132,7 +136,9 @@ product reports, for example in a separately controlled study evidence
 directory. Do not insert telemetry into `pilotpack` verdict/report schemas.
 
 The assignment JSON has exactly these fields (values below are a **blocked
-template**, not observations):
+template**, not observations). It is deliberately not runnable as an analysis
+until a properly frozen manifest and actual assignments exist; null freeze time
+and empty assignments fail validation:
 
 ```json
 {
@@ -158,7 +164,9 @@ reviewer must inspect those retained sources before deciding readiness.
 Each assignment has exactly `id`, `task_id`, `fixture_id`, `task_class`,
 `workflow`, `operator`, `period`, and `evidence_status`. IDs are nonempty
 strings. `task_class` is `eligible`, `blocked`, `zero_cost`, `missing_cost`, or
-`malformed`; `workflow` is `baseline` or `pack`; `period` is `setup` or
+`malformed`; `workflow` is `baseline`, `inspected_pack`, `corrected_pack`, or
+`manual_control` (the last only when relevant actual practice is confirmed);
+`period` is `setup` or
 `repeat`; `evidence_status` is `development` or `holdout`. Keep fixture
 identity consistent across derivatives. The development inventory may add
 identities but must retain A/B/v1/v2. A development identity declared holdout
@@ -225,3 +233,19 @@ invented independence, and development evidence masquerading as holdout.
 The tests exercise these failure modes. Real authorization, source adequacy,
 timing completeness, representative sampling and grading quality remain
 outside the tool's ability to establish.
+
+Implementation verification used only synthetic software fixtures:
+
+- Before the CLI existed,
+  `python3 -m unittest discover -s tests -p test_workflow_study.py -v`
+  ran 11 tests with 40 expected failures from the absent CLI. The captured
+  output is `build/investigation/workflow/red-console.txt`.
+- After implementation, the same command passed all 11 tests; output is
+  `build/investigation/workflow/green-console.txt`.
+- `python3 -m py_compile tools/workflow_study.py tests/test_workflow_study.py`
+  and `git diff --check` exited 0. The parent agent runs the integrated
+  repository suite after combining work packages.
+
+Those checks establish software behavior on declared synthetic logs only.
+There are still no observed operator minutes, authorized reviewers, operating
+requirements, or fresh operational holdout results.
