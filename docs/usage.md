@@ -9,8 +9,11 @@ first; evaluation and reporting make no network calls.
 `freeze` imports a NEEDLE Scholar packet or canonical JSONL directory, retains
 the source bytes and policy, and builds an immutable SQLite ledger. `evaluate`
 verifies evidence, scores it, checks the independent oracle and assesses
-requested comparisons. `report` verifies output identities and renders HTML
-without rescoring.
+requested comparisons. `report` reads the evaluation once, reconstructs every
+claim from the verified frozen run and policy (including fresh scoring and an
+independent oracle check), rejects any difference, then renders HTML. Edited
+evaluation files are not trusted, even if their identity and reference flags
+match. See [the verification boundary](evidence/report-verification.md).
 
 The output directory contains `evaluation.json` (all cases and attempts),
 `verdict.json` (summary and comparison gates), and, after `report`, `report.html`.
@@ -59,7 +62,7 @@ cannot resolve tiny provider differences.
 
 `freeze` refuses an existing destination. Evaluation/reporting can reuse an
 output directory only for identical run/content/protocol identities. Identical
-commands produce identical JSON/HTML bytes. Re-evaluation removes old HTML
+commands under the same recorded Python environment produce identical JSON/HTML bytes. Re-evaluation removes old HTML
 until `report` runs again. Input and output directories must not overlap.
 
 Publication stages a complete directory before replacing the previous output.

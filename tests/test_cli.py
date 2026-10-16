@@ -157,3 +157,88 @@ class CliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         verdict = json.loads((self.out / 'verdict.json').read_text())
         self.assertEqual(verdict['decisions']['b']['decision_status'], 'fails_criteria')
+
+    def test_derived_report_mutations_reject_before_fresh_or_existing_publication(self):
+        from report_mutations import mutations
+        from support import tree_hash
+        protocol = json.loads((self.source / 'protocol.json').read_text())
+        protocol['requested_comparisons'] = [dict(arm_a='a', arm_b='b')]
+        write_json(self.source / 'protocol.json', protocol)
+        rehash(self.source)
+        self.freeze()
+        self.assertEqual(self.command('evaluate', '--run', self.run, '--out', self.out).returncode, 3)
+        self.assertEqual(self.command('report', '--run', self.run, '--evaluation', self.out / 'evaluation.json',
+                                      '--out', self.out).returncode, 3)
+        before = {p.name: p.read_bytes() for p in self.out.iterdir()}
+        frozen = tree_hash(self.run)
+        for label, value in mutations(json.loads(before['evaluation.json'])):
+            path = self.base / 'mutated.json'
+            write_json(path, value)
+            for out in [self.base / 'fresh', self.out]:
+                with self.subTest(mutation=label, existing=out == self.out):
+                    result = self.command('report', '--run', self.run, '--evaluation', path, '--out', out)
+                    self.assertEqual(result.returncode, 2, result.stderr)
+                    self.assertIn('INVALID_REPORT_INPUT', result.stderr)
+                    self.assertNotIn('Traceback', result.stderr)
+                    self.assertFalse((self.base / 'fresh').exists())
+                    self.assertEqual(before, {p.name: p.read_bytes() for p in self.out.iterdir()})
+                    self.assertEqual(tree_hash(self.run), frozen)
+
+    def test_report_exit_uses_verified_published_snapshot_when_input_is_replaced(self):
+        # Timing fault injection only: real verification/scoring/publication all execute.
+        from pilotpack import report
+        protocol = json.loads((self.source / 'protocol.json').read_text())
+        protocol['requested_comparisons'] = [dict(arm_a='a', arm_b='b')]
+        write_json(self.source / 'protocol.json', protocol)
+        rehash(self.source)
+        self.freeze()
+        self.assertEqual(self.command('evaluate', '--run', self.run, '--out', self.out).returncode, 3)
+        path = self.base / 'supplied.json'
+        path.write_bytes((self.out / 'evaluation.json').read_bytes())
+        publish = report._publish
+        def replace_after_publication(*args, **kwargs):
+            publish(*args, **kwargs)
+            value = json.loads(path.read_text())
+            value['pairs'] = []
+            write_json(path, value)
+        with patch('pilotpack.report._publish', side_effect=replace_after_publication):
+            result = cli.main(['report', '--run', str(self.run), '--evaluation', str(path), '--out', str(self.out)])
+        self.assertEqual(result, 3)
+        self.assertEqual(json.loads((self.out / 'evaluation.json').read_text())['pairs'][0]['comparison_status'], 'blocked')
+
+    def test_invalid_evaluation_json_has_structured_diagnostic_and_preserves_output(self):
+        self.freeze()
+        self.assertEqual(self.command('evaluate', '--run', self.run, '--out', self.out).returncode, 0)
+        before = {p.name: p.read_bytes() for p in self.out.iterdir()}
+        valid = (self.out / 'evaluation.json').read_text()
+        for text in ['{', '{"pairs":[],"pairs":[]}', valid.replace('"schema_version": 1', '"schema_version": NaN'),
+                     valid.replace('"schema_version": 1', '"schema_version": 1e999')]:
+            path = self.base / 'bad.json'
+            path.write_text(text)
+            for out in (self.out, self.base / 'fresh'):
+                with self.subTest(text=text[:30], existing=out == self.out):
+                    p = self.command('report', '--run', self.run, '--evaluation', path, '--out', out)
+                    self.assertEqual(p.returncode, 2)
+                    self.assertIn('INVALID_REPORT_INPUT', p.stderr)
+                    self.assertEqual(before, {p.name: p.read_bytes() for p in self.out.iterdir()})
+                    self.assertFalse((self.base / 'fresh').exists())
+
+    def test_eligible_zero_cost_control_and_threshold_failure_publish_with_exit_zero(self):
+        import shutil
+        from support import apply_mutation
+        shutil.rmtree(self.source)
+        apply_mutation(ROOT / 'fixtures/controls/parent-v2', 'H05', self.source)
+        protocol = json.loads((self.source / 'protocol.json').read_text())
+        protocol['decision_criteria'] = {'a': {'max_provider_failure_rate': 0}}
+        write_json(self.source / 'protocol.json', protocol)
+        rehash(self.source)
+        self.freeze()
+        p = self.command('evaluate', '--run', self.run, '--out', self.out)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        p = self.command('report', '--run', self.run, '--evaluation', self.out / 'evaluation.json', '--out', self.out)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        e = json.loads((self.out / 'evaluation.json').read_text())
+        self.assertEqual(e['pairs'][0]['comparison_status'], 'eligible')
+        self.assertEqual(e['arms']['a']['cost']['total'], '0')
+        self.assertEqual(e['arms']['a']['cost']['support_status'], 'supported')
+        self.assertEqual(e['decisions']['a']['decision_status'], 'fails_criteria')

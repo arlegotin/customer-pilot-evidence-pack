@@ -43,7 +43,7 @@ class ReportTests(unittest.TestCase):
         self.out = self.base / 'output'
 
     def publish(self):
-        report.write_json_artifacts(self.out, evaluation=self.evaluation, verdict=self.verdict)
+        report.write_json_artifacts(self.out, run=self.run, evaluation=self.evaluation, verdict=self.verdict)
 
     def test_html_escapes_all_text_and_only_http_links_are_clickable(self):
         evil = '<script title="x">雪 & \' </script>'
@@ -88,10 +88,11 @@ class ReportTests(unittest.TestCase):
         self.assertLess(text.index('Provenance'), text.index('Comparisons'))
         self.assertIn('not a purchasing recommendation', text)
 
-    def test_replay_json_and_html_bytes_are_stable_and_report_does_not_score(self):
+    def test_replay_bytes_are_stable_and_report_runs_fresh_independent_verification(self):
         self.publish()
-        with patch('pilotpack.score.score_run', side_effect=AssertionError('report must not score')):
+        with patch('pilotpack.score.check_reference', wraps=score.check_reference) as check:
             html = report.write_report(self.run, self.out / 'evaluation.json', self.out)
+            self.assertEqual(check.call_count, 1)
         first = {p.name: p.read_bytes() for p in self.out.iterdir()}
         self.publish()
         report.write_report(self.run, self.out / 'evaluation.json', self.out)
@@ -106,13 +107,13 @@ class ReportTests(unittest.TestCase):
             evaluation = copy.deepcopy(self.evaluation)
             evaluation[field] = 'different'
             with self.subTest(field=field), self.assertRaises(ValidationError):
-                report.write_json_artifacts(self.out, evaluation=evaluation,
+                report.write_json_artifacts(self.out, run=self.run, evaluation=evaluation,
                                             verdict=compare.build_verdict(evaluation))
             self.assertEqual((self.out / 'evaluation.json').read_bytes(), before)
         bad = copy.deepcopy(self.verdict)
         bad['arms']['a']['H'] += 1
         with self.assertRaises(ValidationError):
-            report.write_json_artifacts(self.out, evaluation=self.evaluation, verdict=bad)
+            report.write_json_artifacts(self.out, run=self.run, evaluation=self.evaluation, verdict=bad)
 
     def test_report_rejects_wrong_identity_corrupt_or_partial_evaluation_before_publication(self):
         path = self.base / 'evaluation.json'
@@ -157,7 +158,7 @@ class ReportTests(unittest.TestCase):
             bad = copy.deepcopy(self.evaluation)
             bad[field] = value
             with self.subTest(field=field, value=value), self.assertRaises(ValidationError):
-                report.write_json_artifacts(self.out, evaluation=bad, verdict=compare.build_verdict(bad))
+                report.write_json_artifacts(self.out, run=self.run, evaluation=bad, verdict=compare.build_verdict(bad))
             self.assertFalse(self.out.exists())
 
     def test_report_never_writes_inside_or_over_frozen_run(self):
@@ -199,9 +200,43 @@ class ReportTests(unittest.TestCase):
         bad['diagnostics'].append(dict(code='REFERENCE_MISMATCH', severity='block', scope='run',
                                        source_refs=[], message='disagreement'))
         with self.assertRaises(ValidationError):
-            report.write_json_artifacts(self.out, evaluation=bad, verdict=compare.build_verdict(bad))
+            report.write_json_artifacts(self.out, run=self.run, evaluation=bad, verdict=compare.build_verdict(bad))
         path = self.base / 'evaluation.json'
         write_json(path, bad)
         with self.assertRaises(ValidationError):
             report.write_report(self.run, path, self.out)
         self.assertFalse(self.out.exists())
+
+    def test_public_json_writer_reconciles_supplied_claims_against_run(self):
+        self.publish()
+        before = {p.name: p.read_bytes() for p in self.out.iterdir()}
+        bad = copy.deepcopy(self.evaluation)
+        bad['arms']['a']['cost'].update(total='0', support_status='supported')
+        for out in (self.out, self.base / 'fresh'):
+            with self.subTest(out=out), self.assertRaises(ValidationError):
+                report.write_json_artifacts(out, run=self.run, evaluation=bad,
+                                            verdict=compare.build_verdict(bad))
+            self.assertEqual(before, {p.name: p.read_bytes() for p in self.out.iterdir()})
+            self.assertFalse((self.base / 'fresh').exists())
+
+    def test_contending_publication_lock_preserves_complete_output(self):
+        self.publish()
+        report.write_report(self.run, self.out / 'evaluation.json', self.out)
+        before = {p.name: p.read_bytes() for p in self.out.iterdir()}
+        lock = self.out.parent / ('.' + self.out.name + '.publishing')
+        lock.mkdir()
+        with self.assertRaises(FileExistsError):
+            report.write_report(self.run, self.out / 'evaluation.json', self.out)
+        self.assertEqual(before, {p.name: p.read_bytes() for p in self.out.iterdir()})
+        self.assertTrue(lock.is_dir())
+        lock.rmdir()
+
+    def test_symlink_output_never_replaces_target_files(self):
+        target = self.base / 'target'
+        target.mkdir()
+        (target / 'unrelated.txt').write_text('preserve')
+        self.out.symlink_to(target, target_is_directory=True)
+        with self.assertRaises(ValidationError):
+            report.write_json_artifacts(self.out, run=self.run)
+        self.assertEqual((target / 'unrelated.txt').read_text(), 'preserve')
+        self.assertTrue(self.out.is_symlink())

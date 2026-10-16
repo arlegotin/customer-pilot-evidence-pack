@@ -4,7 +4,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-from . import compare, ingest, report, score
+from . import ingest, report
 from .schema import ValidationError
 
 
@@ -25,15 +25,7 @@ def _exit(evaluation: dict) -> int:
 def evaluate_run(run: Path, out: Path) -> int:
     """Verify, score (one reference invocation), qualify, then publish."""
     try:
-        packet = ingest.verify_run(run)
-        report.ensure_output_location(run, out)
-        evaluation = score.score_run(run)
-        if (any(d['code'] == 'REFERENCE_MISMATCH' for d in evaluation['diagnostics'])
-                or any(c['status'] == 'mismatch' for c in evaluation['reference_checks'])):
-            raise ValidationError([dict(code='REFERENCE_MISMATCH', severity='error', scope='run',
-                                        source_refs=[], message='Reference disagreement; no artifacts published.')])
-        evaluation = compare.assess(packet, evaluation)
-        report.write_json_artifacts(out, evaluation=evaluation, verdict=compare.build_verdict(evaluation))
+        evaluation = report.write_json_artifacts(out, run=run)
         for item in evaluation['diagnostics']:
             print(f"{item['code']} [{item['scope']}]: {item['message']}", file=sys.stderr)
         return _exit(evaluation)
@@ -52,7 +44,7 @@ def main(argv: list[str] | None = None) -> int:
     evaluate = commands.add_parser('evaluate', help='Score and qualify a verified frozen run')
     for flag in ('run', 'out'):
         evaluate.add_argument('--' + flag, required=True, type=Path)
-    render = commands.add_parser('report', help='Render a verified evaluation without rescoring')
+    render = commands.add_parser('report', help='Reverify evaluation claims against frozen evidence and render')
     for flag in ('run', 'evaluation', 'out'):
         render.add_argument('--' + flag, required=True, type=Path)
     args = parser.parse_args(argv)
@@ -63,8 +55,8 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == 'evaluate':
             return evaluate_run(args.run, args.out)
-        report.write_report(args.run, args.evaluation, args.out)
-        return _exit(report._read(args.evaluation))
+        evaluation = report.publish_report(args.run, args.evaluation, args.out)
+        return _exit(evaluation)
     except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
         _diagnostic(error)
         return 2

@@ -179,7 +179,7 @@ class FinalFixTests(unittest.TestCase):
         run = self.freeze()
         evaluation = compare.assess(ingest.verify_run(run), score.score_run(run))
         out = self.base / 'output'
-        report.write_json_artifacts(out, evaluation=evaluation, verdict=compare.build_verdict(evaluation))
+        report.write_json_artifacts(out, run=run, evaluation=evaluation, verdict=compare.build_verdict(evaluation))
         report.write_report(run, out / 'evaluation.json', out)
         before = {path.name: path.read_bytes() for path in out.iterdir()}
         for changes in [dict(delivered_hit_at_k=1.0), dict(missingness_range=[1.0, 1.0]),

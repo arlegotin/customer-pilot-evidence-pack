@@ -8,7 +8,8 @@ import tempfile
 from typing import Any
 from urllib.parse import urlsplit
 
-from .compare import build_verdict
+from .compare import assess, build_verdict
+from . import score
 from .ingest import verify_run
 from .schema import ValidationError
 
@@ -35,8 +36,11 @@ def _read(path: Path) -> JsonObject:
                 _fail('Duplicate JSON key: ' + key)
             result[key] = value
         return result
-    value = json.loads(path.read_text(encoding='utf-8'), object_pairs_hook=unique,
-                       parse_constant=lambda value: _fail('Nonfinite JSON number: ' + value))
+    try:
+        value = json.loads(path.read_text(encoding='utf-8'), object_pairs_hook=unique,
+                           parse_constant=lambda value: _fail('Nonfinite JSON number: ' + value))
+    except (json.JSONDecodeError, UnicodeDecodeError) as error:
+        _fail('Malformed evaluation JSON: ' + str(error))
     if not isinstance(value, dict):
         _fail('Expected an object in ' + str(path))
     return value
@@ -253,29 +257,64 @@ def render_html(evaluation: JsonObject, verdict: JsonObject) -> str:
     return '\n'.join(parts)
 
 
-def write_json_artifacts(out: Path, *, evaluation: JsonObject, verdict: JsonObject) -> None:
-    """Publish evaluation and its verdict together; old HTML is invalidated."""
-    _publish(out, evaluation, verdict)
+def _fresh_evaluation(run: Path) -> JsonObject:
+    """Reconstruct claims from frozen evidence, never from supplied diagnostics."""
+    packet = verify_run(Path(run))
+    evaluation = score.score_run(Path(run))  # Includes the independent oracle subprocess.
+    if (any(d['code'] == 'REFERENCE_MISMATCH' for d in evaluation['diagnostics'])
+            or any(c['status'] == 'mismatch' for c in evaluation['reference_checks'])):
+        raise ValidationError([dict(code='REFERENCE_MISMATCH', severity='error', scope='run',
+                                    source_refs=[], message='Reference disagreement; no artifacts published.')])
+    evaluation = assess(packet, evaluation)
+    _validate(evaluation, build_verdict(evaluation))
+    return evaluation
+
+
+def verify_evaluation(run: Path, evaluation: JsonObject) -> JsonObject:
+    """Verify every supplied claim against fresh evidence/policy reconstruction.
+
+    Trust assumes unchanged code and trustworthy frozen inputs. Identity hashes and
+    supplied reference flags alone do not verify derived claims. Ordinary reference
+    checks reconcile retained native sidecars; fresh native replay remains separate.
+    """
+    verdict = build_verdict(evaluation) if all(k in evaluation for k in _FIELDS) else {}
+    _validate(evaluation, verdict)
+    expected = _fresh_evaluation(run)
+    if _bytes(evaluation) != _bytes(expected):
+        fields = sorted(k for k in set(evaluation) | set(expected)
+                        if _bytes({'value': evaluation.get(k)}) != _bytes({'value': expected.get(k)}))
+        _fail('Evaluation differs from verified frozen evidence/policy: ' + ', '.join(fields))
+    return expected
+
+
+def write_json_artifacts(out: Path, *, run: Path, evaluation: JsonObject | None = None,
+                         verdict: JsonObject | None = None) -> JsonObject:
+    """Publish freshly verified JSON; supplied claims require full reconciliation.
+
+    With no supplied evaluation, generate once (including one independent check).
+    Returned claims are the same verified snapshot used for publication and exits.
+    """
+    ensure_output_location(run, out)
+    if evaluation is None and verdict is not None:
+        _fail('A supplied verdict requires its evaluation.')
+    trusted = _fresh_evaluation(run) if evaluation is None else verify_evaluation(run, evaluation)
+    expected_verdict = build_verdict(trusted)
+    if verdict is not None and _bytes(verdict) != _bytes(expected_verdict):
+        _fail('Verdict differs from verified frozen evidence/policy.')
+    _publish(out, trusted, expected_verdict)
+    return trusted
+
+
+def publish_report(run: Path, evaluation_path: Path, out: Path) -> JsonObject:
+    """Read once, verify by regeneration, publish, and return the trusted snapshot."""
+    ensure_output_location(run, out)
+    evaluation = verify_evaluation(run, _read(Path(evaluation_path)))
+    verdict = build_verdict(evaluation)
+    _publish(out, evaluation, verdict, render_html(evaluation, verdict))
+    return evaluation
 
 
 def write_report(run: Path, evaluation_path: Path, out: Path) -> Path:
-    """Verify frozen identity and render supplied evaluation, without scoring."""
-    packet = verify_run(Path(run))
-    ensure_output_location(run, out)
-    evaluation = _read(Path(evaluation_path))
-    verdict = build_verdict(evaluation) if all(k in evaluation for k in _FIELDS) else {}
-    _validate(evaluation, verdict)
-    expected = dict(run_id=packet.manifest['run_id'], content_id=packet.manifest['content_id'],
-                    protocol_hash=packet.manifest['protocol_sha256'])
-    if any(evaluation[k] != expected[k] for k in _IDENTITIES):
-        _fail('Evaluation does not belong to this frozen run/protocol/content.')
-    if set(evaluation['arms']) != set(packet.manifest['intended_count']):
-        _fail('Evaluation arms differ from frozen intended arms.')
-    assignments = {a['assignment_id']: a for a in packet.assignments}
-    cases = evaluation['cases']
-    if (len(cases) != len(assignments) or {c.get('assignment_id') for c in cases} != set(assignments)
-            or any(c.get('task_id') != assignments[c['assignment_id']]['task_id']
-                   or c.get('arm_id') != assignments[c['assignment_id']]['arm_id'] for c in cases)):
-        _fail('Evaluation case identities differ from frozen assignments.')
-    _publish(out, evaluation, verdict, render_html(evaluation, verdict))
+    """Verify supplied claims by fresh scoring/reference checks, then render."""
+    publish_report(run, evaluation_path, out)
     return Path(out) / 'report.html'
