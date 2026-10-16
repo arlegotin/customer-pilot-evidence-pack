@@ -51,6 +51,18 @@ calls `needle.shared.recall.run_known_item_eval`, `recall_summary`, and
 an in-memory SearchClient; cached IDs, matched flags, and ranks are discarded.
 The bounded export uses the same raw join but independent literal matcher.
 
+The supported matching identifiers are `needle-scholar-73c7f810` and the
+existing synthetic-fixture alias `literal-v1`. Both select these pinned
+Scholar URL/title/snippet extraction and normalization rules, including the
+frozen snippet budget and optional conversion map; `literal-v1` does not
+declare a separate matching algorithm. Other identifiers are rejected before
+scoring by both packet validation and the independent oracle. A future
+identifier requires an implemented matcher and independent reference support.
+The standalone oracle also accepts the original direct-JSONL exports, which
+can omit a protocol and profile claim. Those use its implicit pinned literal
+rules; every explicitly supplied profile is still checked. A packet declaring
+a protocol hash cannot omit that protocol and fall back to this legacy input.
+
 Native summary in pinned source includes every per-query row in `num_scored`,
 including search errors; the all-error arm is the key denominator witness.
 README exclusion prose is not the behavior of this revision. Exact values

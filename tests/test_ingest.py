@@ -428,7 +428,7 @@ class IngestTests(unittest.TestCase):
     def test_review_reopen_reconciles_intended_manifest_with_changed_assignments(self):
         run = self.freeze_canonical(self.review_new_run())
         rows = [json.loads(line) for line in (run / 'assignments.jsonl').read_text().splitlines()]
-        rows[0]['settings_id'] = 'b'
+        rows[0]['source_ref'] = 'src#line=1'
         write_rows(run / 'assignments.jsonl', rows)
         rehash(run)
         # Rehashing reaches semantic reconciliation before the stale SQL/content IDs.

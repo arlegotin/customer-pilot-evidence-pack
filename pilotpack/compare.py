@@ -318,7 +318,9 @@ def _pair(packet, evaluation, a, b):
 
 
 def _decision(arm, criteria):
-    criteria = {key: value for key, value in (criteria or {}).items() if value is not None}
+    criteria = {key: value for key, value in (criteria or {}).items()
+                if key in ('min_delivered_hit_rate', 'max_provider_failure_rate', 'max_unknown_rate')
+                and value is not None}
     blocked = [g for g in arm['gates'] if g['severity'] in ('block', 'error')]
     if blocked:
         return dict(criteria=criteria, decision_status='not_evaluable', reasons=blocked)

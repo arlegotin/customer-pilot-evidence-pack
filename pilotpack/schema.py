@@ -162,6 +162,12 @@ def _sha(value, loc):
 _SETTINGS = 'provider mode endpoint query_parameters requested_num_results k snippet_chars retry_policy timeout_s concurrency run_window matching_profile'
 
 
+def _matching_profile(value, loc):
+    # literal-v1 is the existing synthetic alias for the pinned Scholar matcher.
+    if not isinstance(value, str) or value not in ('needle-scholar-73c7f810', 'literal-v1'):
+        _fail(loc, 'unsupported matching profile', 'UNSUPPORTED_MATCHING_PROFILE')
+
+
 def _settings(value, loc):
     _fields(value, _SETTINGS, 'limitations source_refs', loc)
     if 'source_refs' in value:
@@ -174,7 +180,7 @@ def _settings(value, loc):
             if not source or not separator or not (re.fullmatch(r'line=[1-9][0-9]*', fragment) or fragment.startswith('$')):
                 _fail(rloc, 'expected source ID plus line/object path')
     _string(value['provider'], loc + '.provider')
-    _string(value['matching_profile'], loc + '.matching_profile')
+    _matching_profile(value['matching_profile'], loc + '.matching_profile')
     for key in ('mode', 'endpoint'):
         _string(value[key], loc + '.' + key, nullable=True)
     for key in ('requested_num_results', 'k'):
@@ -208,6 +214,7 @@ def _protocol(value, loc):
         _string(value['status'], loc + '.status')
     for key in ('protocol_id', 'adapter_profile', 'matching_profile', 'retry_selection'):
         _string(value[key], loc + '.' + key)
+    _matching_profile(value['matching_profile'], loc + '.matching_profile')
     _enum(value['assignment_basis'], ('predeclared', 'reconstructed', 'unreconstructable'), loc + '.assignment_basis')
     _integer(value['k'], loc + '.k', 1)
     if value['snippet_chars'] is not None:
@@ -398,6 +405,9 @@ def validate_packet(root: Path) -> Packet:
                     _string(row[key], loc + '.' + key)
                 if row['task_id'] not in tasks or row['arm_id'] not in arms or row['settings_id'] not in arms:
                     _fail(loc, 'unknown task/arm/settings', 'ORPHAN_RECORD')
+                if row['settings_id'] != row['arm_id']:
+                    _fail(loc + '.settings_id', 'v1 settings reference must equal assignment arm',
+                          'ASSIGNMENT_SETTINGS_MISMATCH')
                 pair = row['task_id'], row['arm_id']
                 if pair in logical:
                     _fail(loc, 'duplicate task/arm assignment', 'DUPLICATE_ASSIGNMENT')

@@ -119,6 +119,11 @@ def _validate_arms(evaluation: JsonObject) -> None:
                 _fail('Arm partition count does not match cases: ' + arm_id + ':' + partition)
         if arm['N'] is not None and (type(arm['N']) is not int or arm['N'] != len(cases)):
             _fail('Arm denominator does not match cases: ' + arm_id)
+        n = arm['N']
+        expected_rate = arm['H'] / n if n else None
+        expected_bounds = [arm['H'] / n, (arm['H'] + arm['U']) / n] if n else None
+        if rate != expected_rate or bounds != expected_bounds:
+            _fail('Delivered rate and missingness bounds must match H/N and [(H/N), (H+U)/N]: ' + arm_id)
 
 
 def ensure_output_location(run: Path, out: Path) -> None:

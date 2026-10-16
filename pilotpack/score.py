@@ -244,7 +244,10 @@ def score_run(run: Path) -> JsonObject:
                              int(c['terminal_status'] in ('completed', 'provider_error')
                                                      and c['observation_kind'] != 'not_dispatched')) for c in cohort)
         contiguous = all([a['attempt_index'] for a in c['attempts']] == list(range(1, len(c['attempts']) + 1)) for c in cohort)
-        complete = manifest['attempt_history'][arm_id] == 'complete' and lower_bound == observed and contiguous
+        covered = all(c['attempts'] or (c['observation_kind'] == 'not_dispatched'
+                                       and c['terminal_status'] == 'runner_failure') for c in cohort)
+        complete = (manifest['attempt_history'][arm_id] == 'complete' and lower_bound == observed
+                    and contiguous and covered)
         if manifest['attempt_history'][arm_id] == 'complete' and not complete:
             diagnostics.append(_diagnostic('UNKNOWN_ATTEMPT_HISTORY', 'arm:' + arm_id,
                                           'Claimed complete physical history has missing dispatches or attempt indices.',

@@ -97,6 +97,19 @@ def _observation(outcome, requests):
 
 def evaluate_run(root: Path) -> dict[str, Any]:
     packet = json.loads((root / 'packet.json').read_text())
+    policy_path = root / 'protocol.json'
+    if not policy_path.exists() and (packet.get('protocol_sha256') is not None
+                                      or 'protocol.json' in packet.get('hashes', {})):
+        raise ValueError('missing declared protocol')
+    policy = json.loads(policy_path.read_text()) if policy_path.exists() else {}
+    profiles = [policy['matching_profile']] if 'matching_profile' in policy else []
+    profiles.extend(settings['matching_profile'] for settings in policy.get('arms', {}).values()
+                    if 'matching_profile' in settings)
+    profiles.extend(settings['matching_profile'] for settings in packet['actual_settings'].values()
+                    if 'matching_profile' in settings)
+    # Independent closed support list; literal-v1 names the same pinned literal rules.
+    if any(profile not in ('literal-v1', 'needle-scholar-73c7f810') for profile in profiles):
+        raise ValueError('unsupported matching profile')
     tasks = {r['task_id']: r for r in _read_rows(root, 'tasks.jsonl')}
     assignments = _read_rows(root, 'assignments.jsonl')
     observations = {r['assignment_id']: r for r in _read_rows(root, 'outcomes.jsonl')}
@@ -172,6 +185,9 @@ def evaluate_run(root: Path) -> dict[str, Any]:
             observed_count = len(request_indices)
             all_requests_present &= request_indices == list(range(1, observed_count + 1))
             outcome = observations.get(aid)
+            if not request_indices:
+                all_requests_present &= bool(outcome and outcome['observation_kind'] == 'not_dispatched'
+                                             and outcome['terminal_status'] == 'runner_failure')
             dispatch = (outcome and outcome['terminal_status'] in ('completed', 'provider_error')
                         and outcome['observation_kind'] != 'not_dispatched')
             arm['physical_attempt_count_lower_bound'] += max(observed_count, request_indices[-1] if request_indices else 0,
