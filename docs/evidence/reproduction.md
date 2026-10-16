@@ -8,12 +8,18 @@ or old execution outputs. Raw A/B originals, source metadata and frozen
 baseline sidecars are committed inputs, not a copied prior database or
 verdict. The export inventory is [input-export.json](reproduction/input-export.json).
 
-The three retained text files below contain the exact executed preparation,
-network guard and replay scripts. They are documentation of this experiment,
-external to the frozen product/reference/test code. The preparation script
+The three retained text files below contain the preparation, network guard
+and corrected replay handoff procedure. They are documentation of this
+experiment, external to the frozen product/reference/test code. The original
+acceptance transcript is preserved; the later fresh-workspace correction and
+covering execution are identified below. The preparation script
 performs a local Git export, verifies every retained wheel/archive byte count
 and hash, and extracts a fresh unchanged native checkout. The guarded replay
-then creates a new native environment and runs only explicit Python children.
+then creates a new native environment in the clean export and runs only
+explicit Python children. Both the launching-workspace and clean-output
+passes reuse that freshly built clean interpreter and pinned checkout. The
+launching workspace needs only committed files and the retained hashed source
+tar/wheels; it needs no installed native environment or expanded checkout.
 An inherited `sitecustomize` audit hook rejects DNS, connect/send operations,
 non-Python process execution, and explicit `-I`/`-E`/`-S` child options that bypass site
 initialization; the child wrapper restores the guard even when a caller
@@ -45,13 +51,19 @@ PYTHONPATH="$scratch/guard" python "$scratch/replay.py" "$PWD" "$clean"
 `prepare-clean.py` uses current committed `HEAD`; the recorded acceptance
 execution used `9474fdd`. Later evidence-only commits retain the same product,
 profile, suite, protocol, configuration, raw evidence and baseline inputs.
-The full expanded commands, stdout, stderr and actual exit statuses are in
-[command-log.json](reproduction/command-log.json). The harness records
+The original expanded commands, stdout, stderr and actual exit statuses are in
+[command-log.json](reproduction/command-log.json). Its successful workspace pass
+used the original workspace's already installed native environment/checkout.
+The corrected handoff is separately exercised from an entirely fresh launching
+root; its [command log](reproduction/fix-i1/command-log.json) records reuse of
+the freshly built clean dependencies for both passes. Both transcripts remain
+retained without rewriting the original acceptance evidence. The harness records
 `os.uname()` directly so the strict subprocess guard need not allow a system
 `uname` executable. All files used by the two tiny procedures are listed in
 the scripts; no hidden database or generated source packet is required.
 
-The fresh native setup runs exactly:
+The fresh native setup runs exactly, with the clean export as its working
+directory:
 
 ```sh
 python -m venv .cache/native-venv
@@ -76,8 +88,8 @@ python reference/oracle.py --run runs/task9-packet-a
 python reference/oracle.py --run runs/task9-packet-b
 python reference/prepare_packet.py --input fixtures/real/packet-a --config fixtures/config/packet-a.json --out reference/runs/task9-reproduction-a
 python reference/prepare_packet.py --input fixtures/real/packet-b --config fixtures/config/packet-b.json --out reference/runs/task9-reproduction-b
-.cache/native-venv/bin/python reference/needle_replay.py --packet fixtures/real/packet-a --checkout .cache/needle-pinned --out build/task9-reference/a/native-replayed.json
-.cache/native-venv/bin/python reference/needle_replay.py --packet fixtures/real/packet-b --checkout .cache/needle-pinned --out build/task9-reference/b/native-replayed.json
+"$clean/.cache/native-venv/bin/python" reference/needle_replay.py --packet fixtures/real/packet-a --checkout "$clean/.cache/needle-pinned" --out build/task9-reference/a/native-replayed.json
+"$clean/.cache/native-venv/bin/python" reference/needle_replay.py --packet fixtures/real/packet-b --checkout "$clean/.cache/needle-pinned" --out build/task9-reference/b/native-replayed.json
 python -m unittest discover -s tests -v
 ```
 
@@ -114,3 +126,39 @@ Browser/human visual smoke remains unavailable as disclosed in Task 7;
 automated HTML/locality checks do not establish visual review. Full PMID
 re-extraction, collection-time settings/physical histories, exact costs and
 paired latency remain unsupported. A/B metrics remain separate cohorts.
+
+## Fresh-workspace handoff correction (review I1)
+
+The original acceptance execution remains valid, but its documented replay
+procedure originally selected `root/.cache/native-venv` and
+`root/.cache/needle-pinned` during the workspace baseline pass while creating
+those dependencies only in the clean export. A fresh root with exactly the
+stated retained artifacts therefore failed before native replay. The
+[focused failing invocation](reproduction/fix-i1/red-console.txt) records the
+missing interpreter/checkout without using prior runs or environments.
+
+The one-line procedure correction committed at `2ba3888` uses the clean
+export's freshly installed interpreter and verified checkout for both passes.
+A second launching root was exported from that commit with only the hashed
+source tar/seven wheels added. Before execution it contained no runs, build,
+reference runs, native environment or expanded checkout
+([fresh-root inventory](reproduction/fix-i1/corrected-root.json)). Because this
+validation root was a Git export rather than a clone, `GIT_DIR` referenced
+existing local repository metadata solely for the recipe's local
+`git archive`/`rev-parse`; no branch, worktree or checkout changed.
+
+The exact documented shell recipe above then ran there offline. Corrected
+[results](reproduction/fix-i1/results.json),
+[full command/output log](reproduction/fix-i1/command-log.json),
+[network probes](reproduction/fix-i1/network-probes-console.txt),
+[install transcript](reproduction/fix-i1/offline-install-console.txt), and
+[clean suite](reproduction/fix-i1/clean-suite-console.txt) are retained separately
+from the original execution. The launching root still has no native
+environment/checkout afterward; no hidden root dependency was initialized.
+Both packets' stable records/digests/evaluation/verdict/report bytes reproduce
+exactly, supported ranks/counts/metrics agree, and the required harness suite
+passes 190 tests with zero skips. The corrected result hashes also match the
+original acceptance result hashes; all 37 expected command statuses and the
+absence of launching-root native state are recorded in
+[covering-check.json](reproduction/fix-i1/covering-check.json). No product/reference/test/protocol changes
+were required.

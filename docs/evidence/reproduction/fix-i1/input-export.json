@@ -1,0 +1,48 @@
+{
+  "commit": "2ba3888e549aeb6b3a68e5159d10433dbb6e6f71",
+  "clean_directory": "/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8",
+  "method": "git archive --format=tar COMMIT; retained source archive plus seven wheels only",
+  "copied_existing_runs_outputs_databases_or_environments": false,
+  "retained_artifacts": [
+    {
+      "path": ".cache/needle/matched.tar.gz",
+      "bytes": 248258,
+      "sha256": "a1ace5675418249a22f83707dbea296cbe3f858410b6941deb6c3f4c6f450975"
+    },
+    {
+      "path": ".cache/wheels/anyio-4.15.1-py3-none-any.whl",
+      "bytes": 132079,
+      "sha256": "6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101"
+    },
+    {
+      "path": ".cache/wheels/certifi-2026.7.22-py3-none-any.whl",
+      "bytes": 136983,
+      "sha256": "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775"
+    },
+    {
+      "path": ".cache/wheels/h11-0.16.0-py3-none-any.whl",
+      "bytes": 37515,
+      "sha256": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86"
+    },
+    {
+      "path": ".cache/wheels/httpcore-1.0.9-py3-none-any.whl",
+      "bytes": 78784,
+      "sha256": "2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55"
+    },
+    {
+      "path": ".cache/wheels/httpx-0.28.1-py3-none-any.whl",
+      "bytes": 73517,
+      "sha256": "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad"
+    },
+    {
+      "path": ".cache/wheels/idna-3.20-py3-none-any.whl",
+      "bytes": 69583,
+      "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c"
+    },
+    {
+      "path": ".cache/wheels/typing_extensions-4.16.0-py3-none-any.whl",
+      "bytes": 45571,
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "actual_recipe_exit": 0,
+  "command_count": 37,
+  "all_expected_command_exits_match": true,
+  "root_native_environment_after_execution": false,
+  "root_native_checkout_after_execution": false,
+  "original_acceptance_packet_facts_and_all_stable_hashes_match": true,
+  "full_suite": {
+    "tests": 190,
+    "exit": 0,
+    "skips": 0
+  }
+}

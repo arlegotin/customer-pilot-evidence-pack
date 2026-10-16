@@ -1,0 +1,13 @@
+{
+  "fresh_root": "/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-corrected-root-5_9oae4q",
+  "source_commit": "2ba3888e549aeb6b3a68e5159d10433dbb6e6f71",
+  "copied": "committed git archive plus verified source tar and seven wheels only",
+  "no_previous_state": [
+    "runs",
+    "build",
+    "reference/runs",
+    ".cache/native-venv",
+    ".cache/needle-pinned"
+  ],
+  "git_metadata": "GIT_DIR points to existing repository metadata only for local git archive/rev-parse; no branch, worktree or checkout changes"
+}

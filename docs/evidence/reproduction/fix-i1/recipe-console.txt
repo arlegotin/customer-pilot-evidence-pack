@@ -1,0 +1,47 @@
+clean: /Users/artemlegotin/anaconda3/bin/python -c 'import os,socket,subprocess,sys
+for name,action in [('"'"'dns'"'"',lambda:socket.getaddrinfo('"'"'example.com'"'"',443)),('"'"'connect'"'"',lambda:socket.create_connection(('"'"'127.0.0.1'"'"',9))),('"'"'external'"'"',lambda:subprocess.run(['"'"'/usr/bin/curl'"'"','"'"'https://example.com'"'"']))]:
+ try: action()
+ except RuntimeError as e:
+  assert '"'"'Task 9 offline guard'"'"' in str(e); print(name+'"'"': '"'"'+str(e))
+ else: raise AssertionError(name+'"'"' escaped guard'"'"')
+p=subprocess.run([sys.executable,'"'"'-c'"'"',"import socket; socket.getaddrinfo('"'"'example.com'"'"',443)"],env={'"'"'PATH'"'"':os.environ['"'"'PATH'"'"']},capture_output=True,text=True)
+assert p.returncode!=0 and '"'"'Task 9 offline guard'"'"' in p.stderr
+print('"'"'nested child with replacement environment: DNS denied'"'"')
+' -> 0
+clean: /Users/artemlegotin/anaconda3/bin/python -m venv .cache/native-venv -> 0
+clean: /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8/.cache/native-venv/bin/python -m pip install --no-index --no-cache-dir --find-links .cache/wheels --require-hashes -r reference/native-requirements.txt -> 0
+clean: /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8/.cache/native-venv/bin/python -c 'import importlib.metadata,json,sys; print(json.dumps({"python":sys.version,"packages":{d.metadata["Name"]:d.version for d in importlib.metadata.distributions()}}))' -> 0
+workspace: /Users/artemlegotin/anaconda3/bin/python -m pilotpack freeze --adapter needle-scholar --input fixtures/real/packet-a --config fixtures/config/packet-a.json --protocol protocol.json --sources sources.json --out runs/task9-packet-a -> 0
+workspace: /Users/artemlegotin/anaconda3/bin/python -m pilotpack evaluate --run runs/task9-packet-a --out build/task9-packet-a -> 3
+workspace: /Users/artemlegotin/anaconda3/bin/python -m pilotpack report --run runs/task9-packet-a --evaluation build/task9-packet-a/evaluation.json --out build/task9-packet-a -> 3
+workspace: /Users/artemlegotin/anaconda3/bin/python reference/oracle.py --run runs/task9-packet-a -> 0
+workspace: /Users/artemlegotin/anaconda3/bin/python reference/prepare_packet.py --input fixtures/real/packet-a --config fixtures/config/packet-a.json --out reference/runs/task9-reproduction-a -> 0
+workspace: /Users/artemlegotin/anaconda3/bin/python reference/oracle.py --run reference/runs/task9-reproduction-a -> 0
+workspace: /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8/.cache/native-venv/bin/python reference/needle_replay.py --packet fixtures/real/packet-a --checkout /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8/.cache/needle-pinned --out /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-corrected-root-5_9oae4q/build/task9-reference/a/native-replayed.json -> 0
+workspace: /Users/artemlegotin/anaconda3/bin/python -c 'import hashlib,json,sys; from pathlib import Path; from pilotpack.ledger import normalized_digest,read_records; p=Path(sys.argv[1]); print(json.dumps({"digest":normalized_digest(p),"normalized_records_sha256":hashlib.sha256(json.dumps(read_records(p),sort_keys=True,separators=(",",":")).encode()).hexdigest()},sort_keys=True))' runs/task9-packet-a/ledger.sqlite -> 0
+workspace: /Users/artemlegotin/anaconda3/bin/python -m pilotpack freeze --adapter needle-scholar --input fixtures/real/packet-b --config fixtures/config/packet-b.json --protocol protocol.json --sources sources.json --out runs/task9-packet-b -> 0
+workspace: /Users/artemlegotin/anaconda3/bin/python -m pilotpack evaluate --run runs/task9-packet-b --out build/task9-packet-b -> 3
+workspace: /Users/artemlegotin/anaconda3/bin/python -m pilotpack report --run runs/task9-packet-b --evaluation build/task9-packet-b/evaluation.json --out build/task9-packet-b -> 3
+workspace: /Users/artemlegotin/anaconda3/bin/python reference/oracle.py --run runs/task9-packet-b -> 0
+workspace: /Users/artemlegotin/anaconda3/bin/python reference/prepare_packet.py --input fixtures/real/packet-b --config fixtures/config/packet-b.json --out reference/runs/task9-reproduction-b -> 0
+workspace: /Users/artemlegotin/anaconda3/bin/python reference/oracle.py --run reference/runs/task9-reproduction-b -> 0
+workspace: /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8/.cache/native-venv/bin/python reference/needle_replay.py --packet fixtures/real/packet-b --checkout /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8/.cache/needle-pinned --out /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-corrected-root-5_9oae4q/build/task9-reference/b/native-replayed.json -> 0
+workspace: /Users/artemlegotin/anaconda3/bin/python -c 'import hashlib,json,sys; from pathlib import Path; from pilotpack.ledger import normalized_digest,read_records; p=Path(sys.argv[1]); print(json.dumps({"digest":normalized_digest(p),"normalized_records_sha256":hashlib.sha256(json.dumps(read_records(p),sort_keys=True,separators=(",",":")).encode()).hexdigest()},sort_keys=True))' runs/task9-packet-b/ledger.sqlite -> 0
+clean: /Users/artemlegotin/anaconda3/bin/python -m pilotpack freeze --adapter needle-scholar --input fixtures/real/packet-a --config fixtures/config/packet-a.json --protocol protocol.json --sources sources.json --out runs/task9-packet-a -> 0
+clean: /Users/artemlegotin/anaconda3/bin/python -m pilotpack evaluate --run runs/task9-packet-a --out build/task9-packet-a -> 3
+clean: /Users/artemlegotin/anaconda3/bin/python -m pilotpack report --run runs/task9-packet-a --evaluation build/task9-packet-a/evaluation.json --out build/task9-packet-a -> 3
+clean: /Users/artemlegotin/anaconda3/bin/python reference/oracle.py --run runs/task9-packet-a -> 0
+clean: /Users/artemlegotin/anaconda3/bin/python reference/prepare_packet.py --input fixtures/real/packet-a --config fixtures/config/packet-a.json --out reference/runs/task9-reproduction-a -> 0
+clean: /Users/artemlegotin/anaconda3/bin/python reference/oracle.py --run reference/runs/task9-reproduction-a -> 0
+clean: /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8/.cache/native-venv/bin/python reference/needle_replay.py --packet fixtures/real/packet-a --checkout /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8/.cache/needle-pinned --out /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8/build/task9-reference/a/native-replayed.json -> 0
+clean: /Users/artemlegotin/anaconda3/bin/python -c 'import hashlib,json,sys; from pathlib import Path; from pilotpack.ledger import normalized_digest,read_records; p=Path(sys.argv[1]); print(json.dumps({"digest":normalized_digest(p),"normalized_records_sha256":hashlib.sha256(json.dumps(read_records(p),sort_keys=True,separators=(",",":")).encode()).hexdigest()},sort_keys=True))' runs/task9-packet-a/ledger.sqlite -> 0
+clean: /Users/artemlegotin/anaconda3/bin/python -m pilotpack freeze --adapter needle-scholar --input fixtures/real/packet-b --config fixtures/config/packet-b.json --protocol protocol.json --sources sources.json --out runs/task9-packet-b -> 0
+clean: /Users/artemlegotin/anaconda3/bin/python -m pilotpack evaluate --run runs/task9-packet-b --out build/task9-packet-b -> 3
+clean: /Users/artemlegotin/anaconda3/bin/python -m pilotpack report --run runs/task9-packet-b --evaluation build/task9-packet-b/evaluation.json --out build/task9-packet-b -> 3
+clean: /Users/artemlegotin/anaconda3/bin/python reference/oracle.py --run runs/task9-packet-b -> 0
+clean: /Users/artemlegotin/anaconda3/bin/python reference/prepare_packet.py --input fixtures/real/packet-b --config fixtures/config/packet-b.json --out reference/runs/task9-reproduction-b -> 0
+clean: /Users/artemlegotin/anaconda3/bin/python reference/oracle.py --run reference/runs/task9-reproduction-b -> 0
+clean: /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8/.cache/native-venv/bin/python reference/needle_replay.py --packet fixtures/real/packet-b --checkout /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8/.cache/needle-pinned --out /private/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-clean-p5i8cys8/build/task9-reference/b/native-replayed.json -> 0
+clean: /Users/artemlegotin/anaconda3/bin/python -c 'import hashlib,json,sys; from pathlib import Path; from pilotpack.ledger import normalized_digest,read_records; p=Path(sys.argv[1]); print(json.dumps({"digest":normalized_digest(p),"normalized_records_sha256":hashlib.sha256(json.dumps(read_records(p),sort_keys=True,separators=(",",":")).encode()).hexdigest()},sort_keys=True))' runs/task9-packet-b/ledger.sqlite -> 0
+clean: /Users/artemlegotin/anaconda3/bin/python -m unittest discover -s tests -v -> 0
+PASS: all stable records/digests/output bytes reproduced;190 tests; A/B oracle and native checks.

@@ -1,0 +1,4 @@
+dns: Task 9 offline guard denied socket.getaddrinfo
+connect: Task 9 offline guard denied socket.getaddrinfo
+external: Task 9 offline guard denied non-Python subprocess
+nested child with replacement environment: DNS denied

@@ -1,0 +1,166 @@
+{
+  "environment": {
+    "python": "3.11.5 | packaged by conda-forge | (main, Aug 27 2023, 03:33:12) [Clang 15.0.7 ]",
+    "platform": [
+      "Darwin",
+      "Artems-MacBook-Pro.local",
+      "25.6.0",
+      "Darwin Kernel Version 25.6.0: Tue Aug 18 17:51:35 PDT 2026; root:xnu-12377.161.15.700.19~2/RELEASE_ARM64_T6031",
+      "arm64"
+    ]
+  },
+  "packets": {
+    "a": {
+      "workspace": {
+        "tasks": 324,
+        "groups": 81,
+        "exact_rank_comparisons": 972,
+        "max_native_oracle_metric_difference": 2.220446049250313e-16,
+        "all_reference_checks": "passed",
+        "requested_pair": "blocked",
+        "decisions": "descriptive_only",
+        "normalized_table_digest": "24ab0f36e7da4ad81ae862b6ff31f204e3cba5e34b9f8d01c843ed8f4c80e98d",
+        "canonical_file_sha256": {
+          "tasks.jsonl": "820e930faf0f1c8b780f2e7dc634f659b66b6e914c59ff675ab1d57eb68b9c5d",
+          "assignments.jsonl": "0f8ff98c012907a8023e4994df6c630ab4d4c8542cd0ada7c97a18473f8bd7ee",
+          "outcomes.jsonl": "79c75d8790c7a1ad1ab811d873934016aef0b909ad58b29aefacef25a438e527",
+          "attempts.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "packet.json": "48e3e268dfb572b76ca931938d5dd1f87f242faa68188494c2e6e0f8f21d80a0",
+          "sources.json": "6bc670c5840a91515938487a9b3b59b818b121f3bd192ff2618107f4fe43987a",
+          "protocol.json": "181528681dd8fa9bf27016bf442bf1f2ff9c8fbb6034d61002b99dc9a0f1431b"
+        },
+        "output_sha256": {
+          "evaluation.json": "5331a387fe9d7e43aa424157b6f3842e287f99ab57d95f4b615c3cdfb6a2e4ab",
+          "verdict.json": "99357ffc34dcd80448b0d9e4f3478b46b8c4c74e6ae64aabf800714260a849fe",
+          "report.html": "74c46c43e75e53fd394966c35944e81d26b4f5b5d75dde40c873be83301cf801"
+        },
+        "reference_file_sha256": {
+          "oracle-cli.json": "8075b12275857950e1315f718d3b4c716a9186bcdb98ef3cfe1b2cb9af96c897",
+          "reference-oracle.json": "8075b12275857950e1315f718d3b4c716a9186bcdb98ef3cfe1b2cb9af96c897",
+          "native-replayed.json": "44930c530bb0351753eb0879b9b131c3d7f4d18aca4dfae7545c771d0d0dd9ac"
+        },
+        "content_id": "f521cf2886cd16badbaa7ba00a572bccac91d4e5de41becde4e2f0d85da81152",
+        "normalized_records_sha256": "c959a5a79ef3d70c592136a022a793a4babdf270cb156def3c86c2707df5ce99"
+      },
+      "clean": {
+        "tasks": 324,
+        "groups": 81,
+        "exact_rank_comparisons": 972,
+        "max_native_oracle_metric_difference": 2.220446049250313e-16,
+        "all_reference_checks": "passed",
+        "requested_pair": "blocked",
+        "decisions": "descriptive_only",
+        "normalized_table_digest": "24ab0f36e7da4ad81ae862b6ff31f204e3cba5e34b9f8d01c843ed8f4c80e98d",
+        "canonical_file_sha256": {
+          "tasks.jsonl": "820e930faf0f1c8b780f2e7dc634f659b66b6e914c59ff675ab1d57eb68b9c5d",
+          "assignments.jsonl": "0f8ff98c012907a8023e4994df6c630ab4d4c8542cd0ada7c97a18473f8bd7ee",
+          "outcomes.jsonl": "79c75d8790c7a1ad1ab811d873934016aef0b909ad58b29aefacef25a438e527",
+          "attempts.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "packet.json": "48e3e268dfb572b76ca931938d5dd1f87f242faa68188494c2e6e0f8f21d80a0",
+          "sources.json": "6bc670c5840a91515938487a9b3b59b818b121f3bd192ff2618107f4fe43987a",
+          "protocol.json": "181528681dd8fa9bf27016bf442bf1f2ff9c8fbb6034d61002b99dc9a0f1431b"
+        },
+        "output_sha256": {
+          "evaluation.json": "5331a387fe9d7e43aa424157b6f3842e287f99ab57d95f4b615c3cdfb6a2e4ab",
+          "verdict.json": "99357ffc34dcd80448b0d9e4f3478b46b8c4c74e6ae64aabf800714260a849fe",
+          "report.html": "74c46c43e75e53fd394966c35944e81d26b4f5b5d75dde40c873be83301cf801"
+        },
+        "reference_file_sha256": {
+          "oracle-cli.json": "8075b12275857950e1315f718d3b4c716a9186bcdb98ef3cfe1b2cb9af96c897",
+          "reference-oracle.json": "8075b12275857950e1315f718d3b4c716a9186bcdb98ef3cfe1b2cb9af96c897",
+          "native-replayed.json": "44930c530bb0351753eb0879b9b131c3d7f4d18aca4dfae7545c771d0d0dd9ac"
+        },
+        "content_id": "f521cf2886cd16badbaa7ba00a572bccac91d4e5de41becde4e2f0d85da81152",
+        "normalized_records_sha256": "c959a5a79ef3d70c592136a022a793a4babdf270cb156def3c86c2707df5ce99"
+      },
+      "identical_stable_results": true
+    },
+    "b": {
+      "workspace": {
+        "tasks": 328,
+        "groups": 82,
+        "exact_rank_comparisons": 984,
+        "max_native_oracle_metric_difference": 2.220446049250313e-16,
+        "all_reference_checks": "passed",
+        "requested_pair": "blocked",
+        "decisions": "descriptive_only",
+        "normalized_table_digest": "f85b7eac430daab07fc7382c534e38ed60f59d84bdb33a178b1aa6b1b5106a48",
+        "canonical_file_sha256": {
+          "tasks.jsonl": "f2040dff4f72f1770b01e7afefc68e4e838edac103d3a53237b164905bab545d",
+          "assignments.jsonl": "8300f91c9fcc5a7840eb3e9c558c9c64777a989af74575569922094eeae9f51d",
+          "outcomes.jsonl": "a0c3fef6495976a3812d8ced046b53f73676e8359da9b77e9246367cbf59400a",
+          "attempts.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "packet.json": "caea8b27871041394f7bc3a85c08d527a1e7450da0ae71f5117bc09fdc505485",
+          "sources.json": "bf79e33110f1d95860f6be33486cd6c5cbade9398100157345b8d5597207a594",
+          "protocol.json": "181528681dd8fa9bf27016bf442bf1f2ff9c8fbb6034d61002b99dc9a0f1431b"
+        },
+        "output_sha256": {
+          "evaluation.json": "4a740b9f583a253338c24294bf75d301e11f96d83fd0b7d187f20eb8583cca93",
+          "verdict.json": "52876f61e422d053dee1607d08bff27ec253db92b40db2fa718747de3f1975db",
+          "report.html": "91b374078bdbaf70cf7e1a380739aafb818ca56c267bdddc53697cfc1ae2fad9"
+        },
+        "reference_file_sha256": {
+          "oracle-cli.json": "572cf76b1aafd014912c2193a7369b44fc05567e4abb5980a7fbf14cd2f3a375",
+          "reference-oracle.json": "572cf76b1aafd014912c2193a7369b44fc05567e4abb5980a7fbf14cd2f3a375",
+          "native-replayed.json": "7aa55dd0329c3968d98741629c50052db11766a0ff1db6624619b15fc8429d45"
+        },
+        "content_id": "7173c4bba6b84b7ba1100776b448a8904eb5a8dae9ec65ec9c8fff9ceed65a97",
+        "normalized_records_sha256": "f10f0f5960ea27c6d9c1e026362c78f1e056acf5295d4f41d52af99d5a77c607"
+      },
+      "clean": {
+        "tasks": 328,
+        "groups": 82,
+        "exact_rank_comparisons": 984,
+        "max_native_oracle_metric_difference": 2.220446049250313e-16,
+        "all_reference_checks": "passed",
+        "requested_pair": "blocked",
+        "decisions": "descriptive_only",
+        "normalized_table_digest": "f85b7eac430daab07fc7382c534e38ed60f59d84bdb33a178b1aa6b1b5106a48",
+        "canonical_file_sha256": {
+          "tasks.jsonl": "f2040dff4f72f1770b01e7afefc68e4e838edac103d3a53237b164905bab545d",
+          "assignments.jsonl": "8300f91c9fcc5a7840eb3e9c558c9c64777a989af74575569922094eeae9f51d",
+          "outcomes.jsonl": "a0c3fef6495976a3812d8ced046b53f73676e8359da9b77e9246367cbf59400a",
+          "attempts.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "packet.json": "caea8b27871041394f7bc3a85c08d527a1e7450da0ae71f5117bc09fdc505485",
+          "sources.json": "bf79e33110f1d95860f6be33486cd6c5cbade9398100157345b8d5597207a594",
+          "protocol.json": "181528681dd8fa9bf27016bf442bf1f2ff9c8fbb6034d61002b99dc9a0f1431b"
+        },
+        "output_sha256": {
+          "evaluation.json": "4a740b9f583a253338c24294bf75d301e11f96d83fd0b7d187f20eb8583cca93",
+          "verdict.json": "52876f61e422d053dee1607d08bff27ec253db92b40db2fa718747de3f1975db",
+          "report.html": "91b374078bdbaf70cf7e1a380739aafb818ca56c267bdddc53697cfc1ae2fad9"
+        },
+        "reference_file_sha256": {
+          "oracle-cli.json": "572cf76b1aafd014912c2193a7369b44fc05567e4abb5980a7fbf14cd2f3a375",
+          "reference-oracle.json": "572cf76b1aafd014912c2193a7369b44fc05567e4abb5980a7fbf14cd2f3a375",
+          "native-replayed.json": "7aa55dd0329c3968d98741629c50052db11766a0ff1db6624619b15fc8429d45"
+        },
+        "content_id": "7173c4bba6b84b7ba1100776b448a8904eb5a8dae9ec65ec9c8fff9ceed65a97",
+        "normalized_records_sha256": "f10f0f5960ea27c6d9c1e026362c78f1e056acf5295d4f41d52af99d5a77c607"
+      },
+      "identical_stable_results": true
+    }
+  },
+  "network_guard": "inherited sitecustomize audit hook; network events and non-Python subprocesses denied",
+  "sqlite_bytes_compared": false,
+  "native_environment": {
+    "python": "3.11.5 | packaged by conda-forge | (main, Aug 27 2023, 03:33:12) [Clang 15.0.7 ]",
+    "packages": {
+      "httpcore": "1.0.9",
+      "setuptools": "65.5.0",
+      "h11": "0.16.0",
+      "pip": "23.2.1",
+      "certifi": "2026.7.22",
+      "httpx": "0.28.1",
+      "typing_extensions": "4.16.0",
+      "anyio": "4.15.1",
+      "idna": "3.20"
+    }
+  },
+  "full_suite": {
+    "tests": 190,
+    "exit": 0,
+    "skips": 0
+  },
+  "clean_export_commit": "2ba3888e549aeb6b3a68e5159d10433dbb6e6f71"
+}
