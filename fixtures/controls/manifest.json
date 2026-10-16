@@ -1,1 +1,258 @@
-{"controls": [{"allowed_codes": ["INCOMPLETE_COST"], "expected_limitations": ["SYNTHETIC_CONTROL", "MISSING_COST"], "expected_states": {"arms/a/F": 1, "arms/a/H": 1, "arms/a/M": 1, "arms/a/N": 3, "arms/a/U": 0, "arms/a/attempts/physical_attempt_count_exact": 3, "arms/a/cost/total": null, "arms/b/F": 1, "arms/b/H": 1, "arms/b/M": 1, "arms/b/N": 3, "arms/b/U": 0, "arms/b/attempts/physical_attempt_count_exact": 3, "arms/b/cost/total": null, "pairs/0/comparison_status": "eligible"}, "id": "H01", "name": "complete hit/miss/error accounting", "parent": "fixtures/controls/parent", "parent_sha256": "4eb8b6f2ce174d3876a333dbdad5a04ef08f32ba1eeaae12c53c0e7d2785a8b3", "required_stage": "compare"}, {"allowed_codes": ["INCOMPLETE_COST"], "expected_limitations": ["SYNTHETIC_CONTROL", "MISSING_COST"], "expected_states": {"arms/a/F": 1, "arms/a/H": 0, "arms/a/M": 1, "arms/a/N": 3, "arms/a/U": 1, "arms/a/attempts/physical_attempt_count_exact": 3, "arms/a/cost/total": null, "arms/a/unknown_reasons/completed_unknown": 1, "arms/b/F": 1, "arms/b/H": 1, "arms/b/M": 1, "arms/b/N": 3, "arms/b/U": 0, "arms/b/attempts/physical_attempt_count_exact": 3, "arms/b/cost/total": null, "pairs/0/comparison_status": "eligible"}, "id": "H02", "name": "completed unknown with intact dispatch", "parent": "fixtures/controls/parent", "parent_sha256": "4eb8b6f2ce174d3876a333dbdad5a04ef08f32ba1eeaae12c53c0e7d2785a8b3", "required_stage": "compare"}, {"allowed_codes": ["INCOMPLETE_COST", "UNKNOWN_ATTEMPT_HISTORY", "INCOMPLETE_PHYSICAL_HISTORY"], "expected_limitations": ["SYNTHETIC_CONTROL", "UNKNOWN_ATTEMPT_HISTORY", "MISSING_COST"], "expected_states": {"arms/a/F": 1, "arms/a/H": 1, "arms/a/M": 1, "arms/a/N": 3, "arms/a/U": 0, "arms/a/attempts/physical_attempt_count_exact": null, "arms/a/cost/total": null, "arms/b/F": 1, "arms/b/H": 1, "arms/b/M": 1, "arms/b/N": 3, "arms/b/U": 0, "arms/b/attempts/physical_attempt_count_exact": 3, "arms/b/cost/total": null, "pairs/0/comparison_status": "eligible"}, "id": "H03", "name": "documented unavailable archive physical history", "parent": "fixtures/controls/parent", "parent_sha256": "4eb8b6f2ce174d3876a333dbdad5a04ef08f32ba1eeaae12c53c0e7d2785a8b3", "required_stage": "compare"}, {"allowed_codes": ["INCOMPLETE_COST"], "expected_limitations": ["SYNTHETIC_CONTROL", "MISSING_COST"], "expected_states": {"arms/a/F": 1, "arms/a/H": 1, "arms/a/M": 1, "arms/a/N": 3, "arms/a/U": 0, "arms/a/attempts/physical_attempt_count_exact": 3, "arms/a/cost/total": null, "arms/b/F": 1, "arms/b/H": 1, "arms/b/M": 1, "arms/b/N": 3, "arms/b/U": 0, "arms/b/attempts/physical_attempt_count_exact": 3, "arms/b/cost/total": null, "pairs/0/comparison_status": "eligible"}, "id": "H04", "name": "missing cost", "parent": "fixtures/controls/parent", "parent_sha256": "4eb8b6f2ce174d3876a333dbdad5a04ef08f32ba1eeaae12c53c0e7d2785a8b3", "required_stage": "compare"}, {"allowed_codes": [], "expected_limitations": ["SYNTHETIC_CONTROL"], "expected_states": {"arms/a/F": 1, "arms/a/H": 1, "arms/a/M": 1, "arms/a/N": 3, "arms/a/U": 0, "arms/a/attempts/physical_attempt_count_exact": 3, "arms/a/cost/total": "0", "arms/b/F": 1, "arms/b/H": 1, "arms/b/M": 1, "arms/b/N": 3, "arms/b/U": 0, "arms/b/attempts/physical_attempt_count_exact": 3, "arms/b/cost/total": "0", "pairs/0/comparison_status": "eligible"}, "id": "H05", "name": "observed zero with exact receipt provenance", "parent": "fixtures/controls/parent", "parent_sha256": "4eb8b6f2ce174d3876a333dbdad5a04ef08f32ba1eeaae12c53c0e7d2785a8b3", "required_stage": "compare"}, {"allowed_codes": ["INCOMPLETE_COST"], "expected_limitations": ["SYNTHETIC_CONTROL", "MISSING_COST"], "expected_states": {"arms/a/F": 1, "arms/a/H": 1, "arms/a/M": 1, "arms/a/N": 3, "arms/a/U": 0, "arms/a/attempts/physical_attempt_count_exact": 3, "arms/a/cost/total": null, "arms/b/F": 1, "arms/b/H": 1, "arms/b/M": 1, "arms/b/N": 3, "arms/b/U": 0, "arms/b/attempts/physical_attempt_count_exact": 3, "arms/b/cost/total": null, "pairs/0/comparison_status": "eligible"}, "id": "H06", "name": "reordered JSON keys and independent record lines", "parent": "fixtures/controls/parent", "parent_sha256": "4eb8b6f2ce174d3876a333dbdad5a04ef08f32ba1eeaae12c53c0e7d2785a8b3", "required_stage": "compare"}, {"allowed_codes": ["INCOMPLETE_COST"], "expected_limitations": ["SYNTHETIC_CONTROL", "MISSING_COST"], "expected_states": {"arms/a/F": 1, "arms/a/H": 1, "arms/a/M": 1, "arms/a/N": 3, "arms/a/U": 0, "arms/a/attempts/physical_attempt_count_exact": 3, "arms/a/cost/total": null, "arms/b/F": 1, "arms/b/H": 1, "arms/b/M": 1, "arms/b/N": 3, "arms/b/U": 0, "arms/b/attempts/physical_attempt_count_exact": 3, "arms/b/cost/total": null, "pairs/0/comparison_status": "eligible"}, "id": "H07", "name": "same query text with distinct identities", "parent": "fixtures/controls/parent", "parent_sha256": "4eb8b6f2ce174d3876a333dbdad5a04ef08f32ba1eeaae12c53c0e7d2785a8b3", "required_stage": "compare"}, {"allowed_codes": ["INCOMPLETE_COST"], "expected_limitations": ["SYNTHETIC_CONTROL", "MISSING_COST"], "expected_states": {"arms/a/F": 1, "arms/a/H": 1, "arms/a/M": 1, "arms/a/N": 3, "arms/a/U": 0, "arms/a/attempts/physical_attempt_count_exact": 3, "arms/a/cost/total": null, "arms/b/F": 1, "arms/b/H": 1, "arms/b/M": 1, "arms/b/N": 3, "arms/b/U": 0, "arms/b/attempts/physical_attempt_count_exact": 3, "arms/b/cost/total": null, "native_metrics/ceilings/selected_engine_ultimate/recall_at_k": 0.3333333333333333, "pairs/0/comparison_status": "eligible"}, "id": "H08", "name": "declared per-arm modes and native ultimate ceiling", "parent": "fixtures/controls/parent", "parent_sha256": "4eb8b6f2ce174d3876a333dbdad5a04ef08f32ba1eeaae12c53c0e7d2785a8b3", "required_stage": "compare"}], "denominator": 8, "maximum_unexpected_controls": 0, "protocol_id": "protected-validation-v1", "schema_version": 1}
+{
+  "controls": [
+    {
+      "allowed_codes": [
+        "INCOMPLETE_COST"
+      ],
+      "expected_limitations": [
+        "SYNTHETIC_CONTROL",
+        "MISSING_COST"
+      ],
+      "expected_states": {
+        "arms/a/F": 1,
+        "arms/a/H": 2,
+        "arms/a/M": 1,
+        "arms/a/N": 4,
+        "arms/a/U": 0,
+        "arms/a/attempts/physical_attempt_count_exact": 4,
+        "arms/a/cost/total": null,
+        "arms/b/F": 1,
+        "arms/b/H": 2,
+        "arms/b/M": 1,
+        "arms/b/N": 4,
+        "arms/b/U": 0,
+        "arms/b/attempts/physical_attempt_count_exact": 4,
+        "arms/b/cost/total": null,
+        "pairs/0/comparison_status": "eligible"
+      },
+      "id": "H01",
+      "name": "complete hit/miss/error accounting",
+      "parent": "fixtures/controls/parent-v2",
+      "parent_sha256": "4aa79986df41fcded1afe9ec7303bd5dc1f1b9f8c254006b0e3e4b1c008f2072",
+      "required_stage": "compare"
+    },
+    {
+      "allowed_codes": [
+        "INCOMPLETE_COST"
+      ],
+      "expected_limitations": [
+        "SYNTHETIC_CONTROL",
+        "MISSING_COST"
+      ],
+      "expected_states": {
+        "arms/a/F": 1,
+        "arms/a/H": 1,
+        "arms/a/M": 1,
+        "arms/a/N": 4,
+        "arms/a/U": 1,
+        "arms/a/attempts/physical_attempt_count_exact": 4,
+        "arms/a/cost/total": null,
+        "arms/a/unknown_reasons/completed_unknown": 1,
+        "arms/b/F": 1,
+        "arms/b/H": 2,
+        "arms/b/M": 1,
+        "arms/b/N": 4,
+        "arms/b/U": 0,
+        "arms/b/attempts/physical_attempt_count_exact": 4,
+        "arms/b/cost/total": null,
+        "pairs/0/comparison_status": "eligible"
+      },
+      "id": "H02",
+      "name": "completed unknown with intact dispatch",
+      "parent": "fixtures/controls/parent-v2",
+      "parent_sha256": "4aa79986df41fcded1afe9ec7303bd5dc1f1b9f8c254006b0e3e4b1c008f2072",
+      "required_stage": "compare"
+    },
+    {
+      "allowed_codes": [
+        "INCOMPLETE_COST",
+        "UNKNOWN_ATTEMPT_HISTORY",
+        "INCOMPLETE_PHYSICAL_HISTORY"
+      ],
+      "expected_limitations": [
+        "SYNTHETIC_CONTROL",
+        "UNKNOWN_ATTEMPT_HISTORY",
+        "MISSING_COST"
+      ],
+      "expected_states": {
+        "arms/a/F": 1,
+        "arms/a/H": 2,
+        "arms/a/M": 1,
+        "arms/a/N": 4,
+        "arms/a/U": 0,
+        "arms/a/attempts/physical_attempt_count_exact": null,
+        "arms/a/cost/total": null,
+        "arms/b/F": 1,
+        "arms/b/H": 2,
+        "arms/b/M": 1,
+        "arms/b/N": 4,
+        "arms/b/U": 0,
+        "arms/b/attempts/physical_attempt_count_exact": 4,
+        "arms/b/cost/total": null,
+        "pairs/0/comparison_status": "eligible"
+      },
+      "id": "H03",
+      "name": "documented unavailable archive physical history",
+      "parent": "fixtures/controls/parent-v2",
+      "parent_sha256": "4aa79986df41fcded1afe9ec7303bd5dc1f1b9f8c254006b0e3e4b1c008f2072",
+      "required_stage": "compare"
+    },
+    {
+      "allowed_codes": [
+        "INCOMPLETE_COST"
+      ],
+      "expected_limitations": [
+        "SYNTHETIC_CONTROL",
+        "MISSING_COST"
+      ],
+      "expected_states": {
+        "arms/a/F": 1,
+        "arms/a/H": 2,
+        "arms/a/M": 1,
+        "arms/a/N": 4,
+        "arms/a/U": 0,
+        "arms/a/attempts/physical_attempt_count_exact": 4,
+        "arms/a/cost/total": null,
+        "arms/b/F": 1,
+        "arms/b/H": 2,
+        "arms/b/M": 1,
+        "arms/b/N": 4,
+        "arms/b/U": 0,
+        "arms/b/attempts/physical_attempt_count_exact": 4,
+        "arms/b/cost/total": null,
+        "pairs/0/comparison_status": "eligible"
+      },
+      "id": "H04",
+      "name": "missing cost",
+      "parent": "fixtures/controls/parent-v2",
+      "parent_sha256": "4aa79986df41fcded1afe9ec7303bd5dc1f1b9f8c254006b0e3e4b1c008f2072",
+      "required_stage": "compare"
+    },
+    {
+      "allowed_codes": [],
+      "expected_limitations": [
+        "SYNTHETIC_CONTROL"
+      ],
+      "expected_states": {
+        "arms/a/F": 1,
+        "arms/a/H": 2,
+        "arms/a/M": 1,
+        "arms/a/N": 4,
+        "arms/a/U": 0,
+        "arms/a/attempts/physical_attempt_count_exact": 4,
+        "arms/a/cost/total": "0",
+        "arms/b/F": 1,
+        "arms/b/H": 2,
+        "arms/b/M": 1,
+        "arms/b/N": 4,
+        "arms/b/U": 0,
+        "arms/b/attempts/physical_attempt_count_exact": 4,
+        "arms/b/cost/total": "0",
+        "pairs/0/comparison_status": "eligible"
+      },
+      "id": "H05",
+      "name": "observed zero with exact receipt provenance",
+      "parent": "fixtures/controls/parent-v2",
+      "parent_sha256": "4aa79986df41fcded1afe9ec7303bd5dc1f1b9f8c254006b0e3e4b1c008f2072",
+      "required_stage": "compare"
+    },
+    {
+      "allowed_codes": [
+        "INCOMPLETE_COST"
+      ],
+      "expected_limitations": [
+        "SYNTHETIC_CONTROL",
+        "MISSING_COST"
+      ],
+      "expected_states": {
+        "arms/a/F": 1,
+        "arms/a/H": 2,
+        "arms/a/M": 1,
+        "arms/a/N": 4,
+        "arms/a/U": 0,
+        "arms/a/attempts/physical_attempt_count_exact": 4,
+        "arms/a/cost/total": null,
+        "arms/b/F": 1,
+        "arms/b/H": 2,
+        "arms/b/M": 1,
+        "arms/b/N": 4,
+        "arms/b/U": 0,
+        "arms/b/attempts/physical_attempt_count_exact": 4,
+        "arms/b/cost/total": null,
+        "pairs/0/comparison_status": "eligible"
+      },
+      "id": "H06",
+      "name": "reordered JSON keys and independent record lines",
+      "parent": "fixtures/controls/parent-v2",
+      "parent_sha256": "4aa79986df41fcded1afe9ec7303bd5dc1f1b9f8c254006b0e3e4b1c008f2072",
+      "required_stage": "compare"
+    },
+    {
+      "allowed_codes": [
+        "INCOMPLETE_COST"
+      ],
+      "expected_limitations": [
+        "SYNTHETIC_CONTROL",
+        "MISSING_COST"
+      ],
+      "expected_states": {
+        "arms/a/F": 1,
+        "arms/a/H": 2,
+        "arms/a/M": 1,
+        "arms/a/N": 4,
+        "arms/a/U": 0,
+        "arms/a/attempts/physical_attempt_count_exact": 4,
+        "arms/a/cost/total": null,
+        "arms/b/F": 1,
+        "arms/b/H": 2,
+        "arms/b/M": 1,
+        "arms/b/N": 4,
+        "arms/b/U": 0,
+        "arms/b/attempts/physical_attempt_count_exact": 4,
+        "arms/b/cost/total": null,
+        "pairs/0/comparison_status": "eligible"
+      },
+      "id": "H07",
+      "name": "same query text with distinct identities",
+      "parent": "fixtures/controls/parent-v2",
+      "parent_sha256": "4aa79986df41fcded1afe9ec7303bd5dc1f1b9f8c254006b0e3e4b1c008f2072",
+      "required_stage": "compare"
+    },
+    {
+      "allowed_codes": [
+        "INCOMPLETE_COST"
+      ],
+      "expected_limitations": [
+        "SYNTHETIC_CONTROL",
+        "MISSING_COST"
+      ],
+      "expected_states": {
+        "arms/a/F": 1,
+        "arms/a/H": 2,
+        "arms/a/M": 1,
+        "arms/a/N": 4,
+        "arms/a/U": 0,
+        "arms/a/attempts/physical_attempt_count_exact": 4,
+        "arms/a/cost/total": null,
+        "arms/b/F": 1,
+        "arms/b/H": 2,
+        "arms/b/M": 1,
+        "arms/b/N": 4,
+        "arms/b/U": 0,
+        "arms/b/attempts/physical_attempt_count_exact": 4,
+        "arms/b/cost/total": null,
+        "native_metrics/ceilings/selected_engine_ultimate/recall_at_k": 0.5,
+        "pairs/0/comparison_status": "eligible"
+      },
+      "id": "H08",
+      "name": "declared per-arm modes and native ultimate ceiling",
+      "parent": "fixtures/controls/parent-v2",
+      "parent_sha256": "4aa79986df41fcded1afe9ec7303bd5dc1f1b9f8c254006b0e3e4b1c008f2072",
+      "required_stage": "compare"
+    }
+  ],
+  "denominator": 8,
+  "maximum_unexpected_controls": 0,
+  "protocol_id": "protected-validation-v2",
+  "schema_version": 1
+}

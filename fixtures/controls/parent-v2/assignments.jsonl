@@ -1,0 +1,8 @@
+{"arm_id": "a", "assignment_id": "a:c1", "settings_id": "a", "source_ref": "src#$", "task_id": "c1"}
+{"arm_id": "a", "assignment_id": "a:c2", "settings_id": "a", "source_ref": "src#$", "task_id": "c2"}
+{"arm_id": "a", "assignment_id": "a:c3", "settings_id": "a", "source_ref": "src#$", "task_id": "c3"}
+{"arm_id": "a", "assignment_id": "a:c4", "settings_id": "a", "source_ref": "src#$", "task_id": "c4"}
+{"arm_id": "b", "assignment_id": "b:c1", "settings_id": "b", "source_ref": "src#$", "task_id": "c1"}
+{"arm_id": "b", "assignment_id": "b:c2", "settings_id": "b", "source_ref": "src#$", "task_id": "c2"}
+{"arm_id": "b", "assignment_id": "b:c3", "settings_id": "b", "source_ref": "src#$", "task_id": "c3"}
+{"arm_id": "b", "assignment_id": "b:c4", "settings_id": "b", "source_ref": "src#$", "task_id": "c4"}

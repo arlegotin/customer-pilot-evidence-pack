@@ -1,1 +1,104 @@
-{"actual_retry_policy": null, "adapter_profile": "needle-scholar-2026-10-14-v1", "arms": {"bing": {"concurrency": null, "endpoint": null, "k": 10, "matching_profile": "needle-scholar-73c7f810", "mode": null, "provider": "bing", "query_parameters": null, "requested_num_results": 10, "retry_policy": null, "run_window": null, "snippet_chars": 2000, "timeout_s": null}, "keenable": {"concurrency": null, "endpoint": null, "k": 10, "matching_profile": "needle-scholar-73c7f810", "mode": null, "provider": "keenable", "query_parameters": null, "requested_num_results": 10, "retry_policy": null, "run_window": null, "snippet_chars": 2000, "timeout_s": null}, "perplexity": {"concurrency": null, "endpoint": null, "k": 10, "matching_profile": "needle-scholar-73c7f810", "mode": null, "provider": "perplexity", "query_parameters": null, "requested_num_results": 10, "retry_policy": null, "run_window": null, "snippet_chars": 2000, "timeout_s": null}}, "assignment_basis": "reconstructed", "bootstrap": {"confidence": 0.95, "replicates": 2000, "seed": 0}, "comparison_blockers": ["UNKNOWN_ACTUAL_SETTINGS", "UNKNOWN_ACTUAL_RETRY_POLICY"], "comparison_window": null, "conversion_map_sha256": null, "corruption_manifest_sha256": "8c0d8866bc81080c04cf3147e1120b66fd3506c3dc1a12e739b3898c75cebfb4", "decision_criteria": {}, "k": 10, "matching_profile": "needle-scholar-73c7f810", "packets": {"packet-a": {"archive_run_id": "2026-10-14T1506Z", "cohort_selector": "gold.ids.arxiv present", "excluded_task_manifest": "fixtures/expected/packet-a-exclusions.json", "source_sha256": {"packet-a-bing": "c927e86a6207ea541b23f219d132509da6ab1c86c17488d0b2f0b3f7f72fab56", "packet-a-gold": "e6bc043e64122afe1d047fb539e45951f33a1a2480d29a1b52d97e00f54b5169", "packet-a-keenable": "fa7d6d01b929aa88a02529fd16f13ac3b2e6f4ed42dc8617f5ea359a6938df4e", "packet-a-perplexity": "0611f1bbef17fab477cb4d1efc497b32dad95fe787586936850202aa3f062c24", "packet-a-summary": "7b0f8e4ec06448cc66d95707001070b6596df728a3eaca78965d8af10fd9f029"}, "supported_source_group_count": 81, "supported_task_count": 324}, "packet-b": {"archive_run_id": "2026-10-15T1453Z", "cohort_selector": "gold.ids.arxiv present", "outcomes_inspected": false, "protected": true, "source_sha256": {"packet-b-bing": "8ee3a48e41e4452b9e9b638a065f376e6b9fad07725a3d15f3f5592588377374", "packet-b-gold": "97fa9a2c52902192bbe6a9dc5abc532643c94a2fd7c8cc5920e1ff97ffaf14cb", "packet-b-keenable": "a78f849ff83478a74f647b1dd2085354e361d37fa2b5fed223576bc2eb9b3af4", "packet-b-perplexity": "b880e9320731056469701f5da6a2e8c05fd30e81f7211b9a1bc7ef268745532c", "packet-b-summary": "98f0c117d4dbc62cf22e903f2b908a2ddfb398504d0d9999d0a4d57e1b6f891f"}}}, "protocol_id": "protected-validation-v1", "requested_comparisons": [{"arm_a": "bing", "arm_b": "keenable"}], "retry_selection": "archive_native_logical; physical history unknown", "schema_version": 1, "snippet_chars": 2000, "status": "protected-corruption-and-control-assets-frozen"}
+{
+  "actual_retry_policy": null,
+  "adapter_profile": "needle-scholar-2026-10-14-v1",
+  "arms": {
+    "bing": {
+      "concurrency": null,
+      "endpoint": null,
+      "k": 10,
+      "matching_profile": "needle-scholar-73c7f810",
+      "mode": null,
+      "provider": "bing",
+      "query_parameters": null,
+      "requested_num_results": 10,
+      "retry_policy": null,
+      "run_window": null,
+      "snippet_chars": 2000,
+      "timeout_s": null
+    },
+    "keenable": {
+      "concurrency": null,
+      "endpoint": null,
+      "k": 10,
+      "matching_profile": "needle-scholar-73c7f810",
+      "mode": null,
+      "provider": "keenable",
+      "query_parameters": null,
+      "requested_num_results": 10,
+      "retry_policy": null,
+      "run_window": null,
+      "snippet_chars": 2000,
+      "timeout_s": null
+    },
+    "perplexity": {
+      "concurrency": null,
+      "endpoint": null,
+      "k": 10,
+      "matching_profile": "needle-scholar-73c7f810",
+      "mode": null,
+      "provider": "perplexity",
+      "query_parameters": null,
+      "requested_num_results": 10,
+      "retry_policy": null,
+      "run_window": null,
+      "snippet_chars": 2000,
+      "timeout_s": null
+    }
+  },
+  "assignment_basis": "reconstructed",
+  "bootstrap": {
+    "confidence": 0.95,
+    "replicates": 2000,
+    "seed": 0
+  },
+  "comparison_blockers": [
+    "UNKNOWN_ACTUAL_SETTINGS",
+    "UNKNOWN_ACTUAL_RETRY_POLICY"
+  ],
+  "comparison_window": null,
+  "conversion_map_sha256": null,
+  "corruption_manifest_sha256": "8924c00d19e1262844834c9c2751e2058bdde1f3dc2a4726e6142567cd0e5e57",
+  "decision_criteria": {},
+  "k": 10,
+  "matching_profile": "needle-scholar-73c7f810",
+  "packets": {
+    "packet-a": {
+      "archive_run_id": "2026-10-14T1506Z",
+      "cohort_selector": "gold.ids.arxiv present",
+      "excluded_task_manifest": "fixtures/expected/packet-a-exclusions.json",
+      "source_sha256": {
+        "packet-a-bing": "c927e86a6207ea541b23f219d132509da6ab1c86c17488d0b2f0b3f7f72fab56",
+        "packet-a-gold": "e6bc043e64122afe1d047fb539e45951f33a1a2480d29a1b52d97e00f54b5169",
+        "packet-a-keenable": "fa7d6d01b929aa88a02529fd16f13ac3b2e6f4ed42dc8617f5ea359a6938df4e",
+        "packet-a-perplexity": "0611f1bbef17fab477cb4d1efc497b32dad95fe787586936850202aa3f062c24",
+        "packet-a-summary": "7b0f8e4ec06448cc66d95707001070b6596df728a3eaca78965d8af10fd9f029"
+      },
+      "supported_source_group_count": 81,
+      "supported_task_count": 324
+    },
+    "packet-b": {
+      "archive_run_id": "2026-10-15T1453Z",
+      "cohort_selector": "gold.ids.arxiv present",
+      "outcomes_inspected": false,
+      "protected": true,
+      "source_sha256": {
+        "packet-b-bing": "8ee3a48e41e4452b9e9b638a065f376e6b9fad07725a3d15f3f5592588377374",
+        "packet-b-gold": "97fa9a2c52902192bbe6a9dc5abc532643c94a2fd7c8cc5920e1ff97ffaf14cb",
+        "packet-b-keenable": "a78f849ff83478a74f647b1dd2085354e361d37fa2b5fed223576bc2eb9b3af4",
+        "packet-b-perplexity": "b880e9320731056469701f5da6a2e8c05fd30e81f7211b9a1bc7ef268745532c",
+        "packet-b-summary": "98f0c117d4dbc62cf22e903f2b908a2ddfb398504d0d9999d0a4d57e1b6f891f"
+      }
+    }
+  },
+  "protocol_id": "protected-validation-v2",
+  "requested_comparisons": [
+    {
+      "arm_a": "bing",
+      "arm_b": "keenable"
+    }
+  ],
+  "retry_selection": "archive_native_logical; physical history unknown",
+  "schema_version": 1,
+  "snippet_chars": 2000,
+  "status": "protected-corruption-and-control-assets-frozen"
+}

@@ -76,6 +76,8 @@ def apply_mutation(parent: Path, mutation_id: str, out: Path) -> Path:
     data = {name: [json.loads(s) for s in (out / (name + '.jsonl')).read_text().splitlines()]
             for name in ('tasks', 'assignments', 'outcomes', 'attempts')}
     tasks, assignments, outcomes, attempts = (data[n] for n in ('tasks','assignments','outcomes','attempts'))
+    first_id = tasks[0]['task_id']
+    first_aid = 'a:' + first_id
     ident = mutation_id
     if ident == 'C01':
         (out / 'raw/evidence.json').write_bytes(b'{"altered":true}\n')
@@ -85,14 +87,14 @@ def apply_mutation(parent: Path, mutation_id: str, out: Path) -> Path:
     elif ident == 'C04': outcomes.pop(0)
     elif ident == 'C05':
         tasks.append(dict(tasks[0], task_id='replacement', cohort_id='other-gold', gold_ids={'arxiv':['9999.99999']}))
-        assignments[3]['task_id'] = 'replacement'
+        next(row for row in assignments if row['arm_id']=='b' and row['task_id']==first_id)['task_id'] = 'replacement'
     elif ident in ('C06','C07','C08'):
         key,value = {'C06':('k',1),'C07':('snippet_chars',12),'C08':('mode','pro')}[ident]
         m['actual_settings']['a'][key] = value
         if ident == 'C06': m['actual_settings']['a']['requested_num_results'] = 1
     elif ident == 'C09':
-        outcomes[0].update(observation_kind='not_dispatched',terminal_status='runner_failure',selected_attempt_id=None,results=None,reported_hit_rank=None)
-        attempts[:] = [x for x in attempts if x['assignment_id'] != 'a:t1']
+        outcomes[0].update(observation_kind='not_dispatched',terminal_status='runner_failure',selected_attempt_id=None,results=[],reported_hit_rank=None)
+        attempts[:] = [x for x in attempts if x['assignment_id'] != first_aid]
     elif ident == 'C10':
         miss = dict(outcomes[0]['results'][0], url='https://example.org/unrelated')
         outcomes[1].update(results=[miss],reported_hit_rank=1)
@@ -126,7 +128,7 @@ def apply_mutation(parent: Path, mutation_id: str, out: Path) -> Path:
     elif ident == 'C17':
         tasks[0]['gold_ids']={'pmid':['12345678']}
         for row in outcomes + attempts:
-            if row['assignment_id'].endswith('t1'):
+            if row['assignment_id'].endswith(':'+first_id):
                 row['results']=[dict(outcomes[0]['results'][0],url='https://pmc.ncbi.nlm.nih.gov/articles/PMC12345/')]
                 if 'reported_hit_rank' in row: row['reported_hit_rank']=None
         p['conversion_map_sha256']='a'*64
@@ -152,7 +154,7 @@ def apply_mutation(parent: Path, mutation_id: str, out: Path) -> Path:
         inventory['sources'].append(dict(inventory['sources'][0],source_id='gold',local_path='raw/gold.jsonl',parents=['src']))
         write_json(out/'sources.json',inventory)
         for i,t in enumerate(tasks,1): t['source_ref']='gold#line='+str(i)
-        native=dict(discrepancies=[],num_queries=3,engines={a:dict(num_scored=3,recall_at_k=1/3,mrr_at_k=1/3,search_errors=1,per_query_hit_ranks=[1,None,None]) for a in 'ab'},selected_engine_ultimate=dict(recall_at_k=1/3,description='Synthetic native ultimate ceiling'))
+        native=dict(discrepancies=[],num_queries=4,engines={a:dict(num_scored=4,recall_at_k=0.5,mrr_at_k=0.5,search_errors=1,per_query_hit_ranks=[1,None,None,1]) for a in 'ab'},selected_engine_ultimate=dict(recall_at_k=0.5,description='Synthetic native ultimate ceiling'))
         _add_source(out,'native','raw/native.json',native,'native-baseline')
         m['extensions']={'native_profile':'needle-scholar-all-rows-v1','baseline_source_ids':{'native':'native'}}
     elif ident not in ('H01','H04','H07'): raise ValueError(ident)

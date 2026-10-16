@@ -1,0 +1,4 @@
+{"bucket": "title", "cohort_id": "small", "gold_ids": {"arxiv": ["1234.56789"]}, "query_text": "same text", "source_group_id": "reservation2-group1", "source_ref": "src#$", "task_id": "c1"}
+{"bucket": "title", "cohort_id": "small", "gold_ids": {"arxiv": ["1234.56789"]}, "query_text": "same text", "source_group_id": "reservation2-group2", "source_ref": "src#$", "task_id": "c2"}
+{"bucket": "title", "cohort_id": "small", "gold_ids": {"arxiv": ["1234.56789"]}, "query_text": "same text", "source_group_id": "reservation2-group3", "source_ref": "src#$", "task_id": "c3"}
+{"bucket": "title", "cohort_id": "small", "gold_ids": {"arxiv": ["1234.56789"]}, "query_text": "same text", "source_group_id": "reservation2-group4", "source_ref": "src#$", "task_id": "c4"}
