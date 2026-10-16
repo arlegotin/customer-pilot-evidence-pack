@@ -82,9 +82,18 @@ Extract the offline-baselines release asset before real-packet commands or the
 full suite: provenance requires its original NEEDLE source tar even when no
 native code is executed. The synthetic example above needs no external assets.
 The native-replay test additionally needs its isolated environment and explicitly
-skips without one. Release verification runs all 202 tests with zero skips.
+skips without one. The v0.1.0 release verified 202 tests; the [current candidate check](evidence/integrity-2026-10-16.md) verified 233, both with zero skips.
 For native setup and guarded clean replay, follow
 [offline reproduction](evidence/reproduction.md). The bundle supplies the exact
 source archive and seven wheels; replay makes no provider or judgment requests.
 Failed validation and separately reserved v2 remain in
 [validation](evidence/validation.md).
+
+## Prospective reviewer assessment
+
+[Workflow protocol v3](evidence/workflow-protocol-v3.md) defines the prerequisites
+and log format for a future authorized reviewer study. The separate
+`tools/workflow_study.py` CLI validates assignment/event/independent-grade logs
+and reports descriptive totals. Its synthetic tests are software checks, not
+observed operator timings. No reviewers or operating requirements are available;
+operational value is unassessed.

@@ -1,0 +1,475 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "77b6082a2aa9353e5536937eea50dea1d0111c75",
+  "candidate": {
+    "commit": "62b8789bcb5ef144b30f7e0172aff97c7654c8fa",
+    "tree": "18e11a2571f855b3803284ad2f23d7eddf076797",
+    "patch_sha256": "88e95b0ecf582e949626ba2f6ad67748d7a052cef55cd203f98357a91b7170c6",
+    "files": {
+      "pilotpack/__init__.py": "f0f507f47c795c942477703117dddf981ab4fc3b191d7dbbc70120e80248f940",
+      "pilotpack/__main__.py": "5621cbe78f560e830bf444aaf29fd8c5a2f65b73bbcbf5ccae4e2d733a6749e3",
+      "pilotpack/cli.py": "54e515ec31df915fd8d7287a47c0feb55c3d79401792c1c296f7fd2b467f5ea6",
+      "pilotpack/compare.py": "7edb4cc7da7c531baea229ad7e30b1c82ea35183421a69168b8b43ca05e0ad13",
+      "pilotpack/ingest.py": "239f06466377e9c2d28a879dd4e09e95774d5d82507ea44d59e73cb81000e185",
+      "pilotpack/ledger.py": "46ce306c16abf1d61c9f9aeec884049be01e0581f853981211b45d5de2282e4a",
+      "pilotpack/report.py": "e38612efd443b06ce1600a80504d244d767ea3c19b5fe2a4945519a83359339e",
+      "pilotpack/schema.py": "535f0cbe743f9cd8b43afb32e628f94a64a368cde7441090d39844630ffbe324",
+      "pilotpack/score.py": "0f171bbc39ac5448c2398380bc47a4f1fb656302389432a8509ef9296a42a466",
+      "reference/NEEDLE-LICENSE": "c506acdca35cf459d27cd2fbd81ce7cafdc6c009b46ab07aed2b911e8fc0ee62",
+      "reference/native-requirements.txt": "fed9648fb43cf6f220277d140e29b81838b5c90218992a7c1c564cf94e30cd71",
+      "reference/native-source-manifest.json": "fed284c3970fefd44f71d4e1db22b4518312675afde44b0a616830a1a01c0341",
+      "reference/needle_replay.py": "32e550fd18cee365e515affc298a200ba6b21e268eeb502d0d8f0d538d24f13d",
+      "reference/oracle.py": "3dddf29b4b4aab74bf2bd0d9177072c70fced76eea265d382fc4d97ad8e08a69",
+      "reference/prepare_packet.py": "f36e6e6854cbffb44001e575ae93db2ca73967f51be4d557d6f3fe0416cfc0b4",
+      "reference/retention-manifest.json": "dccfa1bc816fac74c7bcd8e15a33c41a7c912d9fe92420409ac09463d04c8678",
+      "tests/report_mutations.py": "5cc17adbb077f37e389d85e2378b4bbbc321bbf9c412f7c648b963f770be2c16",
+      "tests/support.py": "27cbd5d534ebbb678b50c31b78ac0c000a61086ac02ae866aae1754652293720",
+      "tests/test_cli.py": "2de0c4b36d9155e1405edd4782d4c3d3f986965b6dbba20cf4941c29f352bc8f",
+      "tests/test_compare.py": "e8d56f294b0f633034ecb8e64adb422fabb03383dc533efd784e7d307f61824f",
+      "tests/test_controls.py": "e72b75381b731e1a037798f98fec4014bbcfabf1ca239940e075d0a391a0286f",
+      "tests/test_corruptions.py": "7a36b58fc71ffeccd0ec652dac5b7eb2675a3494a51df8afdea18ba9c270ea38",
+      "tests/test_cost.py": "0148e247ad6b663481f5d4f1aed2c87b2214aabfc0fc1d8c8b77c7e046a73eff",
+      "tests/test_final_fixes.py": "728bace2d435eae73b5271e61d0e320a22eed7061d0cd73bcc6399cbd79aaffc",
+      "tests/test_ingest.py": "a1605b007484453844ea38132bbd4fe8eab167c8cab0851bb49c5ba2837cb244",
+      "tests/test_ledger.py": "633eb1462712390fe554d684858a1d8412c84b1df475497a686ffdbcdd4aec0b",
+      "tests/test_reference_baseline.py": "6906b507e1b12895859363ec434effbfe618702f6cb5b1a56a4867e657ac9c3b",
+      "tests/test_report.py": "d243bea7e4217b4e55c634d368b70bbdd178b45969fbe1bc84050b8a980dfe08",
+      "tests/test_schema.py": "463acac8a9a6cabd28e78fbfe24f7cc88c681da33a13ee0c7a1909837dff9782",
+      "tests/test_score.py": "c2e0e785ed8afc24b775459b99f446c0ef1b554eaf713b16dbab899e9f5a6200",
+      "tests/test_validation_diagnostics.py": "dc6f1dbb4a82d848aacd587f21bb6f445ffea47ee280acf6332bff584f85001b",
+      "tests/test_workflow_study.py": "0332585a633ac1107edd79afcf727de4fa181f24c14252f86a7f22d35e19f586",
+      "tools/workflow_study.py": "c3c6bd412de8ea9e880144bad1f4bc82a4e94fbbcaa3b954718f06e0e17368a5"
+    }
+  },
+  "statuses": {
+    "implementation": "completed within authorized technical/tooling scope",
+    "technical_correctness": "verified within described boundary",
+    "operational_results": "UNASSESSED; historical preparation experiment remains NEUTRAL",
+    "blocked_or_not_performed": [
+      "No authorized reviewers or operating requirements: formative/final human study not performed.",
+      "No measured reviewer workflow friction: no WP4 UI/orchestration redesign.",
+      "No browser/human visual smoke performed; automated HTML locality/escaping is separate.",
+      "No live provider collection or provider effectiveness study authorized/performed.",
+      "No new remote push or release publication performed."
+    ]
+  },
+  "native_revision": "73c7f810c57ad675609832bff0195efe5d5275cb",
+  "environment": {
+    "python": "3.11.5 | packaged by conda-forge | (main, Aug 27 2023, 03:33:12) [Clang 15.0.7 ]",
+    "os": [
+      "Darwin",
+      "Artems-MacBook-Pro.local",
+      "25.6.0",
+      "Darwin Kernel Version 25.6.0: Tue Aug 18 17:51:35 PDT 2026; root:xnu-12377.161.15.700.19~2/RELEASE_ARM64_T6031",
+      "arm64"
+    ],
+    "sqlite": "3.46.0"
+  },
+  "native_environment": {
+    "python": "3.11.5 | packaged by conda-forge | (main, Aug 27 2023, 03:33:12) [Clang 15.0.7 ]",
+    "packages": {
+      "httpcore": "1.0.9",
+      "setuptools": "65.5.0",
+      "h11": "0.16.0",
+      "pip": "23.2.1",
+      "certifi": "2026.7.22",
+      "httpx": "0.28.1",
+      "typing_extensions": "4.16.0",
+      "anyio": "4.15.1",
+      "idna": "3.20"
+    }
+  },
+  "baseline_suite": {
+    "tests": 202,
+    "skips": 0
+  },
+  "candidate_suite": {
+    "tests": 233,
+    "exit": 0,
+    "skips": 0
+  },
+  "candidate_commands": {
+    "count": 37,
+    "all_expected_exits": true,
+    "record": "build/investigation/acceptance-complete/command-log.json"
+  },
+  "historical_accounting": {
+    "a": {
+      "tasks": 324,
+      "groups": 81,
+      "ranks_checked": 972,
+      "max_metric_difference": 2.220446049250313e-16,
+      "counts": {
+        "bing": {
+          "N": 324,
+          "H": 157,
+          "M": 167,
+          "F": 0,
+          "U": 0
+        },
+        "keenable": {
+          "N": 324,
+          "H": 293,
+          "M": 31,
+          "F": 0,
+          "U": 0
+        },
+        "perplexity": {
+          "N": 324,
+          "H": 0,
+          "M": 0,
+          "F": 324,
+          "U": 0
+        }
+      },
+      "comparison": "blocked",
+      "costs": "unavailable",
+      "exact_attempts": "unavailable"
+    },
+    "b": {
+      "tasks": 328,
+      "groups": 82,
+      "ranks_checked": 984,
+      "max_metric_difference": 2.220446049250313e-16,
+      "counts": {
+        "bing": {
+          "N": 328,
+          "H": 155,
+          "M": 173,
+          "F": 0,
+          "U": 0
+        },
+        "keenable": {
+          "N": 328,
+          "H": 273,
+          "M": 55,
+          "F": 0,
+          "U": 0
+        },
+        "perplexity": {
+          "N": 328,
+          "H": 248,
+          "M": 80,
+          "F": 0,
+          "U": 0
+        }
+      },
+      "comparison": "blocked",
+      "costs": "unavailable",
+      "exact_attempts": "unavailable"
+    }
+  },
+  "deduplicated_coverage": {
+    "queries": 649,
+    "source_groups": 160,
+    "repeated_queries": 3,
+    "repeated_groups": 3,
+    "pooled_provider_comparison": false
+  },
+  "exclusions": {
+    "a": {
+      "raw": 384,
+      "supported_arxiv": 324,
+      "excluded_pmid": 60
+    },
+    "b": {
+      "raw": 384,
+      "supported_arxiv": 328,
+      "excluded_pmid": 56
+    }
+  },
+  "frozen_inputs_and_protected_evidence": {
+    "record": "build/investigation/unchanged-inputs.json",
+    "files": 76,
+    "all_match_baseline_git_blobs": true
+  },
+  "provider_comparisons": "Historical A/B Bing/Keenable comparisons remain blocked; actual settings/retry/window unknown; costs/exact physical counts unavailable; all decisions descriptive_only.",
+  "stable_reproduction": {
+    "a": {
+      "workspace": {
+        "tasks": 324,
+        "groups": 81,
+        "exact_rank_comparisons": 972,
+        "max_native_oracle_metric_difference": 2.220446049250313e-16,
+        "all_reference_checks": "passed",
+        "requested_pair": "blocked",
+        "decisions": "descriptive_only",
+        "normalized_table_digest": "24ab0f36e7da4ad81ae862b6ff31f204e3cba5e34b9f8d01c843ed8f4c80e98d",
+        "canonical_file_sha256": {
+          "tasks.jsonl": "820e930faf0f1c8b780f2e7dc634f659b66b6e914c59ff675ab1d57eb68b9c5d",
+          "assignments.jsonl": "0f8ff98c012907a8023e4994df6c630ab4d4c8542cd0ada7c97a18473f8bd7ee",
+          "outcomes.jsonl": "79c75d8790c7a1ad1ab811d873934016aef0b909ad58b29aefacef25a438e527",
+          "attempts.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "packet.json": "48e3e268dfb572b76ca931938d5dd1f87f242faa68188494c2e6e0f8f21d80a0",
+          "sources.json": "6bc670c5840a91515938487a9b3b59b818b121f3bd192ff2618107f4fe43987a",
+          "protocol.json": "181528681dd8fa9bf27016bf442bf1f2ff9c8fbb6034d61002b99dc9a0f1431b"
+        },
+        "output_sha256": {
+          "evaluation.json": "5331a387fe9d7e43aa424157b6f3842e287f99ab57d95f4b615c3cdfb6a2e4ab",
+          "verdict.json": "99357ffc34dcd80448b0d9e4f3478b46b8c4c74e6ae64aabf800714260a849fe",
+          "report.html": "74c46c43e75e53fd394966c35944e81d26b4f5b5d75dde40c873be83301cf801"
+        },
+        "reference_file_sha256": {
+          "oracle-cli.json": "8075b12275857950e1315f718d3b4c716a9186bcdb98ef3cfe1b2cb9af96c897",
+          "reference-oracle.json": "8075b12275857950e1315f718d3b4c716a9186bcdb98ef3cfe1b2cb9af96c897",
+          "native-replayed.json": "44930c530bb0351753eb0879b9b131c3d7f4d18aca4dfae7545c771d0d0dd9ac"
+        },
+        "content_id": "f521cf2886cd16badbaa7ba00a572bccac91d4e5de41becde4e2f0d85da81152",
+        "normalized_records_sha256": "c959a5a79ef3d70c592136a022a793a4babdf270cb156def3c86c2707df5ce99"
+      },
+      "clean": {
+        "tasks": 324,
+        "groups": 81,
+        "exact_rank_comparisons": 972,
+        "max_native_oracle_metric_difference": 2.220446049250313e-16,
+        "all_reference_checks": "passed",
+        "requested_pair": "blocked",
+        "decisions": "descriptive_only",
+        "normalized_table_digest": "24ab0f36e7da4ad81ae862b6ff31f204e3cba5e34b9f8d01c843ed8f4c80e98d",
+        "canonical_file_sha256": {
+          "tasks.jsonl": "820e930faf0f1c8b780f2e7dc634f659b66b6e914c59ff675ab1d57eb68b9c5d",
+          "assignments.jsonl": "0f8ff98c012907a8023e4994df6c630ab4d4c8542cd0ada7c97a18473f8bd7ee",
+          "outcomes.jsonl": "79c75d8790c7a1ad1ab811d873934016aef0b909ad58b29aefacef25a438e527",
+          "attempts.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "packet.json": "48e3e268dfb572b76ca931938d5dd1f87f242faa68188494c2e6e0f8f21d80a0",
+          "sources.json": "6bc670c5840a91515938487a9b3b59b818b121f3bd192ff2618107f4fe43987a",
+          "protocol.json": "181528681dd8fa9bf27016bf442bf1f2ff9c8fbb6034d61002b99dc9a0f1431b"
+        },
+        "output_sha256": {
+          "evaluation.json": "5331a387fe9d7e43aa424157b6f3842e287f99ab57d95f4b615c3cdfb6a2e4ab",
+          "verdict.json": "99357ffc34dcd80448b0d9e4f3478b46b8c4c74e6ae64aabf800714260a849fe",
+          "report.html": "74c46c43e75e53fd394966c35944e81d26b4f5b5d75dde40c873be83301cf801"
+        },
+        "reference_file_sha256": {
+          "oracle-cli.json": "8075b12275857950e1315f718d3b4c716a9186bcdb98ef3cfe1b2cb9af96c897",
+          "reference-oracle.json": "8075b12275857950e1315f718d3b4c716a9186bcdb98ef3cfe1b2cb9af96c897",
+          "native-replayed.json": "44930c530bb0351753eb0879b9b131c3d7f4d18aca4dfae7545c771d0d0dd9ac"
+        },
+        "content_id": "f521cf2886cd16badbaa7ba00a572bccac91d4e5de41becde4e2f0d85da81152",
+        "normalized_records_sha256": "c959a5a79ef3d70c592136a022a793a4babdf270cb156def3c86c2707df5ce99"
+      },
+      "identical_stable_results": true
+    },
+    "b": {
+      "workspace": {
+        "tasks": 328,
+        "groups": 82,
+        "exact_rank_comparisons": 984,
+        "max_native_oracle_metric_difference": 2.220446049250313e-16,
+        "all_reference_checks": "passed",
+        "requested_pair": "blocked",
+        "decisions": "descriptive_only",
+        "normalized_table_digest": "f85b7eac430daab07fc7382c534e38ed60f59d84bdb33a178b1aa6b1b5106a48",
+        "canonical_file_sha256": {
+          "tasks.jsonl": "f2040dff4f72f1770b01e7afefc68e4e838edac103d3a53237b164905bab545d",
+          "assignments.jsonl": "8300f91c9fcc5a7840eb3e9c558c9c64777a989af74575569922094eeae9f51d",
+          "outcomes.jsonl": "a0c3fef6495976a3812d8ced046b53f73676e8359da9b77e9246367cbf59400a",
+          "attempts.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "packet.json": "caea8b27871041394f7bc3a85c08d527a1e7450da0ae71f5117bc09fdc505485",
+          "sources.json": "bf79e33110f1d95860f6be33486cd6c5cbade9398100157345b8d5597207a594",
+          "protocol.json": "181528681dd8fa9bf27016bf442bf1f2ff9c8fbb6034d61002b99dc9a0f1431b"
+        },
+        "output_sha256": {
+          "evaluation.json": "4a740b9f583a253338c24294bf75d301e11f96d83fd0b7d187f20eb8583cca93",
+          "verdict.json": "52876f61e422d053dee1607d08bff27ec253db92b40db2fa718747de3f1975db",
+          "report.html": "91b374078bdbaf70cf7e1a380739aafb818ca56c267bdddc53697cfc1ae2fad9"
+        },
+        "reference_file_sha256": {
+          "oracle-cli.json": "572cf76b1aafd014912c2193a7369b44fc05567e4abb5980a7fbf14cd2f3a375",
+          "reference-oracle.json": "572cf76b1aafd014912c2193a7369b44fc05567e4abb5980a7fbf14cd2f3a375",
+          "native-replayed.json": "7aa55dd0329c3968d98741629c50052db11766a0ff1db6624619b15fc8429d45"
+        },
+        "content_id": "7173c4bba6b84b7ba1100776b448a8904eb5a8dae9ec65ec9c8fff9ceed65a97",
+        "normalized_records_sha256": "f10f0f5960ea27c6d9c1e026362c78f1e056acf5295d4f41d52af99d5a77c607"
+      },
+      "clean": {
+        "tasks": 328,
+        "groups": 82,
+        "exact_rank_comparisons": 984,
+        "max_native_oracle_metric_difference": 2.220446049250313e-16,
+        "all_reference_checks": "passed",
+        "requested_pair": "blocked",
+        "decisions": "descriptive_only",
+        "normalized_table_digest": "f85b7eac430daab07fc7382c534e38ed60f59d84bdb33a178b1aa6b1b5106a48",
+        "canonical_file_sha256": {
+          "tasks.jsonl": "f2040dff4f72f1770b01e7afefc68e4e838edac103d3a53237b164905bab545d",
+          "assignments.jsonl": "8300f91c9fcc5a7840eb3e9c558c9c64777a989af74575569922094eeae9f51d",
+          "outcomes.jsonl": "a0c3fef6495976a3812d8ced046b53f73676e8359da9b77e9246367cbf59400a",
+          "attempts.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "packet.json": "caea8b27871041394f7bc3a85c08d527a1e7450da0ae71f5117bc09fdc505485",
+          "sources.json": "bf79e33110f1d95860f6be33486cd6c5cbade9398100157345b8d5597207a594",
+          "protocol.json": "181528681dd8fa9bf27016bf442bf1f2ff9c8fbb6034d61002b99dc9a0f1431b"
+        },
+        "output_sha256": {
+          "evaluation.json": "4a740b9f583a253338c24294bf75d301e11f96d83fd0b7d187f20eb8583cca93",
+          "verdict.json": "52876f61e422d053dee1607d08bff27ec253db92b40db2fa718747de3f1975db",
+          "report.html": "91b374078bdbaf70cf7e1a380739aafb818ca56c267bdddc53697cfc1ae2fad9"
+        },
+        "reference_file_sha256": {
+          "oracle-cli.json": "572cf76b1aafd014912c2193a7369b44fc05567e4abb5980a7fbf14cd2f3a375",
+          "reference-oracle.json": "572cf76b1aafd014912c2193a7369b44fc05567e4abb5980a7fbf14cd2f3a375",
+          "native-replayed.json": "7aa55dd0329c3968d98741629c50052db11766a0ff1db6624619b15fc8429d45"
+        },
+        "content_id": "7173c4bba6b84b7ba1100776b448a8904eb5a8dae9ec65ec9c8fff9ceed65a97",
+        "normalized_records_sha256": "f10f0f5960ea27c6d9c1e026362c78f1e056acf5295d4f41d52af99d5a77c607"
+      },
+      "identical_stable_results": true
+    }
+  },
+  "baseline_candidate": {
+    "a": {
+      "frozen_non_sqlite_bytes_identical": true,
+      "normalized_ledger_digest": "24ab0f36e7da4ad81ae862b6ff31f204e3cba5e34b9f8d01c843ed8f4c80e98d",
+      "outputs_identical": true,
+      "outputs": {
+        "evaluation.json": {
+          "sha256": "5331a387fe9d7e43aa424157b6f3842e287f99ab57d95f4b615c3cdfb6a2e4ab",
+          "bytes": 7808902,
+          "baseline": "build/investigation/baseline/report-a/evaluation.json",
+          "candidate": "build/integrity-verified-packet-a/evaluation.json"
+        },
+        "verdict.json": {
+          "sha256": "99357ffc34dcd80448b0d9e4f3478b46b8c4c74e6ae64aabf800714260a849fe",
+          "bytes": 978354,
+          "baseline": "build/investigation/baseline/report-a/verdict.json",
+          "candidate": "build/integrity-verified-packet-a/verdict.json"
+        },
+        "report.html": {
+          "sha256": "74c46c43e75e53fd394966c35944e81d26b4f5b5d75dde40c873be83301cf801",
+          "bytes": 9396094,
+          "baseline": "build/investigation/baseline/report-a/report.html",
+          "candidate": "build/integrity-verified-packet-a/report.html"
+        }
+      },
+      "frozen_file_sha256": {
+        "sources.json": "6bc670c5840a91515938487a9b3b59b818b121f3bd192ff2618107f4fe43987a",
+        "assignments.jsonl": "0f8ff98c012907a8023e4994df6c630ab4d4c8542cd0ada7c97a18473f8bd7ee",
+        "packet.json": "48e3e268dfb572b76ca931938d5dd1f87f242faa68188494c2e6e0f8f21d80a0",
+        "outcomes.jsonl": "79c75d8790c7a1ad1ab811d873934016aef0b909ad58b29aefacef25a438e527",
+        "protocol.json": "181528681dd8fa9bf27016bf442bf1f2ff9c8fbb6034d61002b99dc9a0f1431b",
+        "tasks.jsonl": "820e930faf0f1c8b780f2e7dc634f659b66b6e914c59ff675ab1d57eb68b9c5d",
+        "attempts.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw/packet-a-summary.json": "7b0f8e4ec06448cc66d95707001070b6596df728a3eaca78965d8af10fd9f029",
+        "raw/baseline-check.json": "989b30a292d72fd37819432ef19cdd24c610d32889b49dcde5e8c3d8e670920b",
+        "raw/packet-a-gold.jsonl": "e6bc043e64122afe1d047fb539e45951f33a1a2480d29a1b52d97e00f54b5169",
+        "raw/needle-source.tar.gz": "a1ace5675418249a22f83707dbea296cbe3f858410b6941deb6c3f4c6f450975",
+        "raw/packet-a-keenable.json": "fa7d6d01b929aa88a02529fd16f13ac3b2e6f4ed42dc8617f5ea359a6938df4e",
+        "raw/exclusions.json": "18c55bbd1a9d24a3e3dd3d6d08781685fe3672781069e3f12493a2a569f701f5",
+        "raw/packet-a-bing.json": "c927e86a6207ea541b23f219d132509da6ab1c86c17488d0b2f0b3f7f72fab56",
+        "raw/normalization-input.json": "c31908d70d3f7d5a456b413d7801712619f65b2112d7db5e5fbbdd7307c1ed62",
+        "raw/metadata-packet-a-inventory.json.json": "4ebd6995c300a26a1308aede2c58c98ae38bfac4abc460b1872c4d5d8e4ff5e2",
+        "raw/baseline-oracle.json": "b7c0a086cea80021efd9562a2f0d8694c079a10730fb73b7949b58fca8237587",
+        "raw/baseline-native.json": "44930c530bb0351753eb0879b9b131c3d7f4d18aca4dfae7545c771d0d0dd9ac",
+        "raw/packet-a-perplexity.json": "0611f1bbef17fab477cb4d1efc497b32dad95fe787586936850202aa3f062c24"
+      }
+    },
+    "b": {
+      "frozen_non_sqlite_bytes_identical": true,
+      "normalized_ledger_digest": "f85b7eac430daab07fc7382c534e38ed60f59d84bdb33a178b1aa6b1b5106a48",
+      "outputs_identical": true,
+      "outputs": {
+        "evaluation.json": {
+          "sha256": "4a740b9f583a253338c24294bf75d301e11f96d83fd0b7d187f20eb8583cca93",
+          "bytes": 12164324,
+          "baseline": "build/investigation/baseline/report-b/evaluation.json",
+          "candidate": "build/integrity-verified-packet-b/evaluation.json"
+        },
+        "verdict.json": {
+          "sha256": "52876f61e422d053dee1607d08bff27ec253db92b40db2fa718747de3f1975db",
+          "bytes": 998806,
+          "baseline": "build/investigation/baseline/report-b/verdict.json",
+          "candidate": "build/integrity-verified-packet-b/verdict.json"
+        },
+        "report.html": {
+          "sha256": "91b374078bdbaf70cf7e1a380739aafb818ca56c267bdddc53697cfc1ae2fad9",
+          "bytes": 14219784,
+          "baseline": "build/investigation/baseline/report-b/report.html",
+          "candidate": "build/integrity-verified-packet-b/report.html"
+        }
+      },
+      "frozen_file_sha256": {
+        "sources.json": "bf79e33110f1d95860f6be33486cd6c5cbade9398100157345b8d5597207a594",
+        "assignments.jsonl": "8300f91c9fcc5a7840eb3e9c558c9c64777a989af74575569922094eeae9f51d",
+        "packet.json": "caea8b27871041394f7bc3a85c08d527a1e7450da0ae71f5117bc09fdc505485",
+        "outcomes.jsonl": "a0c3fef6495976a3812d8ced046b53f73676e8359da9b77e9246367cbf59400a",
+        "protocol.json": "181528681dd8fa9bf27016bf442bf1f2ff9c8fbb6034d61002b99dc9a0f1431b",
+        "tasks.jsonl": "f2040dff4f72f1770b01e7afefc68e4e838edac103d3a53237b164905bab545d",
+        "attempts.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw/baseline-packet-b-check.json": "302022dec68d6aed2f8141c0054bdd0888905b332ad5fea691c1328cf6b702b3",
+        "raw/packet-b-keenable.json": "a78f849ff83478a74f647b1dd2085354e361d37fa2b5fed223576bc2eb9b3af4",
+        "raw/packet-b-perplexity.json": "b880e9320731056469701f5da6a2e8c05fd30e81f7211b9a1bc7ef268745532c",
+        "raw/baseline-packet-b-native.json": "7aa55dd0329c3968d98741629c50052db11766a0ff1db6624619b15fc8429d45",
+        "raw/needle-source.tar.gz": "a1ace5675418249a22f83707dbea296cbe3f858410b6941deb6c3f4c6f450975",
+        "raw/baseline-packet-b-oracle.json": "572cf76b1aafd014912c2193a7369b44fc05567e4abb5980a7fbf14cd2f3a375",
+        "raw/exclusions.json": "6fd50c06da4286ca6b4f7725d71d42167151fd42b3456502c2b2c0faf612f384",
+        "raw/packet-b-gold.jsonl": "97fa9a2c52902192bbe6a9dc5abc532643c94a2fd7c8cc5920e1ff97ffaf14cb",
+        "raw/packet-b-bing.json": "8ee3a48e41e4452b9e9b638a065f376e6b9fad07725a3d15f3f5592588377374",
+        "raw/normalization-input.json": "f1c198cdef0c7553ff452e0b9c4cea389cf679b88819f1ca620876bff7a4ed6e",
+        "raw/metadata-packet-b-inventory.json.json": "35097b667c1bf6a3cdf83c2eb9e3a4374a7449058300d780579e706b8c61014c",
+        "raw/packet-b-summary.json": "98f0c117d4dbc62cf22e903f2b908a2ddfb398504d0d9999d0a4d57e1b6f891f"
+      }
+    }
+  },
+  "report_mutations": {
+    "known_development_recipes": 23,
+    "fresh_and_existing_destinations": 46,
+    "baseline_reproduced_acceptance": 46,
+    "candidate_rejected": 46,
+    "source": "tests/report_mutations.py",
+    "source_sha256": "5cc17adbb077f37e389d85e2378b4bbbc321bbf9c412f7c648b963f770be2c16",
+    "fresh_holdout": false,
+    "extra_checks": [
+      "source-path replacement after publication",
+      "strict JSON and nested overflow diagnostics",
+      "eligible, blocked, unrequested and arm-threshold-failure controls",
+      "alias rollback and final symlink refusal"
+    ]
+  },
+  "intermediate_results": [
+    {
+      "commit": "784b650a09e82d0fcaff014f1344d5bb6a3475ad",
+      "tests": 230,
+      "skips": 0,
+      "status": "passed; later publication alias defect independently found and fixed",
+      "record": "build/investigation/acceptance/results.json"
+    },
+    {
+      "commit": "a299aed32fd8623386a9ea0410b401a5c0099c44",
+      "tests": 233,
+      "skips": 0,
+      "status": "passed; later nested-overflow diagnostic refined without false publication",
+      "record": "build/investigation/acceptance-final/results.json"
+    }
+  ],
+  "development_failure_disclosure": "windows/full-suite.txt was a concurrent dirty-tree run during workflow-tool TDD: expected absent-tool failures, never accepted as a pass. Initial mutation, path, parsing and overflow failures remain retained.",
+  "review_records": [
+    "build/investigation/review-technical/summary.json",
+    "build/investigation/review-outcome/review-summary.json",
+    "build/investigation/review-execution/review-summary.json",
+    "build/investigation/review-execution/followup-a299aed/review-summary.json"
+  ],
+  "reviewer_value": {
+    "status": "UNASSESSED",
+    "source": "User: No reviewers or operating requirements available; proceed with technical work and tooling.",
+    "participants": null,
+    "operating_accuracy": null,
+    "turnaround": null,
+    "practical_improvement": null,
+    "human_events": null,
+    "final_holdout": null
+  },
+  "machine_latency_record": "build/investigation/latency.json",
+  "machine_latency_caveat": "One sequential baseline/candidate invocation per packet before alias/diagnostic followups; concurrent development activity possible. Descriptive machine observations only, not a controlled benchmark or human-work evidence.",
+  "threat_model": "Unchanged trusted code and trustworthy verified frozen inputs; no authenticity guarantee against replacement of all evidence/code. Ordinary native checks use retained sidecars; separate fresh native replay executed offline.",
+  "recipe": "Current documented prepare-clean/replay scripts, adapted only to NEW evidence/run/reference/output destinations. Preserved beside this manifest; candidate exported from committed HEAD, not dirty edits. Runtime/reference/test/tool bytes of later evidence-only commit must match candidate-code.json.",
+  "execution_records": {
+    "file": "execution-records.tar.gz",
+    "bytes": 581201,
+    "sha256": "88dd5908a01b814651a20932c21ee6288aef2731ea04e4e5fd0cc978f576323a",
+    "inventory": "archive-inventory.json",
+    "inventory_sha256": "66e54a8d7796c3a4e382c0d3e326d12f83955987520861d616b0ded85eb392b9",
+    "files": 121,
+    "verified_safe_members_and_all_lengths_and_hashes": true,
+    "excludes": "Large generated report/frozen-run copies and native environments/wheels; report hashes/paths are in manifest and committed raw inputs plus retained assets reproduce them."
+  }
+}

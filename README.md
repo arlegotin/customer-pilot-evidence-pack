@@ -6,9 +6,9 @@ You get `report.html`, a summary in `verdict.json`, and every assignment in `eva
 
 ## What the PoC found
 
-Two real packets cover **649 distinct queries and 160 source groups**. Supported scores agree with independent checks, and the reports reproduce offline. The suite passes 202 tests. Frozen validation v2 catches all 20 introduced faults, including 12 critical faults, with no unexpected findings in eight healthy controls. The failed first validation remains [recorded](docs/evidence/validation.md).
+Two real packets cover **649 distinct queries and 160 source groups**. Supported scores agree with independent checks, and the reports reproduce offline. The [current offline check](docs/evidence/integrity-2026-10-16.md) passes 233 tests, including rejection of edited report claims. Frozen validation v2 catches all 20 introduced faults, including 12 critical faults, with no unexpected findings in eight healthy controls. V2 reused known fault families after feedback; the failed first validation remains [recorded](docs/evidence/validation.md).
 
-**Preparation savings are unproven.** The existing baseline also handled the second packet through configuration. Both real provider comparisons are blocked because actual comparison conditions are missing. Exact request totals and costs remain unknown. These reports support no provider purchasing recommendation. See the [assessment](docs/evidence/poc-assessment.md).
+**The preparation experiment was neutral.** The existing baseline also handled the second packet through configuration. Reviewer time savings remain unassessed; no reviewer study has run. Both real provider comparisons are blocked because actual comparison conditions are missing. Exact request totals and costs remain unknown. These reports support no provider purchasing recommendation. See the [assessment](docs/evidence/poc-assessment.md).
 
 ## Try it
 
