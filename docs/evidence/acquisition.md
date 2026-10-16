@@ -1,5 +1,11 @@
 # Acquisition and gate
 
+This is the retained Task1 acquisition snapshot. Later [Task9 B release](packet-b-release.md)
+and [clean reproduction](reproduction.md) validate both packets and satisfy the
+deduplicated engineering counts; the original protection/gate statements below
+describe their historical stage. Provider comparisons remain blocked and the
+measured workflow outcome is [neutral](poc-assessment.md).
+
 Decision: **continue only the narrow accounting/replay PoC over the declared
 arXiv projection; block provider-comparison conclusions**. Acquisition is
 real and sufficient for that projection. It does not reproduce the complete

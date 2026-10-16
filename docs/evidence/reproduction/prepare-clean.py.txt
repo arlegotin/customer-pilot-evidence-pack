@@ -1,0 +1,29 @@
+import hashlib,io,json,shutil,subprocess,sys,tarfile,tempfile
+from pathlib import Path
+root=Path.cwd(); commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+clean=Path(tempfile.mkdtemp(prefix='pilotpack-task9-clean-'))
+archive=subprocess.check_output(['git','archive','--format=tar',commit])
+with tarfile.open(fileobj=io.BytesIO(archive)) as tar: tar.extractall(clean)
+assert not any((clean/p).exists() for p in ('runs','build','reference/runs','.cache'))
+sources=json.loads((root/'sources.json').read_text())['sources']
+source=next(s for s in sources if s['source_id']=='needle-source')
+retention=json.loads((root/'reference/retention-manifest.json').read_text())
+records=[]
+for s in [source,*retention['artifacts']]:
+ rel=s.get('local_path',s.get('path')); raw=(root/rel).read_bytes()
+ assert len(raw)==s['bytes'] and hashlib.sha256(raw).hexdigest()==s['sha256'],rel
+ dest=clean/rel; dest.parent.mkdir(parents=True,exist_ok=True); dest.write_bytes(raw)
+ records.append({'path':rel,'bytes':len(raw),'sha256':s['sha256']})
+checkout=clean/'.cache/needle-pinned'; checkout.mkdir(parents=True)
+with tarfile.open(clean/source['local_path']) as tar:
+ members=tar.getmembers(); prefix=members[0].name.split('/')[0]
+ for member in members:
+  rel=Path(member.name).relative_to(prefix)
+  if str(rel)=='.': continue
+  assert '..' not in rel.parts and not member.issym() and not member.islnk()
+  member.name=str(rel); tar.extract(member,checkout)
+manifest=json.loads((root/'reference/native-source-manifest.json').read_text())
+for rel,digest in manifest['files'].items(): assert hashlib.sha256((checkout/rel).read_bytes()).hexdigest()==digest
+(root/'.superpowers/sdd/2026-10-16-customer-pilot-evidence-pack/task9-clean-path.txt').write_text(str(clean)+'\n')
+(root/'docs/evidence/reproduction/input-export.json').write_text(json.dumps({'commit':commit,'clean_directory':str(clean),'method':'git archive --format=tar COMMIT; retained source archive plus seven wheels only','copied_existing_runs_outputs_databases_or_environments':False,'retained_artifacts':records},indent=2)+'\n')
+print(clean)

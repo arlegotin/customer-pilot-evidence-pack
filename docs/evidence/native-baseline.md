@@ -1,5 +1,11 @@
 # Unchanged native offline baseline
 
+This Task1 baseline snapshot is supplemented by [Task9 reproduction](reproduction.md)
+for both packets. The retained-wheel fresh install there adds `--no-cache-dir`
+and verifies all current native/oracle ranks and stable outputs offline. The
+original Task1 artifact hashes remain historical; the root source registry has
+since added released B and its derived baselines.
+
 Interpreter: Anaconda `python` 3.11.5, in an isolated venv. Only the
 `run_papers` import closure is installed (`httpx` plus dependencies), not
 unrelated generation/tokenizer dependencies. Exact package/wheel hashes are
@@ -61,12 +67,16 @@ Clean offline verification used a second venv and no package index:
 
 ```sh
 python -m venv .cache/native-clean
-.cache/native-clean/bin/python -m pip install --no-index --find-links .cache/wheels --require-hashes -r reference/native-requirements.txt
+.cache/native-clean/bin/python -m pip install --no-index --no-cache-dir --find-links .cache/wheels --require-hashes -r reference/native-requirements.txt
 .cache/native-clean/bin/python reference/needle_replay.py --packet fixtures/real/packet-a --checkout .cache/needle-pinned --out /tmp/task1-clean-native.json
 cmp docs/evidence/packet-a-native.json /tmp/task1-clean-native.json
 ```
 
-Installation/replay/cmp all exited 0; derived replay bytes are identical.
+The recipe above includes the deferred `--no-cache-dir` correction. The
+original Task1 install omitted it; Task9 actually exercised the corrected
+flag in a fresh guarded environment using the same retained wheels.
+
+Task1 installation/replay/cmp all exited 0; derived replay bytes are identical.
 Pip emitted a harmless unavailable user-cache warning and disabled that
 cache; all installs came from retained wheels. Output hashes are frozen in
 `baseline-hashes.json`. Timestamps and acquisition logs are separate from
