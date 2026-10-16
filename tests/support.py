@@ -27,3 +27,17 @@ def rehash(root):
                           for p in sorted(root.rglob('*')) if p.is_file() and p.name != 'packet.json'}
     manifest['protocol_sha256'] = manifest['hashes']['protocol.json']
     write_json(root / 'packet.json', manifest)
+
+
+def canonical_records(root):
+    """Read complete canonical-only fixture records without product helpers."""
+    root = make_packet(root)
+    values = {name: tuple(json.loads(line) for line in (root / (name + '.jsonl')).read_text().splitlines())
+              for name in ('tasks', 'assignments', 'outcomes', 'attempts')}
+    values['sources'] = tuple(json.loads((root / 'sources.json').read_text())['sources'])
+    values['manifest'] = json.loads((root / 'packet.json').read_text())
+    values['protocol'] = json.loads((root / 'protocol.json').read_text())
+    values['root'] = root
+    values['diagnostics'] = (dict(code='TEST_LIMITATION', severity='limitation', scope='packet',
+                                 source_refs=['src#$'], message='Synthetic control'),)
+    return values
