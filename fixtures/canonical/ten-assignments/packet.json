@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "run_id": "ten-assignments",
+  "assignment_basis": "predeclared",
+  "intended_count": {
+    "a": 10
+  },
+  "attempt_history": {
+    "a": "complete"
+  },
+  "actual_settings": {
+    "a": {
+      "k": 2,
+      "snippet_chars": 2000
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{"bucket": "literal", "cohort_id": "hand-authored", "gold_ids": {"arxiv": ["2101.00001"]}, "query_text": "one", "source_group_id": "one", "source_ref": "hand-authored", "task_id": "one"}
+{"bucket": "literal", "cohort_id": "hand-authored", "gold_ids": {"doi": ["10.1000/test"]}, "query_text": "two", "source_group_id": "two", "source_ref": "hand-authored", "task_id": "two"}
+{"bucket": "literal", "cohort_id": "hand-authored", "gold_ids": {"arxiv": ["hep-th/9901001"]}, "query_text": "three", "source_group_id": "three", "source_ref": "hand-authored", "task_id": "three"}
+{"bucket": "literal", "cohort_id": "hand-authored", "gold_ids": {"arxiv": ["2202.00002"]}, "query_text": "four", "source_group_id": "four", "source_ref": "hand-authored", "task_id": "four"}
+{"bucket": "literal", "cohort_id": "hand-authored", "gold_ids": {"arxiv": ["2101.00001"]}, "query_text": "five", "source_group_id": "five", "source_ref": "hand-authored", "task_id": "five"}
+{"bucket": "literal", "cohort_id": "hand-authored", "gold_ids": {"doi": ["10.1000/test"]}, "query_text": "six", "source_group_id": "six", "source_ref": "hand-authored", "task_id": "six"}
+{"bucket": "literal", "cohort_id": "hand-authored", "gold_ids": {"arxiv": ["2101.00001"]}, "query_text": "seven", "source_group_id": "seven", "source_ref": "hand-authored", "task_id": "seven"}
+{"bucket": "literal", "cohort_id": "hand-authored", "gold_ids": {"arxiv": ["2101.00001"]}, "query_text": "eight", "source_group_id": "eight", "source_ref": "hand-authored", "task_id": "eight"}
+{"bucket": "literal", "cohort_id": "hand-authored", "gold_ids": {"arxiv": ["2101.00001"]}, "query_text": "nine", "source_group_id": "nine", "source_ref": "hand-authored", "task_id": "nine"}
+{"bucket": "literal", "cohort_id": "hand-authored", "gold_ids": {"arxiv": ["2101.00001"]}, "query_text": "ten", "source_group_id": "ten", "source_ref": "hand-authored", "task_id": "ten"}

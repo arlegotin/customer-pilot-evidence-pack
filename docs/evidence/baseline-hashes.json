@@ -1,0 +1,11 @@
+{
+  "docs/evidence/packet-a-oracle.json": "b7c0a086cea80021efd9562a2f0d8694c079a10730fb73b7949b58fca8237587",
+  "docs/evidence/packet-a-native.json": "44930c530bb0351753eb0879b9b131c3d7f4d18aca4dfae7545c771d0d0dd9ac",
+  "docs/evidence/reference-check.json": "989b30a292d72fd37819432ef19cdd24c610d32889b49dcde5e8c3d8e670920b",
+  "fixtures/expected/packet-a.json": "a538a42c64734b8fdc9ff5acb89a2922c5fb8c5385e21333e1fa28e5446c53b5",
+  "fixtures/expected/packet-a-exclusions.json": "73b6a78ea3c1f5ba250bf5ecf2d0b04211f963ecc0abf63072e0af0a3d518169",
+  "sources.json": "d88448a1c341ca29132bc5a2b95ee499a945e7df4f4824170c9f7c42d67ebe4e",
+  "protocol.json": "cf9bafc351351e396dfb3b16d885e59d9881da94e6e18e024f6704dfcd4f4b83",
+  "reference/native-source-manifest.json": "fed284c3970fefd44f71d4e1db22b4518312675afde44b0a616830a1a01c0341",
+  "reference/native-requirements.txt": "fed9648fb43cf6f220277d140e29b81838b5c90218992a7c1c564cf94e30cd71"
+}

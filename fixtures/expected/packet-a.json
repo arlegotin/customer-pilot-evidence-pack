@@ -1,0 +1,262 @@
+{
+  "examples": [
+    {
+      "task_id": "d342a579431d638b_2026-10-14T12",
+      "arm_id": "bing",
+      "source_index": 0,
+      "bucket": "title",
+      "gold_ids": {
+        "arxiv": "2610.18787",
+        "doi": "10.1109/icad69378.2026.11608884"
+      },
+      "expected_partition": "M",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 3
+    },
+    {
+      "task_id": "22f3a807864384fc_2026-10-14T12",
+      "arm_id": "bing",
+      "source_index": 1,
+      "bucket": "body",
+      "gold_ids": {
+        "arxiv": "2610.18787",
+        "doi": "10.1109/icad69378.2026.11608884"
+      },
+      "expected_partition": "M",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 10
+    },
+    {
+      "task_id": "060909216378eab5_2026-10-14T12",
+      "arm_id": "bing",
+      "source_index": 2,
+      "bucket": "clue",
+      "gold_ids": {
+        "arxiv": "2610.18787",
+        "doi": "10.1109/icad69378.2026.11608884"
+      },
+      "expected_partition": "M",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 10
+    },
+    {
+      "task_id": "e9e0a60d9821d497_2026-10-14T12",
+      "arm_id": "bing",
+      "source_index": 3,
+      "bucket": "tot",
+      "gold_ids": {
+        "arxiv": "2610.18787",
+        "doi": "10.1109/icad69378.2026.11608884"
+      },
+      "expected_partition": "M",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 10
+    },
+    {
+      "task_id": "03a472a4685b9510_2026-10-14T12",
+      "arm_id": "bing",
+      "source_index": 4,
+      "bucket": "title",
+      "gold_ids": {
+        "arxiv": "2610.15184",
+        "doi": "10.1109/lwc.2026.3742528"
+      },
+      "expected_partition": "H",
+      "expected_first_hit_rank": 1,
+      "expected_result_count": 10
+    },
+    {
+      "task_id": "9c67f78e74e7b9da_2026-10-14T12",
+      "arm_id": "bing",
+      "source_index": 5,
+      "bucket": "body",
+      "gold_ids": {
+        "arxiv": "2610.15184",
+        "doi": "10.1109/lwc.2026.3742528"
+      },
+      "expected_partition": "M",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 10
+    },
+    {
+      "task_id": "01575b9b92e275a5_2026-10-14T12",
+      "arm_id": "bing",
+      "source_index": 6,
+      "bucket": "clue",
+      "gold_ids": {
+        "arxiv": "2610.15184",
+        "doi": "10.1109/lwc.2026.3742528"
+      },
+      "expected_partition": "M",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 10
+    },
+    {
+      "task_id": "66da7db95cab5dfe_2026-10-14T12",
+      "arm_id": "bing",
+      "source_index": 7,
+      "bucket": "tot",
+      "gold_ids": {
+        "arxiv": "2610.15184",
+        "doi": "10.1109/lwc.2026.3742528"
+      },
+      "expected_partition": "M",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 10
+    },
+    {
+      "task_id": "d342a579431d638b_2026-10-14T12",
+      "arm_id": "keenable",
+      "source_index": 0,
+      "bucket": "title",
+      "gold_ids": {
+        "arxiv": "2610.18787",
+        "doi": "10.1109/icad69378.2026.11608884"
+      },
+      "expected_partition": "H",
+      "expected_first_hit_rank": 1,
+      "expected_result_count": 10
+    },
+    {
+      "task_id": "22f3a807864384fc_2026-10-14T12",
+      "arm_id": "keenable",
+      "source_index": 1,
+      "bucket": "body",
+      "gold_ids": {
+        "arxiv": "2610.18787",
+        "doi": "10.1109/icad69378.2026.11608884"
+      },
+      "expected_partition": "H",
+      "expected_first_hit_rank": 1,
+      "expected_result_count": 1
+    },
+    {
+      "task_id": "060909216378eab5_2026-10-14T12",
+      "arm_id": "keenable",
+      "source_index": 2,
+      "bucket": "clue",
+      "gold_ids": {
+        "arxiv": "2610.18787",
+        "doi": "10.1109/icad69378.2026.11608884"
+      },
+      "expected_partition": "H",
+      "expected_first_hit_rank": 1,
+      "expected_result_count": 10
+    },
+    {
+      "task_id": "e9e0a60d9821d497_2026-10-14T12",
+      "arm_id": "keenable",
+      "source_index": 3,
+      "bucket": "tot",
+      "gold_ids": {
+        "arxiv": "2610.18787",
+        "doi": "10.1109/icad69378.2026.11608884"
+      },
+      "expected_partition": "H",
+      "expected_first_hit_rank": 1,
+      "expected_result_count": 10
+    },
+    {
+      "task_id": "d342a579431d638b_2026-10-14T12",
+      "arm_id": "perplexity",
+      "source_index": 0,
+      "bucket": "title",
+      "gold_ids": {
+        "arxiv": "2610.18787",
+        "doi": "10.1109/icad69378.2026.11608884"
+      },
+      "expected_partition": "F",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 0
+    },
+    {
+      "task_id": "22f3a807864384fc_2026-10-14T12",
+      "arm_id": "perplexity",
+      "source_index": 1,
+      "bucket": "body",
+      "gold_ids": {
+        "arxiv": "2610.18787",
+        "doi": "10.1109/icad69378.2026.11608884"
+      },
+      "expected_partition": "F",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 0
+    },
+    {
+      "task_id": "060909216378eab5_2026-10-14T12",
+      "arm_id": "perplexity",
+      "source_index": 2,
+      "bucket": "clue",
+      "gold_ids": {
+        "arxiv": "2610.18787",
+        "doi": "10.1109/icad69378.2026.11608884"
+      },
+      "expected_partition": "F",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 0
+    },
+    {
+      "task_id": "e9e0a60d9821d497_2026-10-14T12",
+      "arm_id": "perplexity",
+      "source_index": 3,
+      "bucket": "tot",
+      "gold_ids": {
+        "arxiv": "2610.18787",
+        "doi": "10.1109/icad69378.2026.11608884"
+      },
+      "expected_partition": "F",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 0
+    },
+    {
+      "task_id": "356e89cadccd0272_2026-10-14T12",
+      "arm_id": "bing",
+      "source_index": 73,
+      "bucket": "body",
+      "gold_ids": {
+        "arxiv": "2605.26368"
+      },
+      "expected_partition": "H",
+      "expected_first_hit_rank": 4,
+      "expected_result_count": 6
+    },
+    {
+      "task_id": "62a0b85d9d975283_2026-10-14T12",
+      "arm_id": "bing",
+      "source_index": 74,
+      "bucket": "clue",
+      "gold_ids": {
+        "arxiv": "2605.26368"
+      },
+      "expected_partition": "H",
+      "expected_first_hit_rank": 2,
+      "expected_result_count": 9
+    },
+    {
+      "task_id": "bdc763a299796acd_2026-10-14T12",
+      "arm_id": "bing",
+      "source_index": 161,
+      "bucket": "body",
+      "gold_ids": {
+        "arxiv": "2601.12622"
+      },
+      "expected_partition": "M",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 0
+    },
+    {
+      "task_id": "84a6d3dfc6cee538_2026-10-14T12",
+      "arm_id": "bing",
+      "source_index": 225,
+      "bucket": "body",
+      "gold_ids": {
+        "arxiv": "2606.16803"
+      },
+      "expected_partition": "M",
+      "expected_first_hit_rank": null,
+      "expected_result_count": 0
+    }
+  ],
+  "selected_task_count": 324,
+  "selected_group_count": 81
+}

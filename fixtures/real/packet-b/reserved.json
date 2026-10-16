@@ -1,0 +1,51 @@
+{
+  "run_id": "2026-10-15T1453Z",
+  "protection": "Opaque bytes hashed only; no JSON decoding or provider outcome inspection",
+  "artifacts": [
+    {
+      "source_uri": "https://huggingface.co/datasets/keenable-ai/needle-results/resolve/fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4/runs/2026-10-15T1453Z/scholar.jsonl",
+      "revision": "fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4",
+      "path": ".cache/protected-b/scholar.jsonl",
+      "bytes": 297945,
+      "sha256": "97fa9a2c52902192bbe6a9dc5abc532643c94a2fd7c8cc5920e1ff97ffaf14cb",
+      "acquired_at": "2026-10-16T08:11:21.404355+00:00",
+      "inspected": false
+    },
+    {
+      "source_uri": "https://huggingface.co/datasets/keenable-ai/needle-results/resolve/fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4/runs/2026-10-15T1453Z/scholar.json",
+      "revision": "fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4",
+      "path": ".cache/protected-b/scholar.json",
+      "bytes": 80673,
+      "sha256": "98f0c117d4dbc62cf22e903f2b908a2ddfb398504d0d9999d0a4d57e1b6f891f",
+      "acquired_at": "2026-10-16T08:11:21.854717+00:00",
+      "inspected": false
+    },
+    {
+      "source_uri": "https://huggingface.co/datasets/keenable-ai/needle-results/resolve/fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4/runs/2026-10-15T1453Z/scholar/bing.json",
+      "revision": "fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4",
+      "path": ".cache/protected-b/scholar/bing.json",
+      "bytes": 1246716,
+      "sha256": "8ee3a48e41e4452b9e9b638a065f376e6b9fad07725a3d15f3f5592588377374",
+      "acquired_at": "2026-10-16T08:11:22.304552+00:00",
+      "inspected": false
+    },
+    {
+      "source_uri": "https://huggingface.co/datasets/keenable-ai/needle-results/resolve/fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4/runs/2026-10-15T1453Z/scholar/keenable.json",
+      "revision": "fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4",
+      "path": ".cache/protected-b/scholar/keenable.json",
+      "bytes": 5209495,
+      "sha256": "a78f849ff83478a74f647b1dd2085354e361d37fa2b5fed223576bc2eb9b3af4",
+      "acquired_at": "2026-10-16T08:11:22.947143+00:00",
+      "inspected": false
+    },
+    {
+      "source_uri": "https://huggingface.co/datasets/keenable-ai/needle-results/resolve/fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4/runs/2026-10-15T1453Z/scholar/perplexity.json",
+      "revision": "fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4",
+      "path": ".cache/protected-b/scholar/perplexity.json",
+      "bytes": 4656285,
+      "sha256": "b880e9320731056469701f5da6a2e8c05fd30e81f7211b9a1bc7ef268745532c",
+      "acquired_at": "2026-10-16T08:11:23.825909+00:00",
+      "inspected": false
+    }
+  ]
+}

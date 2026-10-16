@@ -1,0 +1,20 @@
+test_bounded_export_reconciles_frozen_examples_without_physical_fabrication (test_reference_baseline.AcquiredPacketTests.test_bounded_export_reconciles_frozen_examples_without_physical_fabrication) ... ok
+test_unchanged_native_scorer_replays_rank_and_denominator (test_reference_baseline.AcquiredPacketTests.test_unchanged_native_scorer_replays_rank_and_denominator) ... ok
+test_literal_aliases_first_rank_empty_and_unknown (test_reference_baseline.ReferenceBaselineTests.test_literal_aliases_first_rank_empty_and_unknown) ... ok
+test_oracle_cli_diagnostic_and_exit_code (test_reference_baseline.ReferenceBaselineTests.test_oracle_cli_diagnostic_and_exit_code) ... ok
+test_synthetic_native_metrics_are_unsupported_without_replay_profile (test_reference_baseline.ReferenceBaselineTests.test_synthetic_native_metrics_are_unsupported_without_replay_profile) ... ERROR
+test_ten_assignments_keeps_failures_and_unknowns (test_reference_baseline.ReferenceBaselineTests.test_ten_assignments_keeps_failures_and_unknowns) ... ok
+
+======================================================================
+ERROR: test_synthetic_native_metrics_are_unsupported_without_replay_profile (test_reference_baseline.ReferenceBaselineTests.test_synthetic_native_metrics_are_unsupported_without_replay_profile)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/tests/test_reference_baseline.py", line 37, in test_synthetic_native_metrics_are_unsupported_without_replay_profile
+    self.assertEqual(arm['native_metrics']['support_status'], 'unsupported')
+                     ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+KeyError: 'support_status'
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.520s
+
+FAILED (errors=1)

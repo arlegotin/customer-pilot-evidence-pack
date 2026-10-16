@@ -1,0 +1,21 @@
+test_reference_baseline (unittest.loader._FailedTest.test_reference_baseline) ... ERROR
+
+======================================================================
+ERROR: test_reference_baseline (unittest.loader._FailedTest.test_reference_baseline)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_reference_baseline
+Traceback (most recent call last):
+  File "/Users/artemlegotin/anaconda3/lib/python3.11/unittest/loader.py", line 407, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/artemlegotin/anaconda3/lib/python3.11/unittest/loader.py", line 350, in _get_module_from_name
+    __import__(name)
+  File "/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/tests/test_reference_baseline.py", line 9, in <module>
+    from reference.oracle import evaluate_run
+ModuleNotFoundError: No module named 'reference.oracle'
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)

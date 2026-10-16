@@ -1,0 +1,40 @@
+test_bounded_export_reconciles_frozen_examples_without_physical_fabrication (test_reference_baseline.AcquiredPacketTests.test_bounded_export_reconciles_frozen_examples_without_physical_fabrication) ... ok
+test_unchanged_native_scorer_replays_rank_and_denominator (test_reference_baseline.AcquiredPacketTests.test_unchanged_native_scorer_replays_rank_and_denominator) ... ok
+test_literal_aliases_first_rank_empty_and_unknown (test_reference_baseline.ReferenceBaselineTests.test_literal_aliases_first_rank_empty_and_unknown) ... FAIL
+test_oracle_cli_diagnostic_and_exit_code (test_reference_baseline.ReferenceBaselineTests.test_oracle_cli_diagnostic_and_exit_code) ... ok
+test_ten_assignments_keeps_failures_and_unknowns (test_reference_baseline.ReferenceBaselineTests.test_ten_assignments_keeps_failures_and_unknowns) ... FAIL
+
+======================================================================
+FAIL: test_literal_aliases_first_rank_empty_and_unknown (test_reference_baseline.ReferenceBaselineTests.test_literal_aliases_first_rank_empty_and_unknown)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/tests/test_reference_baseline.py", line 31, in test_literal_aliases_first_rank_empty_and_unknown
+    self.assertEqual(records['a:eight']['partition'], 'U')
+AssertionError: 'M' != 'U'
+- M
++ U
+
+
+======================================================================
+FAIL: test_ten_assignments_keeps_failures_and_unknowns (test_reference_baseline.ReferenceBaselineTests.test_ten_assignments_keeps_failures_and_unknowns)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/tests/test_reference_baseline.py", line 19, in test_ten_assignments_keeps_failures_and_unknowns
+    self.assertEqual([arm[x] for x in ('N', 'H', 'M', 'F', 'U')], [10, 4, 2, 1, 3])
+AssertionError: Lists differ: [10, 4, 5, 1, 0] != [10, 4, 2, 1, 3]
+
+First differing element 2:
+5
+2
+
+- [10, 4, 5, 1, 0]
+?         ^     ^
+
++ [10, 4, 2, 1, 3]
+?         ^     ^
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.488s
+
+FAILED (failures=2)

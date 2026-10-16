@@ -1,0 +1,27 @@
+test_bounded_export_reconciles_frozen_examples_without_physical_fabrication (test_reference_baseline.AcquiredPacketTests.test_bounded_export_reconciles_frozen_examples_without_physical_fabrication) ... ERROR
+test_unchanged_native_scorer_replays_rank_and_denominator (test_reference_baseline.AcquiredPacketTests.test_unchanged_native_scorer_replays_rank_and_denominator) ... FAIL
+test_literal_aliases_first_rank_empty_and_unknown (test_reference_baseline.ReferenceBaselineTests.test_literal_aliases_first_rank_empty_and_unknown) ... ok
+test_oracle_cli_diagnostic_and_exit_code (test_reference_baseline.ReferenceBaselineTests.test_oracle_cli_diagnostic_and_exit_code) ... ok
+test_ten_assignments_keeps_failures_and_unknowns (test_reference_baseline.ReferenceBaselineTests.test_ten_assignments_keeps_failures_and_unknowns) ... ok
+
+======================================================================
+ERROR: test_bounded_export_reconciles_frozen_examples_without_physical_fabrication (test_reference_baseline.AcquiredPacketTests.test_bounded_export_reconciles_frozen_examples_without_physical_fabrication)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/tests/test_reference_baseline.py", line 53, in test_bounded_export_reconciles_frozen_examples_without_physical_fabrication
+    from reference.prepare_packet import prepare_run
+ModuleNotFoundError: No module named 'reference.prepare_packet'
+
+======================================================================
+FAIL: test_unchanged_native_scorer_replays_rank_and_denominator (test_reference_baseline.AcquiredPacketTests.test_unchanged_native_scorer_replays_rank_and_denominator)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/tests/test_reference_baseline.py", line 82, in test_unchanged_native_scorer_replays_rank_and_denominator
+    self.assertEqual(proc.returncode, 0, proc.stderr)
+AssertionError: 2 != 0 : /Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/.cache/native-venv/bin/python: can't open file '/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/reference/needle_replay.py': [Errno 2] No such file or directory
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.071s
+
+FAILED (failures=1, errors=1)
