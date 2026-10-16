@@ -105,6 +105,45 @@ class CliTests(unittest.TestCase):
             self.assertEqual(cli.evaluate_run(self.run, self.out), 2)
         self.assertEqual(before, (self.out / 'evaluation.json').read_bytes())
 
+    def test_corrupt_empty_arm_summaries_exit_two_without_new_artifacts(self):
+        self.freeze()
+        self.assertEqual(self.command('evaluate', '--run', self.run, '--out', self.out).returncode, 0)
+        self.assertEqual(self.command('report', '--run', self.run, '--evaluation', self.out / 'evaluation.json',
+                                      '--out', self.out).returncode, 0)
+        before = {p.name: p.read_bytes() for p in self.out.iterdir()}
+        bad = json.loads(before['evaluation.json'])
+        bad['arms'] = {}
+        path = self.base / 'corrupt.json'
+        write_json(path, bad)
+        for out in [self.base / 'fresh', self.out]:
+            with self.subTest(out=out):
+                result = self.command('report', '--run', self.run, '--evaluation', path, '--out', out)
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertIn('INVALID_REPORT_INPUT', result.stderr)
+                self.assertNotIn('Traceback', result.stderr)
+                self.assertFalse((self.base / 'fresh').exists())
+                self.assertEqual(before, {p.name: p.read_bytes() for p in self.out.iterdir()})
+
+    def test_oracle_subprocess_failures_exit_two_without_replacing_prior_output(self):
+        self.freeze()
+        self.assertEqual(self.command('evaluate', '--run', self.run, '--out', self.out).returncode, 0)
+        self.assertEqual(self.command('report', '--run', self.run, '--evaluation', self.out / 'evaluation.json',
+                                      '--out', self.out).returncode, 0)
+        before = {p.name: p.read_bytes() for p in self.out.iterdir()}
+        errors = [subprocess.TimeoutExpired(['independent-oracle'], 60),
+                  subprocess.CalledProcessError(1, ['independent-oracle'], stderr='oracle failed')]
+        for error in errors:
+            for out in [self.base / 'fresh', self.out]:
+                stderr = io.StringIO()
+                with self.subTest(error=type(error).__name__, out=out), redirect_stderr(stderr), \
+                        patch('pilotpack.score.check_reference', side_effect=error):
+                    result = cli.main(['evaluate', '--run', str(self.run), '--out', str(out)])
+                    self.assertEqual(result, 2)
+                self.assertIn('REFERENCE_FAILURE', stderr.getvalue())
+                self.assertNotIn('Traceback', stderr.getvalue())
+                self.assertFalse((self.base / 'fresh').exists())
+                self.assertEqual(before, {p.name: p.read_bytes() for p in self.out.iterdir()})
+
     def test_threshold_failure_does_not_change_success_exit(self):
         protocol = json.loads((self.source / 'protocol.json').read_text())
         protocol['decision_criteria'] = {'b': {'max_provider_failure_rate': 0}}

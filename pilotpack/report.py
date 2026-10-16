@@ -65,11 +65,11 @@ def _validate(evaluation: JsonObject, verdict: JsonObject) -> None:
                    'results', 'source_refs')
     for case in evaluation['cases']:
         if (any(k not in case for k in case_fields) or case['classification'] not in ('H', 'M', 'F', 'U')
+                or any(not isinstance(case[k], str) for k in ('assignment_id', 'task_id', 'arm_id'))
                 or not isinstance(case['attempts'], list) or not isinstance(case['source_refs'], list)
                 or any(not isinstance(a, dict) for a in case['attempts'])):
             _fail('Malformed case or attempt record.')
-    if any(not isinstance(arm, dict) for arm in evaluation['arms'].values()):
-        _fail('Expected arm summary objects.')
+    _validate_arms(evaluation)
     if verdict != build_verdict(evaluation):
         _fail('Verdict must be the documented evaluation subset.')
     checks = evaluation['reference_checks']
@@ -81,6 +81,44 @@ def _validate(evaluation: JsonObject, verdict: JsonObject) -> None:
         _fail('Invalid comparison status.')
     _bytes(evaluation)
     _bytes(verdict)
+
+
+def _validate_arms(evaluation: JsonObject) -> None:
+    arms = evaluation['arms']
+    intended = evaluation['accounting'].get('intended_count')
+    case_arms = {c['arm_id'] for c in evaluation['cases']}
+    if (not isinstance(intended, dict) or set(arms) != set(intended) or not case_arms <= set(arms)
+            or set(evaluation['decisions']) != set(arms) or not set(arms) <= set(evaluation['native_metrics'])):
+        _fail('Arm summaries must match intended arms, cases, decisions and native metrics.')
+    required = ('N', 'H', 'M', 'F', 'U', 'unknown_reasons', 'delivered_hit_at_k',
+                'missingness_range', 'attempts', 'cost', 'latency', 'settings', 'gates')
+    nested = dict(attempts=('observed_attempt_rows', 'physical_attempt_count_lower_bound',
+                            'physical_attempt_count_exact', 'history'),
+                  cost=('total', 'support_status', 'coverage', 'unavailable_reason'),
+                  latency=('paired', 'support_status', 'unavailable_reason'),
+                  settings=('actual', 'declared'))
+    for arm_id, arm in arms.items():
+        if not isinstance(arm, dict) or any(field not in arm for field in required):
+            _fail('Arm summary is missing required fields: ' + arm_id)
+        if not isinstance(arm['unknown_reasons'], dict) or not isinstance(arm['gates'], list):
+            _fail('Malformed unknown reasons or gates: ' + arm_id)
+        for field, fields in nested.items():
+            if not isinstance(arm[field], dict) or any(key not in arm[field] for key in fields):
+                _fail('Malformed arm availability/settings summary: ' + arm_id + ':' + field)
+        rate, bounds = arm['delivered_hit_at_k'], arm['missingness_range']
+        if rate is not None and (type(rate) not in (int, float) or not 0 <= rate <= 1):
+            _fail('Malformed delivered hit rate: ' + arm_id)
+        if bounds is not None and (not isinstance(bounds, list) or len(bounds) != 2
+                or any(type(v) not in (int, float) or not 0 <= v <= 1 for v in bounds)
+                or bounds[0] > bounds[1]):
+            _fail('Malformed missingness bounds: ' + arm_id)
+        cases = [c for c in evaluation['cases'] if c['arm_id'] == arm_id]
+        for partition in 'HMFU':
+            if (type(arm[partition]) is not int or arm[partition] < 0
+                    or arm[partition] != sum(c['classification'] == partition for c in cases)):
+                _fail('Arm partition count does not match cases: ' + arm_id + ':' + partition)
+        if arm['N'] is not None and (type(arm['N']) is not int or arm['N'] != len(cases)):
+            _fail('Arm denominator does not match cases: ' + arm_id)
 
 
 def ensure_output_location(run: Path, out: Path) -> None:
@@ -226,6 +264,8 @@ def write_report(run: Path, evaluation_path: Path, out: Path) -> Path:
                     protocol_hash=packet.manifest['protocol_sha256'])
     if any(evaluation[k] != expected[k] for k in _IDENTITIES):
         _fail('Evaluation does not belong to this frozen run/protocol/content.')
+    if set(evaluation['arms']) != set(packet.manifest['intended_count']):
+        _fail('Evaluation arms differ from frozen intended arms.')
     assignments = {a['assignment_id']: a for a in packet.assignments}
     cases = evaluation['cases']
     if (len(cases) != len(assignments) or {c.get('assignment_id') for c in cases} != set(assignments)

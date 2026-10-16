@@ -1,6 +1,7 @@
 """Install-free offline freeze, evaluate and report commands."""
 import argparse
 from pathlib import Path
+import subprocess
 import sys
 
 from . import compare, ingest, report, score
@@ -11,6 +12,8 @@ def _diagnostic(error: Exception) -> None:
     if isinstance(error, ValidationError):
         for item in error.diagnostics:
             print(f"{item['code']} [{item['scope']}]: {item['message']}", file=sys.stderr)
+    elif isinstance(error, subprocess.SubprocessError):
+        print('REFERENCE_FAILURE [run]: Independent reference subprocess failed: ' + str(error), file=sys.stderr)
     else:
         print(str(error), file=sys.stderr)
 
@@ -34,7 +37,7 @@ def evaluate_run(run: Path, out: Path) -> int:
         for item in evaluation['diagnostics']:
             print(f"{item['code']} [{item['scope']}]: {item['message']}", file=sys.stderr)
         return _exit(evaluation)
-    except (OSError, ValueError, KeyError, TypeError) as error:
+    except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
         _diagnostic(error)
         return 2
 
@@ -62,6 +65,6 @@ def main(argv: list[str] | None = None) -> int:
             return evaluate_run(args.run, args.out)
         report.write_report(args.run, args.evaluation, args.out)
         return _exit(report._read(args.evaluation))
-    except (OSError, ValueError, KeyError, TypeError) as error:
+    except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
         _diagnostic(error)
         return 2

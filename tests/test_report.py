@@ -167,6 +167,33 @@ class ReportTests(unittest.TestCase):
                 report.write_report(self.run, self.out / 'evaluation.json', out)
         ingest.verify_run(self.run)
 
+    def test_corrupt_arm_summary_membership_and_required_fields_cannot_publish(self):
+        self.publish()
+        report.write_report(self.run, self.out / 'evaluation.json', self.out)
+        before = {p.name: p.read_bytes() for p in self.out.iterdir()}
+        corruptions = [('empty', lambda e: e.update(arms={})),
+                       ('missing_arm', lambda e: e['arms'].pop('b')),
+                       ('unexpected_arm', lambda e: e['arms'].update(extra=copy.deepcopy(e['arms']['a']))),
+                       ('missing_decision', lambda e: e['decisions'].pop('a'))]
+        for field in ['N', 'H', 'M', 'F', 'U', 'unknown_reasons', 'delivered_hit_at_k',
+                      'missingness_range', 'attempts', 'cost', 'latency', 'settings', 'gates']:
+            corruptions.append((field, lambda e, field=field: e['arms']['a'].pop(field)))
+        for field in ['attempts', 'cost', 'latency', 'settings']:
+            corruptions.append((field + '_empty', lambda e, field=field: e['arms']['a'].update({field: {}})))
+        for field, value in [('delivered_hit_at_k', 'corrupt'), ('missingness_range', []),
+                             ('unknown_reasons', None), ('gates', None)]:
+            corruptions.append((field + '_type', lambda e, field=field, value=value: e['arms']['a'].update({field: value})))
+        for label, corrupt in corruptions:
+            bad = copy.deepcopy(self.evaluation)
+            corrupt(bad)
+            path = self.base / 'corrupt-evaluation.json'
+            write_json(path, bad)
+            for out in [self.base / 'fresh', self.out]:
+                with self.subTest(corruption=label, out=out), self.assertRaises(ValidationError):
+                    report.write_report(self.run, path, out)
+                self.assertFalse((self.base / 'fresh').exists())
+                self.assertEqual(before, {p.name: p.read_bytes() for p in self.out.iterdir()})
+
     def test_reference_mismatch_cannot_be_published_or_rendered_from_file(self):
         bad = copy.deepcopy(self.evaluation)
         bad['diagnostics'].append(dict(code='REFERENCE_MISMATCH', severity='block', scope='run',
