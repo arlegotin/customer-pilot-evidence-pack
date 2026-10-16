@@ -208,6 +208,72 @@ class SchemaTests(unittest.TestCase):
         self.assertIsNone(packet.protocol['arms']['bing']['retry_policy'])
         self.assertEqual(packet.protocol['decision_criteria'], {})
 
+    def test_review_comparison_ids_require_strings_before_lookup(self):
+        for field, value in [('arm_a', []), ('arm_b', {}), ('arm_a', '')]:
+            with self.subTest(field=field, value=value):
+                pair = dict(arm_a='a', arm_b='b')
+                pair[field] = value
+                self.mutate('protocol.json', lambda x: x.update(requested_comparisons=[pair]))
+                self.rejects('INVALID_SCHEMA', 'protocol.json:$.requested_comparisons[0].' + field)
+
+    def test_review_transformation_parents_require_strings_before_lookup(self):
+        for value in [{}, [], '']:
+            with self.subTest(value=value):
+                self.mutate('sources.json', lambda x: x['sources'][0].update(parents=[value]))
+                self.rejects('INVALID_SCHEMA', 'sources.json:$.sources[0].parents[0]')
+
+    def test_review_valid_unknown_parent_retains_orphan_diagnostic(self):
+        self.mutate('sources.json', lambda x: x['sources'][0].update(parents=['unknown']))
+        self.rejects('ORPHAN_RECORD', 'sources.json')
+
+    def test_review_limitations_are_lists_wherever_accepted(self):
+        cases = [
+            ('sources.json', lambda x: x['sources'][0].update(limitations='not-a-list'), '.sources[0].limitations'),
+            ('protocol.json', lambda x: x.update(limitations={'x': 1}), '.limitations'),
+            ('protocol.json', lambda x: x['arms']['a'].update(limitations={'x': 1}), '.arms.a.limitations'),
+            ('packet.json', lambda x: x['actual_settings']['a'].update(limitations={'x': 1}), '.actual_settings.a.limitations'),
+        ]
+        for file, change, location in cases:
+            with self.subTest(file=file, location=location):
+                original = json.loads((self.root / file).read_text())
+                self.mutate(file, change)
+                try:
+                    self.rejects('INVALID_SCHEMA', file + ':$' + location)
+                finally:
+                    write_json(self.root / file, original)
+                    rehash(self.root)
+
+    def test_review_settings_source_refs_require_reference_lists(self):
+        for value in [42, {}, [''], ['src'], [False]]:
+            with self.subTest(value=value):
+                self.mutate('protocol.json', lambda x: x['arms']['a'].update(source_refs=value))
+                self.rejects('INVALID_SCHEMA', 'protocol.json:$.arms.a.source_refs')
+
+    def test_review_protocol_status_requires_nonempty_string(self):
+        self.mutate('protocol.json', lambda x: x.update(status=[]))
+        self.rejects('INVALID_SCHEMA', 'protocol.json:$.status')
+
+    def test_review_optional_packet_metadata_has_declared_types(self):
+        base = dict(archive_run_id='control', source_sha256={}, cohort_selector='all')
+        for field, value in [('excluded_task_manifest', []), ('supported_task_count', True),
+                             ('supported_source_group_count', '2'), ('protected', 1),
+                             ('outcomes_inspected', []), ('comparison_window', [])]:
+            with self.subTest(field=field):
+                packet = dict(base, **{field: value})
+                self.mutate('protocol.json', lambda x: x.update(packets={'control': packet}))
+                self.rejects('INVALID_SCHEMA', 'protocol.json:$.packets.control.' + field)
+
+    def test_review_valid_optional_evidence_keeps_unknown_archive_fields(self):
+        self.mutate('protocol.json', lambda x: x.update(status='acquired', limitations=['UNKNOWN_ACTUAL_SETTINGS']))
+        self.mutate('protocol.json', lambda x: x['arms']['a'].update(
+                    limitations=['UNKNOWN_ACTUAL_SETTINGS'], source_refs=['src#$']))
+        self.mutate('packet.json', lambda x: x['actual_settings']['a'].update(
+                    limitations=['UNKNOWN_ACTUAL_SETTINGS'], source_refs=['src#$']))
+        packet = validate_packet(self.root)
+        self.assertIsNone(packet.sources[0]['revision'])
+        self.assertIn('NO_IMMUTABLE_REVISION', packet.sources[0]['limitations'])
+        self.assertIsNone(packet.manifest['actual_settings']['a']['endpoint'])
+
     def test_orphan_outcome(self):
         self.mutate('outcomes.jsonl', lambda x: x[0].update(assignment_id='absent'))
         self.rejects('ORPHAN_RECORD', 'outcomes.jsonl')

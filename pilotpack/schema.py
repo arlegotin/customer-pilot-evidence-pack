@@ -97,6 +97,8 @@ def _fields(value, required, optional, loc):
     unknown = value.keys() - set((required + ' ' + optional + ' extensions').split())
     if missing or unknown:
         _fail(loc, f'missing fields {sorted(missing)}; unknown fields {sorted(unknown)}')
+    if 'limitations' in value:
+        _limitations(value['limitations'], loc + '.limitations')
     if 'extensions' in value and not isinstance(value['extensions'], dict):
         _fail(loc + '.extensions', 'expected object')
 
@@ -159,6 +161,15 @@ _SETTINGS = 'provider mode endpoint query_parameters requested_num_results k sni
 
 def _settings(value, loc):
     _fields(value, _SETTINGS, 'limitations source_refs', loc)
+    if 'source_refs' in value:
+        if not isinstance(value['source_refs'], list):
+            _fail(loc + '.source_refs', 'expected list of source references')
+        for index, reference in enumerate(value['source_refs']):
+            rloc = loc + f'.source_refs[{index}]'
+            _string(reference, rloc)
+            source, separator, fragment = reference.partition('#')
+            if not source or not separator or not (re.fullmatch(r'line=[1-9][0-9]*', fragment) or fragment.startswith('$')):
+                _fail(rloc, 'expected source ID plus line/object path')
     _string(value['provider'], loc + '.provider')
     _string(value['matching_profile'], loc + '.matching_profile')
     for key in ('mode', 'endpoint'):
@@ -190,6 +201,8 @@ def _window(value, loc):
 def _protocol(value, loc):
     _fields(value, 'schema_version protocol_id adapter_profile matching_profile assignment_basis k snippet_chars retry_selection actual_retry_policy conversion_map_sha256 comparison_window requested_comparisons comparison_blockers bootstrap corruption_manifest_sha256 decision_criteria arms packets', 'status limitations', loc)
     _version(value, loc)
+    if 'status' in value:
+        _string(value['status'], loc + '.status')
     for key in ('protocol_id', 'adapter_profile', 'matching_profile', 'retry_selection'):
         _string(value[key], loc + '.' + key)
     _enum(value['assignment_basis'], ('predeclared', 'reconstructed', 'unreconstructable'), loc + '.assignment_basis')
@@ -227,6 +240,8 @@ def _protocol(value, loc):
         _fail(loc + '.requested_comparisons', 'expected list')
     for i, pair in enumerate(value['requested_comparisons']):
         _fields(pair, 'arm_a arm_b', '', loc + f'.requested_comparisons[{i}]')
+        for field in ('arm_a', 'arm_b'):
+            _string(pair[field], loc + f'.requested_comparisons[{i}].' + field)
         if pair['arm_a'] not in value['arms'] or pair['arm_b'] not in value['arms'] or pair['arm_a'] == pair['arm_b']:
             _fail(loc + '.requested_comparisons', 'invalid arm pair')
     for key, packet in value['packets'].items():
@@ -234,6 +249,16 @@ def _protocol(value, loc):
         _fields(packet, 'archive_run_id source_sha256 cohort_selector', 'excluded_task_manifest supported_task_count supported_source_group_count protected outcomes_inspected comparison_window', ploc)
         for field in ('archive_run_id', 'cohort_selector'):
             _string(packet[field], ploc + '.' + field)
+        if 'excluded_task_manifest' in packet:
+            _string(packet['excluded_task_manifest'], ploc + '.excluded_task_manifest')
+        for field in ('supported_task_count', 'supported_source_group_count'):
+            if field in packet:
+                _integer(packet[field], ploc + '.' + field)
+        for field in ('protected', 'outcomes_inspected'):
+            if field in packet and type(packet[field]) is not bool:
+                _fail(ploc + '.' + field, 'expected boolean')
+        if 'comparison_window' in packet:
+            _window(packet['comparison_window'], ploc + '.comparison_window')
         if not isinstance(packet['source_sha256'], dict):
             _fail(ploc, 'expected source hashes object')
         for source, digest in packet['source_sha256'].items():
@@ -330,9 +355,15 @@ def validate_packet(root: Path) -> Packet:
         if len(raw) != source['bytes'] or hashlib.sha256(raw).hexdigest() != source['sha256']:
             _fail(loc, 'source bytes differ from inventory', 'HASH_MISMATCH')
         sources[source['source_id']] = source
-    for source in sources.values():
-        if not isinstance(source['parents'], list) or any(p not in sources for p in source['parents']):
-            _fail('sources.json:$.parents', 'unknown transformation parent', 'ORPHAN_RECORD')
+    for index, source in enumerate(sources.values()):
+        loc = f'sources.json:$.sources[{index}].parents'
+        if not isinstance(source['parents'], list):
+            _fail(loc, 'expected list of source identifiers')
+        for parent_index, parent in enumerate(source['parents']):
+            ploc = loc + f'[{parent_index}]'
+            _string(parent, ploc)
+            if parent not in sources:
+                _fail(ploc, 'unknown transformation parent', 'ORPHAN_RECORD')
 
     def ref(value, loc):
         if not isinstance(value, str) or '#' not in value:
