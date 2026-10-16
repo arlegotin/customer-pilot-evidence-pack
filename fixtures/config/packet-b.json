@@ -64,5 +64,9 @@
   "auxiliary_source_ids": [
     "metadata-packet-b-inventory.json"
   ],
-  "baseline_source_ids": {}
+  "baseline_source_ids": {
+    "native": "baseline-packet-b-native",
+    "oracle": "baseline-packet-b-oracle",
+    "check": "baseline-packet-b-check"
+  }
 }

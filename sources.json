@@ -68,11 +68,11 @@
     },
     {
       "source_id": "packet-b-gold",
-      "role": "protected-opaque-artifact",
+      "role": "gold",
       "source_uri": "https://huggingface.co/datasets/keenable-ai/needle-results/resolve/fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4/runs/2026-10-15T1453Z/scholar.jsonl",
       "revision": "fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4",
       "acquired_at": "2026-10-16T08:11:21.404355+00:00",
-      "local_path": ".cache/protected-b/scholar.jsonl",
+      "local_path": "fixtures/real/packet-b/scholar.jsonl",
       "bytes": 297945,
       "sha256": "97fa9a2c52902192bbe6a9dc5abc532643c94a2fd7c8cc5920e1ff97ffaf14cb",
       "license": "MIT",
@@ -81,11 +81,11 @@
     },
     {
       "source_id": "packet-b-summary",
-      "role": "protected-opaque-artifact",
+      "role": "native-summary",
       "source_uri": "https://huggingface.co/datasets/keenable-ai/needle-results/resolve/fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4/runs/2026-10-15T1453Z/scholar.json",
       "revision": "fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4",
       "acquired_at": "2026-10-16T08:11:21.854717+00:00",
-      "local_path": ".cache/protected-b/scholar.json",
+      "local_path": "fixtures/real/packet-b/scholar.json",
       "bytes": 80673,
       "sha256": "98f0c117d4dbc62cf22e903f2b908a2ddfb398504d0d9999d0a4d57e1b6f891f",
       "license": "MIT",
@@ -94,11 +94,11 @@
     },
     {
       "source_id": "packet-b-bing",
-      "role": "protected-opaque-artifact",
+      "role": "engine-terminal-results",
       "source_uri": "https://huggingface.co/datasets/keenable-ai/needle-results/resolve/fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4/runs/2026-10-15T1453Z/scholar/bing.json",
       "revision": "fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4",
       "acquired_at": "2026-10-16T08:11:22.304552+00:00",
-      "local_path": ".cache/protected-b/scholar/bing.json",
+      "local_path": "fixtures/real/packet-b/scholar/bing.json",
       "bytes": 1246716,
       "sha256": "8ee3a48e41e4452b9e9b638a065f376e6b9fad07725a3d15f3f5592588377374",
       "license": "MIT",
@@ -107,11 +107,11 @@
     },
     {
       "source_id": "packet-b-keenable",
-      "role": "protected-opaque-artifact",
+      "role": "engine-terminal-results",
       "source_uri": "https://huggingface.co/datasets/keenable-ai/needle-results/resolve/fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4/runs/2026-10-15T1453Z/scholar/keenable.json",
       "revision": "fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4",
       "acquired_at": "2026-10-16T08:11:22.947143+00:00",
-      "local_path": ".cache/protected-b/scholar/keenable.json",
+      "local_path": "fixtures/real/packet-b/scholar/keenable.json",
       "bytes": 5209495,
       "sha256": "a78f849ff83478a74f647b1dd2085354e361d37fa2b5fed223576bc2eb9b3af4",
       "license": "MIT",
@@ -120,11 +120,11 @@
     },
     {
       "source_id": "packet-b-perplexity",
-      "role": "protected-opaque-artifact",
+      "role": "engine-terminal-results",
       "source_uri": "https://huggingface.co/datasets/keenable-ai/needle-results/resolve/fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4/runs/2026-10-15T1453Z/scholar/perplexity.json",
       "revision": "fc40441e7d6d521dc2dbec7e46e76ed9ba1fe6f4",
       "acquired_at": "2026-10-16T08:11:23.825909+00:00",
-      "local_path": ".cache/protected-b/scholar/perplexity.json",
+      "local_path": "fixtures/real/packet-b/scholar/perplexity.json",
       "bytes": 4656285,
       "sha256": "b880e9320731056469701f5da6a2e8c05fd30e81f7211b9a1bc7ef268745532c",
       "license": "MIT",
@@ -264,6 +264,64 @@
       "parents": [
         "baseline-native",
         "baseline-oracle"
+      ]
+    },
+    {
+      "source_id": "baseline-packet-b-native",
+      "role": "derived-native-replay",
+      "source_uri": "local:docs/evidence/packet-b-native.json",
+      "revision": null,
+      "revision_absence_reason": "Locally generated deterministic baseline; source parents pinned",
+      "acquired_at": "2026-10-16T10:10:16.923563+00:00",
+      "local_path": "docs/evidence/packet-b-native.json",
+      "bytes": 5392,
+      "sha256": "7aa55dd0329c3968d98741629c50052db11766a0ff1db6624619b15fc8429d45",
+      "license": "MIT-derived-data",
+      "command": ".cache/native-venv/bin/python reference/needle_replay.py --packet fixtures/real/packet-b --checkout .cache/needle-pinned --out docs/evidence/packet-b-native.json",
+      "parents": [
+        "needle-source",
+        "packet-b-gold",
+        "packet-b-summary",
+        "packet-b-bing",
+        "packet-b-keenable",
+        "packet-b-perplexity"
+      ]
+    },
+    {
+      "source_id": "baseline-packet-b-oracle",
+      "role": "derived-independent-baseline",
+      "source_uri": "local:docs/evidence/packet-b-oracle.json",
+      "revision": null,
+      "revision_absence_reason": "Locally generated deterministic baseline; source parents pinned",
+      "acquired_at": "2026-10-16T10:10:16.437643+00:00",
+      "local_path": "docs/evidence/packet-b-oracle.json",
+      "bytes": 97336,
+      "sha256": "572cf76b1aafd014912c2193a7369b44fc05567e4abb5980a7fbf14cd2f3a375",
+      "license": "MIT-derived-data",
+      "command": "python reference/prepare_packet.py --input fixtures/real/packet-b --config fixtures/config/packet-b.json --out reference/runs/task9-packet-b; python reference/oracle.py --run reference/runs/task9-packet-b > docs/evidence/packet-b-oracle.json",
+      "parents": [
+        "packet-b-gold",
+        "packet-b-summary",
+        "packet-b-bing",
+        "packet-b-keenable",
+        "packet-b-perplexity"
+      ]
+    },
+    {
+      "source_id": "baseline-packet-b-check",
+      "role": "derived-comparison",
+      "source_uri": "local:docs/evidence/packet-b-reference-check.json",
+      "revision": null,
+      "revision_absence_reason": "Locally generated deterministic baseline; source parents pinned",
+      "acquired_at": "2026-10-16T10:10:35.356044+00:00",
+      "local_path": "docs/evidence/packet-b-reference-check.json",
+      "bytes": 178,
+      "sha256": "302022dec68d6aed2f8141c0054bdd0888905b332ad5fea691c1328cf6b702b3",
+      "license": "MIT-derived-data",
+      "command": "Compare every selected query rank and num_scored/search_errors/recall_at_k/mrr_at_k from packet-b-oracle.json and packet-b-native.json; absolute metric tolerance 1e-9, exact counts/ranks",
+      "parents": [
+        "baseline-packet-b-native",
+        "baseline-packet-b-oracle"
       ]
     }
   ],

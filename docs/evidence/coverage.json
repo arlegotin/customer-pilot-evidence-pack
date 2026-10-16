@@ -1,0 +1,222 @@
+{
+  "query_identity": [
+    "native gold.paper_key",
+    "query_origin.bucket",
+    "query_text"
+  ],
+  "group_identity": "native gold.paper_key (arXiv ID in the supported cohort)",
+  "deduplication": "Count each identity once across all providers and packets; archive-hour query_id and cohort_id are excluded from coverage identity. Cohorts remain separate for evaluation.",
+  "packets": {
+    "packet-a": {
+      "raw_tasks": 384,
+      "tasks": 324,
+      "source_groups": 81,
+      "assignments": 972,
+      "excluded_tasks": 60,
+      "gold_sha256": "e6bc043e64122afe1d047fb539e45951f33a1a2480d29a1b52d97e00f54b5169"
+    },
+    "packet-b": {
+      "raw_tasks": 384,
+      "tasks": 328,
+      "source_groups": 82,
+      "assignments": 984,
+      "excluded_tasks": 56,
+      "gold_sha256": "97fa9a2c52902192bbe6a9dc5abc532643c94a2fd7c8cc5920e1ff97ffaf14cb"
+    }
+  },
+  "distinct_queries": 649,
+  "distinct_source_groups": 160,
+  "query_target": 200,
+  "source_group_target": 50,
+  "targets_met": true,
+  "overlapping_queries": [
+    {
+      "paper_key": "2610.03978",
+      "bucket": "title",
+      "query_text": "learning latent protein languages for autoregressive generation",
+      "source_records": [
+        {
+          "source_ref": "packet-a-gold#line=201",
+          "task_id": "9d60ae27fa1f63eb_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-b-gold#line=197",
+          "task_id": "9d60ae27fa1f63eb_2026-10-15T12",
+          "packet": "packet-b"
+        }
+      ]
+    },
+    {
+      "paper_key": "2610.04800",
+      "bucket": "title",
+      "query_text": "medimageosworld benchmarking gui agents for medical image consoles",
+      "source_records": [
+        {
+          "source_ref": "packet-a-gold#line=41",
+          "task_id": "22cf975d5865af64_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-b-gold#line=41",
+          "task_id": "22cf975d5865af64_2026-10-15T12",
+          "packet": "packet-b"
+        }
+      ]
+    },
+    {
+      "paper_key": "2610.18435",
+      "bucket": "title",
+      "query_text": "how well do llms perform in peer review evidence from finance and accounting",
+      "source_records": [
+        {
+          "source_ref": "packet-a-gold#line=265",
+          "task_id": "1917abfe83ecab99_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-b-gold#line=257",
+          "task_id": "1917abfe83ecab99_2026-10-15T12",
+          "packet": "packet-b"
+        }
+      ]
+    }
+  ],
+  "overlapping_source_groups": [
+    {
+      "paper_key": "2610.03978",
+      "source_records": [
+        {
+          "source_ref": "packet-a-gold#line=201",
+          "task_id": "9d60ae27fa1f63eb_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-a-gold#line=202",
+          "task_id": "90dc4ebd294c7b05_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-a-gold#line=203",
+          "task_id": "8c1c1bded03a08f2_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-a-gold#line=204",
+          "task_id": "cac99da64a90082c_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-b-gold#line=197",
+          "task_id": "9d60ae27fa1f63eb_2026-10-15T12",
+          "packet": "packet-b"
+        },
+        {
+          "source_ref": "packet-b-gold#line=198",
+          "task_id": "ec27b5c2877c33e7_2026-10-15T12",
+          "packet": "packet-b"
+        },
+        {
+          "source_ref": "packet-b-gold#line=199",
+          "task_id": "d9fc31ea739e0e83_2026-10-15T12",
+          "packet": "packet-b"
+        },
+        {
+          "source_ref": "packet-b-gold#line=200",
+          "task_id": "0387c6c12855ebbe_2026-10-15T12",
+          "packet": "packet-b"
+        }
+      ]
+    },
+    {
+      "paper_key": "2610.04800",
+      "source_records": [
+        {
+          "source_ref": "packet-a-gold#line=41",
+          "task_id": "22cf975d5865af64_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-a-gold#line=42",
+          "task_id": "7168a3cb5810ef5c_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-a-gold#line=43",
+          "task_id": "a34285b5b96fb61a_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-a-gold#line=44",
+          "task_id": "35c5ba0a028f982d_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-b-gold#line=41",
+          "task_id": "22cf975d5865af64_2026-10-15T12",
+          "packet": "packet-b"
+        },
+        {
+          "source_ref": "packet-b-gold#line=42",
+          "task_id": "fe929fe26188f8ca_2026-10-15T12",
+          "packet": "packet-b"
+        },
+        {
+          "source_ref": "packet-b-gold#line=43",
+          "task_id": "24eb340e4b914f86_2026-10-15T12",
+          "packet": "packet-b"
+        },
+        {
+          "source_ref": "packet-b-gold#line=44",
+          "task_id": "c97ca12b9dd49058_2026-10-15T12",
+          "packet": "packet-b"
+        }
+      ]
+    },
+    {
+      "paper_key": "2610.18435",
+      "source_records": [
+        {
+          "source_ref": "packet-a-gold#line=265",
+          "task_id": "1917abfe83ecab99_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-a-gold#line=266",
+          "task_id": "ca1c2dcec6687c7b_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-a-gold#line=267",
+          "task_id": "245a080dcb98b7eb_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-a-gold#line=268",
+          "task_id": "07ff3f4ed97db81a_2026-10-14T12",
+          "packet": "packet-a"
+        },
+        {
+          "source_ref": "packet-b-gold#line=257",
+          "task_id": "1917abfe83ecab99_2026-10-15T12",
+          "packet": "packet-b"
+        },
+        {
+          "source_ref": "packet-b-gold#line=258",
+          "task_id": "9529013c456410de_2026-10-15T12",
+          "packet": "packet-b"
+        },
+        {
+          "source_ref": "packet-b-gold#line=259",
+          "task_id": "baaa87c50baad804_2026-10-15T12",
+          "packet": "packet-b"
+        },
+        {
+          "source_ref": "packet-b-gold#line=260",
+          "task_id": "a112171c98163512_2026-10-15T12",
+          "packet": "packet-b"
+        }
+      ]
+    }
+  ]
+}

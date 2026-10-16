@@ -1,0 +1,8 @@
+{
+  "absolute_tolerance": 1e-09,
+  "task_count": 328,
+  "group_count": 82,
+  "rank_comparisons": 984,
+  "native_archive_discrepancies": [],
+  "oracle_native_discrepancies": []
+}
