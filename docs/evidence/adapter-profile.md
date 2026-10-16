@@ -300,3 +300,56 @@ files. An unmarked missing protocol-pinned map also fails; explicit initial
 unavailability distinguishes incomplete evidence from broken retained evidence.
 The map JSON object is strictly decoded, but conversion interpretation and
 coverage are assigned to scoring; ingestion adds no matching algorithm.
+
+## Comparison and absolute decision policy
+
+`pilotpack.compare.assess(packet, evaluation)` consumes the verified Packet and
+Task 5's independently reconciled evaluation. It returns a copy, without another
+oracle invocation or changes to the frozen run. Only
+`protocol.requested_comparisons` generates pairs; an empty list requests none.
+Each pair retains scoped gates and remains blocked when its actual request
+settings, retry policy, cohort or temporal window cannot be established. Explicit
+`protocol.comparison_blockers` remain binding. A's unknown actual settings and
+retry history do not establish a fair provider comparison. Distinct exact modes
+are allowed when each is evidenced and matches its own frozen arm declaration.
+A known actual/declaration mismatch also blocks the affected arm's decision.
+
+Unknown comparison conditions are recorded at
+`metric:arm:<arm_id>:comparison_conditions` and gate requested pairs. They do not
+erase independently supported absolute H/M/F/U accounting. Missing physical
+history limits exact attempts, observed total cost and request efficiency;
+supported logical delivery can remain evaluable when retry selection is known.
+Unavailable conversion coverage blocks only affected assignment judgments;
+a direct confirmed hit can retain delivered recall while its exact first rank
+and native MRR remain unavailable. A canonical packet with no original native
+metric has no original native-replay obligation; independent oracle agreement
+is still required.
+
+`protocol.decision_criteria` remains empty for the acquired baseline. To declare
+criteria, freeze a new protocol identity with a map such as
+`{"arm_a":{"min_delivered_hit_rate":0.6},"arm_b":{"max_provider_failure_rate":0.1,"max_unknown_rate":0.05}}`,
+using actual arm IDs. These are examples, not recommended thresholds or
+acquisition observations. Missing/null thresholds mean `descriptive_only`.
+Hit-rate thresholds use the entire missingness range; F/N and U/N are exact.
+Decisions stay keyed by arm, and pair eligibility is separate. There is no
+automatic winner or run-wide customer decision.
+
+Eligible complete pairs use exactly 2,000 source-group bootstrap replicates,
+seed 0, and nearest-rank 2.5th/97.5th endpoints. Sorted group IDs make replay
+stable; every query variant and both arms move together. Each resample computes
+query-weighted rates, including F as non-hits. Any U suppresses this interval;
+its missingness identification range remains separate. Fewer than two groups
+makes bootstrap unavailable; fewer than 50 carries a small-group qualification.
+The result records the Python version, estimand and counts.
+
+Observed request cost uses decimal strings, evidence-backed zero, one currency,
+attempt scope, complete physical history and coverage of every attempt. Missing,
+estimated, mixed-currency or incomplete evidence yields `total=null`; known
+subtotals and coverage remain visible. The helper relies on ingestion's strict
+request-specific receipt validation. Original archive latency samples remain
+marginal, with source references and their native eligibility metadata. Only
+selected-response-linked measurements on every task in both eligible arms can
+supply paired latency; arrays are never zipped onto tasks. `build_verdict`
+retains identities, source inventory, accounting, per-arm availability, pair
+findings, decisions and reference checks while leaving full case records in
+`evaluation.json`.
