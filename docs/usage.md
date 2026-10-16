@@ -1,0 +1,83 @@
+# Usage
+
+Run from the checkout with Python 3.11+. Product commands need no installation,
+third-party runtime packages, network, paid APIs or model judge.
+
+## Inputs and outputs
+
+`freeze` imports a NEEDLE Scholar packet or canonical JSONL directory, retains
+the source bytes and policy, and builds an immutable SQLite ledger. `evaluate`
+verifies evidence, scores it, checks the independent oracle and assesses
+requested comparisons. `report` verifies output identities and renders HTML
+without rescoring.
+
+The output directory contains `evaluation.json` (all cases and attempts),
+`verdict.json` (summary and comparison gates), and, after `report`, `report.html`.
+HTML opens locally without scripts, assets or a server. Optional thresholds
+produce independent arm decisions; there is no automatic winner.
+
+Use `python -m pilotpack --help` and each subcommand's `--help` for flags.
+[The adapter profile](evidence/adapter-profile.md) documents canonical records,
+provenance, conversion maps and actual-vs-declared settings.
+
+## Canonical example
+
+This is a synthetic schema control, not customer or provider evidence:
+
+```sh
+python -m pilotpack freeze --adapter canonical \
+  --input fixtures/canonical/schema-small --config fixtures/config/canonical.json \
+  --protocol fixtures/canonical/schema-small/protocol.json \
+  --sources fixtures/canonical/schema-small/sources.json --out runs/canonical
+python -m pilotpack evaluate --run runs/canonical --out build/canonical
+python -m pilotpack report --run runs/canonical \
+  --evaluation build/canonical/evaluation.json --out build/canonical
+```
+
+For real packet B, use the README's NEEDLE commands with `packet-b` input and
+configuration, `runs/demo-b`, and `build/demo-b`. Its requested comparison is
+also blocked. Originals and explicit exclusions are retained. Supported real
+cohorts are arXiv-only: A has 324 tasks/81 groups, B has 328/82. Full historical
+PMID extraction is unsupported.
+
+## Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| 0 | Artifacts generated; comparisons eligible, or none requested |
+| 2 | Invalid evidence, integrity/reference failure or publication failure |
+| 3 | Qualified artifacts generated with a requested comparison blocked |
+
+A threshold failure is valid and does not change the exit code. Diagnostics go
+to stderr. Missing costs stay missing; exact request counts require complete
+evidenced histories. Sorted marginal latency samples cannot supply task-paired
+latency. Missingness ranges aren't confidence intervals; the demonstration
+cannot resolve tiny provider differences.
+
+## Repeating commands and interrupted publication
+
+`freeze` refuses an existing destination. Evaluation/reporting can reuse an
+output directory only for identical run/content/protocol identities. Identical
+commands produce identical JSON/HTML bytes. Re-evaluation removes old HTML
+until `report` runs again. Input and output directories must not overlap.
+
+Publication stages a complete directory before replacing the previous output.
+Handled errors preserve that output or leave no final output. The destination
+can briefly be absent during replacement. A hard kill can leave a sibling
+`.NAME.previous-*` complete backup and `.NAME.publishing` lock; inspect the
+backup before restoring it and removing a stale lock. Do not edit frozen runs.
+
+## Checks and full reproduction
+
+```sh
+python -m unittest discover -s tests -v
+python reference/oracle.py --run runs/demo-a
+```
+
+A plain clone runs product checks; the native-replay test explicitly skips
+without its isolated environment. Release verification runs all 202 tests
+with zero skips. For the unchanged native baseline and guarded clean replay,
+follow [offline reproduction](evidence/reproduction.md). The optional release
+offline-baselines asset supplies the exact source archive and seven wheels;
+replay makes no provider or judgment requests. Original failed validation and
+separately reserved v2 evidence remain in [validation](evidence/validation.md).

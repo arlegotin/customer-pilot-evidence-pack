@@ -1,0 +1,13 @@
+Customer Pilot Evidence Pack
+Copyright (c) 2026 Artem Legotin.
+
+Original software is licensed under GNU AGPL version 3 only.
+Original writing and result presentation are licensed under CC BY 4.0.
+See LICENSING.md for scope and THIRD_PARTY_NOTICES.md for upstream material.
+
+NEEDLE source and benchmark records are by Keenable.ai and retain MIT terms.
+The unchanged license is retained in reference/NEEDLE-LICENSE.
+
+Development, evaluation and documentation used AI assistance under the project
+owner's direction. Citation is requested separately from license conditions;
+see CITATION.cff. No affiliation with or endorsement by Keenable is implied.

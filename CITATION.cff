@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this software or its reported results, please cite this repository and record the commit used."
+type: software
+title: "Customer Pilot Evidence Pack: auditable retrieval pilot reports"
+authors:
+  - family-names: Legotin
+    given-names: Artem
+version: 0.1.0
+date-released: "2026-10-16"
+repository-code: "https://github.com/arlegotin/customer-pilot-evidence-pack"
+url: "https://github.com/arlegotin/customer-pilot-evidence-pack"
+license:
+  - AGPL-3.0-only
+  - CC-BY-4.0
+abstract: >-
+  Local Python tooling for freezing retrieval evaluation evidence, preserving
+  assignment and physical-attempt accounting, and producing qualified JSON and
+  static HTML reports. Two real NEEDLE packets cover 649 distinct queries and
+  160 source groups. Supported native and independent scores reconcile and
+  reports reproduce offline. Missing actual comparison conditions block both
+  requested provider comparisons. Workflow value is neutral: the existing
+  reusable baseline also handled the second packet through configuration, so
+  reduced bespoke preparation was not demonstrated.
+keywords:
+  - retrieval evaluation
+  - evidence provenance
+  - reproducible research
+  - pilot evaluation
+  - missing outcomes
