@@ -1,0 +1,2 @@
+{"bucket": "title", "cohort_id": "small", "gold_ids": {"arxiv": ["1234.56789"]}, "query_text": "same text", "source_group_id": "t1", "source_ref": "src#$", "task_id": "t1"}
+{"bucket": "title", "cohort_id": "small", "gold_ids": {"arxiv": ["1234.56789"]}, "query_text": "same text", "source_group_id": "t2", "source_ref": "src#$", "task_id": "t2"}

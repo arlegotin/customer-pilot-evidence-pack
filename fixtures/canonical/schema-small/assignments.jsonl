@@ -1,0 +1,4 @@
+{"arm_id": "a", "assignment_id": "a:t1", "settings_id": "a", "source_ref": "src#$", "task_id": "t1"}
+{"arm_id": "a", "assignment_id": "a:t2", "settings_id": "a", "source_ref": "src#$", "task_id": "t2"}
+{"arm_id": "b", "assignment_id": "b:t1", "settings_id": "b", "source_ref": "src#$", "task_id": "t1"}
+{"arm_id": "b", "assignment_id": "b:t2", "settings_id": "b", "source_ref": "src#$", "task_id": "t2"}

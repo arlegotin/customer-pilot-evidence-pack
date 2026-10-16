@@ -97,3 +97,76 @@ with known dispatch evidenced by physical attempt records. The initial
 reference experiment used null result lists; these were corrected to the
 canonical list shape in a subsequent recorded RED/GREEN cycle. Native
 metrics are unsupported on synthetic fixtures without a replay profile.
+
+## Product canonical v1 schema contract
+
+`pilotpack.schema` provides a frozen `Packet` dataclass, `ValidationError`
+(with a list of structured diagnostics), `load_json(Path)`,
+`load_jsonl(Path)`, and `validate_packet(Path)`. Decoding rejects duplicate
+keys, nonfinite numbers (including overflowing exponent notation), non-object
+records and blank JSONL rows. Semantic validation separately accepts disclosed
+unknown evidence; it never replaces nulls with defaults. Unknown core fields
+are rejected; annotations such as the reference driver's `native_profile`
+belong in `extensions` in product packets.
+
+A product run contains `packet.json`, `protocol.json`, `sources.json`, and
+`tasks.jsonl`, `assignments.jsonl`, `outcomes.jsonl`, `attempts.jsonl`, plus the
+inventoried source files. `sources.json` uses the existing envelope
+`{"schema_version":1,"sources":[...]}`. Source objects use `source_id`,
+`role`, `source_uri`, `revision`, `acquired_at`, `local_path`, `bytes`,
+`sha256`, `license`, `parents`, `command`; optional `limitations` documents
+missing immutable revision. References use `<source-id>#line=N` (1-based) or
+`<source-id>#$...`. Inventory paths and hashed paths must stay under the run
+root, including after symlink resolution.
+
+The full manifest requires the section 5 identity/evidence fields and a
+`hashes` object mapping run-relative file names to lowercase SHA-256 strings;
+this covers canonical JSONL, protocol, sources and each source artifact.
+`protocol_sha256` must match the protocol entry. `reconciliation_note` is
+required for reconstructed assignments. New-run manifests additionally
+require `assignment_manifest_frozen_at` and `assignment_manifest_sha256`;
+freezing after an evidenced dispatch is `MANIFEST_AFTER_DISPATCH`.
+`content_id` and `normalized_table_digest` are optional until freeze/ledger
+creation; they are integrity checks owned by subsequent ingest/ledger stages.
+
+Protocol v1 preserves the checked-in acquisition policy's exact top-level
+fields, including `status`, `actual_retry_policy`, `comparison_blockers`, and
+the reserved `packets` metadata. Each arm and each manifest actual-settings
+entry declares all settings fields from section 5. Actual mode, endpoint,
+query parameters, retry policy, timeout, concurrency and window may be null;
+`snippet_chars` may also be null. Known result count and k remain positive
+integers, with `k <= requested_num_results`. `snippet_chars=0` is valid and
+means no cap. Unknown actual settings require manifest limitations and yield
+`UNKNOWN_ACTUAL_SETTINGS` blocks rather than schema errors. Unknown or partial
+physical history yields `UNKNOWN_ATTEMPT_HISTORY` limitations.
+
+`decision_criteria` maps protocol arm IDs to null or objects whose optional
+keys are exactly `min_delivered_hit_rate`, `max_provider_failure_rate`, and
+`max_unknown_rate`. Every present non-null threshold is a finite numeric
+rate in [0,1], excluding booleans. Unknown arms/criterion names are invalid;
+empty objects and null thresholds preserve descriptive reporting. Bootstrap
+configuration is explicit (`seed`, `replicates`, `confidence`); requested
+comparisons use objects with `arm_a` and `arm_b`. Non-null run/comparison
+windows use `started_at` and `ended_at` timezone-aware RFC3339 strings.
+
+The intentionally narrow v1 observed-cost witness is a source JSON object
+referenced at `#$`, with `request` equal to the physical `attempt_id`, and
+`amount`/`currency` equal to the cost record. Merely naming an existing source
+or an assignment does not prove a request's cost; missing/incorrect evidence
+is `INVALID_COST_PROVENANCE`. The amount is a nonnegative fixed-point decimal
+string; observed `"0"` is valid with this evidence. Missing cost retains null
+amount/currency/source_ref. A missing request measurement requires explicit
+attempt limitations. This acquired archive has no cost witness and therefore
+continues to report missing cost. Other cost-source shapes require an explicit
+adapter transformation and retained parents, rather than accepting an
+unverifiable observed amount.
+
+Task identities are source IDs, never query text. Missing outcome records
+survive validation with an assignment-scoped `MISSING_OUTCOME` block; the
+subsequent accounting stage must synthesize explicit unknown outcomes before
+publication. Validation does not manufacture attempts or decide retry
+selection, cohort compatibility, native metric support or comparative gates.
+`fixtures/canonical/schema-small` is a separate hand-authored synthetic
+control with two equal-text tasks, four assignments, one physical request,
+known no-cap settings, unknown archive settings/history, and an evidenced
+zero cost. The earlier `ten-assignments` reference fixture remains unchanged.
