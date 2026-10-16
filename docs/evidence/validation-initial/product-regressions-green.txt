@@ -1,0 +1,11 @@
+test_actual_setting_and_time_gates_emit_spec_codes (test_validation_diagnostics.StableDiagnostics.test_actual_setting_and_time_gates_emit_spec_codes) ... ok
+test_forged_reported_rank_has_reference_mismatch_code (test_validation_diagnostics.StableDiagnostics.test_forged_reported_rank_has_reference_mismatch_code) ... ok
+test_marginal_latency_cannot_be_presented_as_paired (test_validation_diagnostics.StableDiagnostics.test_marginal_latency_cannot_be_presented_as_paired) ... ok
+test_non_dispatch_has_stable_runner_failure_finding (test_validation_diagnostics.StableDiagnostics.test_non_dispatch_has_stable_runner_failure_finding) ... ok
+test_reconciled_missing_outcome_retains_diagnostic_after_freeze (test_validation_diagnostics.StableDiagnostics.test_reconciled_missing_outcome_retains_diagnostic_after_freeze) ... ok
+test_unavailable_total_cost_has_explicit_limitation (test_validation_diagnostics.StableDiagnostics.test_unavailable_total_cost_has_explicit_limitation) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.176s
+
+OK

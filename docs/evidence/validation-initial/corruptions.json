@@ -1,0 +1,254 @@
+{
+  "cases": [
+    {
+      "codes": [
+        "HASH_MISMATCH"
+      ],
+      "critical": true,
+      "detected": true,
+      "errors": [],
+      "id": "C01",
+      "stage": "import"
+    },
+    {
+      "codes": [
+        "DUPLICATE_ASSIGNMENT"
+      ],
+      "critical": true,
+      "detected": true,
+      "errors": [],
+      "id": "C02",
+      "stage": "import"
+    },
+    {
+      "codes": [
+        "ORPHAN_RECORD"
+      ],
+      "critical": true,
+      "detected": true,
+      "errors": [],
+      "id": "C03",
+      "stage": "import"
+    },
+    {
+      "codes": [
+        "DISPATCH_NOT_ESTABLISHED"
+      ],
+      "critical": true,
+      "detected": false,
+      "errors": [
+        "missing intended finding MISSING_OUTCOME"
+      ],
+      "id": "C04",
+      "stage": "compare"
+    },
+    {
+      "codes": [
+        "COHORT_MISMATCH",
+        "NATIVE_RANK_MISMATCH"
+      ],
+      "critical": true,
+      "detected": false,
+      "errors": [
+        "arms/b/H: 0 != 1",
+        "arms/b/M: 2 != 1"
+      ],
+      "id": "C05",
+      "stage": "compare"
+    },
+    {
+      "codes": [
+        "ACTUAL_SETTINGS_MISMATCH",
+        "COMPARISON_CONDITIONS_MISMATCH",
+        "SCORING_POLICY_MISMATCH"
+      ],
+      "critical": true,
+      "detected": false,
+      "errors": [
+        "missing intended finding SETTINGS_MISMATCH"
+      ],
+      "id": "C06",
+      "stage": "compare"
+    },
+    {
+      "codes": [
+        "ACTUAL_SETTINGS_MISMATCH",
+        "COMPARISON_CONDITIONS_MISMATCH",
+        "SCORING_POLICY_MISMATCH"
+      ],
+      "critical": true,
+      "detected": false,
+      "errors": [
+        "missing intended finding SETTINGS_MISMATCH"
+      ],
+      "id": "C07",
+      "stage": "compare"
+    },
+    {
+      "codes": [
+        "ACTUAL_SETTINGS_MISMATCH"
+      ],
+      "critical": true,
+      "detected": false,
+      "errors": [
+        "missing intended finding SETTINGS_MISMATCH"
+      ],
+      "id": "C08",
+      "stage": "compare"
+    },
+    {
+      "codes": [
+        "INVALID_SCHEMA"
+      ],
+      "critical": true,
+      "detected": false,
+      "errors": [
+        "stage import != compare",
+        "missing intended finding RUNNER_FAILURE",
+        "arms/a/F: '<absent>' != 1",
+        "arms/a/H: '<absent>' != 0",
+        "arms/a/M: '<absent>' != 1",
+        "arms/a/N: '<absent>' != 3",
+        "arms/a/U: '<absent>' != 1",
+        "arms/a/attempts/physical_attempt_count_exact: '<absent>' != 2",
+        "arms/a/cost/total: '<absent>' != None",
+        "arms/a/unknown_reasons/runner_not_dispatched: '<absent>' != 1",
+        "arms/b/F: '<absent>' != 1",
+        "arms/b/H: '<absent>' != 1",
+        "arms/b/M: '<absent>' != 1",
+        "arms/b/N: '<absent>' != 3",
+        "arms/b/U: '<absent>' != 0",
+        "arms/b/attempts/physical_attempt_count_exact: '<absent>' != 3",
+        "arms/b/cost/total: '<absent>' != None",
+        "cases/0/attempts: '<absent>' != []",
+        "pairs/0/comparison_status: '<absent>' != 'blocked'"
+      ],
+      "id": "C09",
+      "stage": "import"
+    },
+    {
+      "codes": [
+        "NATIVE_RANK_MISMATCH"
+      ],
+      "critical": true,
+      "detected": false,
+      "errors": [
+        "missing intended finding REFERENCE_MISMATCH"
+      ],
+      "id": "C10",
+      "stage": "compare"
+    },
+    {
+      "codes": [
+        "DISPATCH_NOT_ESTABLISHED",
+        "RETRY_SELECTION_MISMATCH"
+      ],
+      "critical": true,
+      "detected": true,
+      "errors": [],
+      "id": "C11",
+      "stage": "compare"
+    },
+    {
+      "codes": [
+        "INVALID_COST_PROVENANCE"
+      ],
+      "critical": true,
+      "detected": true,
+      "errors": [],
+      "id": "C12",
+      "stage": "import"
+    },
+    {
+      "codes": [
+        "INCOMPLETE_PHYSICAL_HISTORY",
+        "UNKNOWN_ATTEMPT_HISTORY"
+      ],
+      "critical": false,
+      "detected": false,
+      "errors": [
+        "missing intended finding UNPAIRED_LATENCY"
+      ],
+      "id": "C13",
+      "stage": "compare"
+    },
+    {
+      "codes": [
+        "INCOMPLETE_PHYSICAL_HISTORY",
+        "UNKNOWN_ATTEMPT_HISTORY"
+      ],
+      "critical": false,
+      "detected": true,
+      "errors": [],
+      "id": "C14",
+      "stage": "compare"
+    },
+    {
+      "codes": [],
+      "critical": false,
+      "detected": false,
+      "errors": [
+        "missing intended finding INCOMPLETE_COST",
+        "arms/b/cost/total: '0' != None"
+      ],
+      "id": "C15",
+      "stage": "compare"
+    },
+    {
+      "codes": [
+        "COMPARISON_WINDOW_MISMATCH"
+      ],
+      "critical": false,
+      "detected": false,
+      "errors": [
+        "missing intended finding TIME_WINDOW_MISMATCH"
+      ],
+      "id": "C16",
+      "stage": "compare"
+    },
+    {
+      "codes": [
+        "MISSING_MATCH_EVIDENCE"
+      ],
+      "critical": false,
+      "detected": true,
+      "errors": [],
+      "id": "C17",
+      "stage": "compare"
+    },
+    {
+      "codes": [
+        "INVALID_JSON"
+      ],
+      "critical": false,
+      "detected": true,
+      "errors": [],
+      "id": "C18",
+      "stage": "import"
+    },
+    {
+      "codes": [
+        "UNSAFE_SOURCE_PATH"
+      ],
+      "critical": false,
+      "detected": true,
+      "errors": [],
+      "id": "C19",
+      "stage": "import"
+    },
+    {
+      "codes": [
+        "MANIFEST_AFTER_DISPATCH"
+      ],
+      "critical": false,
+      "detected": true,
+      "errors": [],
+      "id": "C20",
+      "stage": "import"
+    }
+  ],
+  "critical_detected": 5,
+  "critical_total": 12,
+  "detected": 10,
+  "total": 20
+}

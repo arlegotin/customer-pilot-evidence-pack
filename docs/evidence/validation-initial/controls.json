@@ -1,0 +1,58 @@
+{
+  "controls": [
+    {
+      "codes": [],
+      "errors": [],
+      "healthy": true,
+      "id": "H01"
+    },
+    {
+      "codes": [],
+      "errors": [],
+      "healthy": true,
+      "id": "H02"
+    },
+    {
+      "codes": [
+        "INCOMPLETE_PHYSICAL_HISTORY",
+        "UNKNOWN_ATTEMPT_HISTORY"
+      ],
+      "errors": [],
+      "healthy": true,
+      "id": "H03"
+    },
+    {
+      "codes": [],
+      "errors": [],
+      "healthy": true,
+      "id": "H04"
+    },
+    {
+      "codes": [],
+      "errors": [],
+      "healthy": true,
+      "id": "H05"
+    },
+    {
+      "codes": [],
+      "errors": [],
+      "healthy": true,
+      "id": "H06"
+    },
+    {
+      "codes": [],
+      "errors": [],
+      "healthy": true,
+      "id": "H07"
+    },
+    {
+      "codes": [],
+      "errors": [],
+      "healthy": true,
+      "id": "H08"
+    }
+  ],
+  "healthy": 8,
+  "total": 8,
+  "unexpected_controls": 0
+}

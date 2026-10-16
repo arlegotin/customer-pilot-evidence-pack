@@ -103,9 +103,12 @@ def select_delivery(assignment: JsonObject, outcome: JsonObject,
         delivery['unknown_reason'] = 'runner_not_dispatched'
         if rows:
             return unknown('RETRY_SELECTION_MISMATCH', 'Non-dispatch contradicts physical request evidence.', 'runner_not_dispatched')
-        return delivery
+        return unknown('RUNNER_FAILURE', 'Intended task was not dispatched.', 'runner_not_dispatched')
     if kind == 'unobserved':
         delivery['unknown_reason'] = 'missing_record' if 'MISSING_OUTCOME' in outcome.get('limitations', []) else 'unresolved_dispatch'
+        if delivery['unknown_reason'] == 'missing_record':
+            delivery['diagnostics'].append(_diagnostic('MISSING_OUTCOME', 'assignment:' + aid,
+                'Intended assignment has no terminal outcome.', refs))
         return delivery
     if kind == 'attempt_backed':
         if not rows:
@@ -205,6 +208,9 @@ def score_run(run: Path) -> JsonObject:
                 and exact and outcome['reported_hit_rank'] != rank):
             delivery['diagnostics'].append(_diagnostic('NATIVE_RANK_MISMATCH', 'assignment:' + aid,
                                                       'Reported native rank differs from literal recomputation.', delivery['source_refs']))
+        if any(d['code'] == 'NATIVE_RANK_MISMATCH' for d in delivery['diagnostics']):
+            delivery['diagnostics'].append(_diagnostic('REFERENCE_MISMATCH', 'assignment:' + aid,
+                'Cached native rank disagrees with literal evidence.', delivery['source_refs']))
         arm = arms[arm_id]
         arm['N'] += 1
         arm[delivery['classification']] += 1

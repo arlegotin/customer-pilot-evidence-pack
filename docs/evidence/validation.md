@@ -16,3 +16,11 @@ Protected commands (results will be appended without replacing this declaration)
 PILOTPACK_VALIDATION_RESULTS=docs/evidence/validation-initial python -m unittest discover -s tests -p test_corruptions.py -v
 PILOTPACK_VALIDATION_RESULTS=docs/evidence/validation-initial python -m unittest discover -s tests -p test_controls.py -v
 ```
+
+## Initial v1 result: failed and invalid for acceptance
+
+Freeze commit: `69ee79e`. Initial protected commands above produced **10/20 detections, 5/12 critical, 8/8 healthy with zero unexpected controls**. Exact per-case codes/errors and console output are retained in `validation-initial/`. Undetected: C04–C10, C13, C15, C16. This run does not satisfy acceptance.
+
+Three frozen harness defects invalidate a protected success claim: C05 expected unchanged b hit/miss counts despite substituted gold; C09 supplied null results although canonical outcomes require a ranked list, causing unrelated structural failure; C15 supplied valid zero receipts to b while expecting its total null. These are retained as failures, with no retroactive adjustment. Separately, ordinary focused regressions exposed missing stable spec diagnostics for missing outcomes, runner non-dispatch, forged cached rank, settings/window mismatch, unavailable total cost and marginal-only latency. Six focused regression tests failed before the product fixes and passed after; exact outputs are retained. Existing diagnostic aliases remain available.
+
+The coordinator reserved **a separate v2 evaluation** with a newly authored parent, fresh task/group IDs and an additional literal known hit per arm. Only the three disclosed harness corrections and necessary literal new-parent projections are permitted. C01–C20, 12 critical and eight healthy denominators stay fixed. V1 definitions remain available in Git at `69ee79e`, and initial evidence is never overwritten. V2 is a newly reserved evaluation, not an uninterrupted first-pass protected claim. B remains unopened.

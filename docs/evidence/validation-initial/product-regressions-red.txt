@@ -1,0 +1,59 @@
+test_actual_setting_and_time_gates_emit_spec_codes (test_validation_diagnostics.StableDiagnostics.test_actual_setting_and_time_gates_emit_spec_codes) ... FAIL
+test_forged_reported_rank_has_reference_mismatch_code (test_validation_diagnostics.StableDiagnostics.test_forged_reported_rank_has_reference_mismatch_code) ... FAIL
+test_marginal_latency_cannot_be_presented_as_paired (test_validation_diagnostics.StableDiagnostics.test_marginal_latency_cannot_be_presented_as_paired) ... FAIL
+test_non_dispatch_has_stable_runner_failure_finding (test_validation_diagnostics.StableDiagnostics.test_non_dispatch_has_stable_runner_failure_finding) ... FAIL
+test_reconciled_missing_outcome_retains_diagnostic_after_freeze (test_validation_diagnostics.StableDiagnostics.test_reconciled_missing_outcome_retains_diagnostic_after_freeze) ... FAIL
+test_unavailable_total_cost_has_explicit_limitation (test_validation_diagnostics.StableDiagnostics.test_unavailable_total_cost_has_explicit_limitation) ... FAIL
+
+======================================================================
+FAIL: test_actual_setting_and_time_gates_emit_spec_codes (test_validation_diagnostics.StableDiagnostics.test_actual_setting_and_time_gates_emit_spec_codes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/tests/test_validation_diagnostics.py", line 16, in test_actual_setting_and_time_gates_emit_spec_codes
+    self.assertIn('SETTINGS_MISMATCH',{d['code'] for d in got['diagnostics']})
+AssertionError: 'SETTINGS_MISMATCH' not found in {'INCOMPLETE_PHYSICAL_HISTORY', 'ACTUAL_SETTINGS_MISMATCH'}
+
+======================================================================
+FAIL: test_forged_reported_rank_has_reference_mismatch_code (test_validation_diagnostics.StableDiagnostics.test_forged_reported_rank_has_reference_mismatch_code)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/tests/test_validation_diagnostics.py", line 42, in test_forged_reported_rank_has_reference_mismatch_code
+    self.assertIn('REFERENCE_MISMATCH',{d['code'] for d in score.score_run(run)['diagnostics']})
+AssertionError: 'REFERENCE_MISMATCH' not found in {'UNKNOWN_ACTUAL_SETTINGS', 'UNKNOWN_ATTEMPT_HISTORY', 'NATIVE_RANK_MISMATCH', 'UNKNOWN_ACTUAL_RETRY_POLICY'}
+
+======================================================================
+FAIL: test_marginal_latency_cannot_be_presented_as_paired (test_validation_diagnostics.StableDiagnostics.test_marginal_latency_cannot_be_presented_as_paired)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/tests/test_validation_diagnostics.py", line 57, in test_marginal_latency_cannot_be_presented_as_paired
+    self.assertIn('UNPAIRED_LATENCY',{d['code'] for d in got['diagnostics']})
+AssertionError: 'UNPAIRED_LATENCY' not found in {'INCOMPLETE_PHYSICAL_HISTORY'}
+
+======================================================================
+FAIL: test_non_dispatch_has_stable_runner_failure_finding (test_validation_diagnostics.StableDiagnostics.test_non_dispatch_has_stable_runner_failure_finding)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/tests/test_validation_diagnostics.py", line 25, in test_non_dispatch_has_stable_runner_failure_finding
+    self.assertIn('RUNNER_FAILURE',{d['code'] for d in delivery['diagnostics']})
+AssertionError: 'RUNNER_FAILURE' not found in set()
+
+======================================================================
+FAIL: test_reconciled_missing_outcome_retains_diagnostic_after_freeze (test_validation_diagnostics.StableDiagnostics.test_reconciled_missing_outcome_retains_diagnostic_after_freeze)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/tests/test_validation_diagnostics.py", line 33, in test_reconciled_missing_outcome_retains_diagnostic_after_freeze
+    self.assertIn('MISSING_OUTCOME',{d['code'] for d in score.score_run(run)['diagnostics']})
+AssertionError: 'MISSING_OUTCOME' not found in {'UNKNOWN_ACTUAL_SETTINGS', 'UNKNOWN_ATTEMPT_HISTORY'}
+
+======================================================================
+FAIL: test_unavailable_total_cost_has_explicit_limitation (test_validation_diagnostics.StableDiagnostics.test_unavailable_total_cost_has_explicit_limitation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/artemlegotin/Documents/git_alter/customer-pilot-evidence-pack/tests/test_validation_diagnostics.py", line 48, in test_unavailable_total_cost_has_explicit_limitation
+    self.assertIn('INCOMPLETE_COST',{d['code'] for d in got['diagnostics']})
+AssertionError: 'INCOMPLETE_COST' not found in {'INCOMPLETE_PHYSICAL_HISTORY'}
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.170s
+
+FAILED (failures=6)

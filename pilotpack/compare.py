@@ -172,6 +172,9 @@ def _arm_gates(packet, evaluation, arm, cases):
     if mismatches:
         gates.append(_diagnostic('ACTUAL_SETTINGS_MISMATCH', scope,
                                  'Actual settings differ from the frozen arm declaration: ' + ', '.join(mismatches), refs))
+    if mismatches:
+        gates.append(_diagnostic('SETTINGS_MISMATCH', scope,
+                                 'Actual settings differ from the frozen arm declaration.', refs))
     checks = evaluation.get('reference_checks', [])
     oracle = [c for c in checks if c['reference'] == 'independent_oracle']
     if not oracle or any(c['status'] != 'passed' for c in oracle):
@@ -286,6 +289,8 @@ def _pair(packet, evaluation, a, b):
         gates.append(_diagnostic('UNKNOWN_COMPARISON_WINDOW', scope, 'Frozen comparison window is unknown.', refs))
     elif any(s['run_window'] is not None and not _inside_window(s['run_window'], window) for s in (actual_a, actual_b)):
         gates.append(_diagnostic('COMPARISON_WINDOW_MISMATCH', scope, 'An actual run window is outside the frozen comparison window.', refs))
+        gates.append(_diagnostic('TIME_WINDOW_MISMATCH', scope,
+                                 'An actual run window is outside the frozen comparison window.', refs))
     # The common profile/budget must also agree with the protocol's global scoring policy.
     for key in ('k', 'snippet_chars', 'matching_profile'):
         if any(s[key] != packet.protocol[key] for s in (actual_a, actual_b)):
@@ -371,8 +376,21 @@ def assess(packet: Packet, evaluation: JsonObject) -> JsonObject:
                     and data['attempts']['physical_attempt_count_exact'] == len(attempts))
         data['cost'] = observed_cost(attempts, history_complete=complete)
         data['latency'] = _latency(packet, cases)
+        if data['cost']['total'] is None:
+            result['diagnostics'].append(_diagnostic('INCOMPLETE_COST', 'metric:arm:' + arm + ':cost',
+                data['cost']['unavailable_reason'], _arm_refs(packet, arm, cases), severity='limitation'))
     result['pairs'] = [_pair(packet, result, p['arm_a'], p['arm_b'])
                        for p in packet.protocol['requested_comparisons']]
+    for pair in result['pairs']:
+        if pair['latency']['paired'] is None and any(
+                result['arms'][arm]['latency']['support_status'] == 'marginal_only'
+                for arm in (pair['arm_a'], pair['arm_b'])):
+            result['diagnostics'].append(_diagnostic('UNPAIRED_LATENCY',
+                'pair:' + pair['arm_a'] + ':' + pair['arm_b'],
+                'Sorted marginal latency cannot establish task-linked paired latency.',
+                [r for arm in (pair['arm_a'], pair['arm_b']) for r in
+                 _arm_refs(packet, arm, [c for c in result['cases'] if c['arm_id'] == arm])],
+                severity='limitation'))
     result['decisions'] = {arm: _decision(data, packet.protocol['decision_criteria'].get(arm))
                            for arm, data in sorted(result['arms'].items())}
     # Collect newly generated findings while preserving source diagnostic provenance.
