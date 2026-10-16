@@ -380,3 +380,179 @@ class IngestTests(unittest.TestCase):
         manifest['normalized_table_digest'] = '0' * 64
         write_json(run / 'packet.json', manifest)
         self.fault('LEDGER_INTEGRITY_MISMATCH', lambda: ingest.verify_run(run))
+
+    def review_new_run(self, base=None, retained_rows=None):
+        source = make_packet(base or self.base)
+        assignments = [json.loads(line) for line in (source / 'assignments.jsonl').read_text().splitlines()]
+        rows = assignments if retained_rows is None else retained_rows(assignments)
+        retained = source / 'raw/intended.jsonl'
+        retained.write_text(''.join(json.dumps(row, sort_keys=False) + '\n' for row in rows))
+        inventory = json.loads((source / 'sources.json').read_text())
+        parent = inventory['sources'][0]
+        inventory['sources'].append({**parent, 'source_id': 'intended', 'local_path': 'raw/intended.jsonl',
+                                     'role': 'pre-dispatch-assignment-manifest', 'parents': ['src'],
+                                     'bytes': retained.stat().st_size, 'sha256': hashlib.sha256(retained.read_bytes()).hexdigest()})
+        write_json(source / 'sources.json', inventory)
+        manifest = json.loads((source / 'packet.json').read_text())
+        manifest.update(origin='new_run', assignment_manifest_frozen_at='2026-01-01T00:00:00Z',
+                        assignment_manifest_sha256=hashlib.sha256(retained.read_bytes()).hexdigest(),
+                        extensions={'assignment_manifest_source_id': 'intended'})
+        write_json(source / 'packet.json', manifest)
+        rehash(source)
+        return source
+
+    def test_review_predispatch_manifest_requires_exact_assignment_contents(self):
+        changes = {
+            'unrelated': lambda rows: [dict(rows[0], assignment_id='unrelated')],
+            'missing': lambda rows: rows[1:],
+            'extra': lambda rows: rows + [dict(rows[0], assignment_id='extra')],
+            'duplicate': lambda rows: rows + [rows[0]],
+        }
+        for field, value in [('assignment_id', 'different'), ('task_id', 't2'), ('arm_id', 'b'),
+                             ('settings_id', 'b'), ('source_ref', 'src#line=1')]:
+            changes[field] = lambda rows, field=field, value=value: [dict(rows[0], **{field: value}), *rows[1:]]
+        for name, change in changes.items():
+            with self.subTest(change=name):
+                base = self.base / name
+                base.mkdir()
+                source = self.review_new_run(base, change)
+                self.fault('MANIFEST_CONTENT_MISMATCH', lambda: self.freeze_canonical(source, base / 'run'))
+
+    def test_review_predispatch_manifest_allows_record_and_key_reordering(self):
+        source = self.review_new_run(retained_rows=lambda rows: [dict(reversed(list(row.items()))) for row in reversed(rows)])
+        run = self.freeze_canonical(source)
+        packet = ingest.verify_run(run)
+        self.assertEqual(len(packet.assignments), 4)
+        self.assertEqual((run / 'raw/assignment-manifest.jsonl').read_bytes(), (source / 'raw/intended.jsonl').read_bytes())
+
+    def test_review_reopen_reconciles_intended_manifest_with_changed_assignments(self):
+        run = self.freeze_canonical(self.review_new_run())
+        rows = [json.loads(line) for line in (run / 'assignments.jsonl').read_text().splitlines()]
+        rows[0]['settings_id'] = 'b'
+        write_rows(run / 'assignments.jsonl', rows)
+        rehash(run)
+        # Rehashing reaches semantic reconciliation before the stale SQL/content IDs.
+        self.fault('MANIFEST_CONTENT_MISMATCH', lambda: ingest.verify_run(run))
+
+    def review_map(self, source=None):
+        source = source or make_packet(self.base)
+        path = source / 'identifier-map.json'
+        path.write_bytes(b'{ "pmc_to_pmid" : {"PMC123": "456"} }\n')
+        inventory = json.loads((source / 'sources.json').read_text())
+        parent = inventory['sources'][0]
+        inventory['sources'].append({**parent, 'source_id': 'conversion-map', 'local_path': 'identifier-map.json',
+                                     'role': 'identifier-conversion-map', 'parents': ['src'],
+                                     'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
+        write_json(source / 'sources.json', inventory)
+        protocol = json.loads((source / 'protocol.json').read_text())
+        protocol['conversion_map_sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
+        write_json(source / 'protocol.json', protocol)
+        rehash(source)
+        return source
+
+    def test_review_conversion_map_keeps_canonical_bytes_hash_and_source_link(self):
+        source = self.review_map()
+        original = (source / 'identifier-map.json').read_bytes()
+        run = self.freeze_canonical(source)
+        packet = ingest.verify_run(run)
+        self.assertTrue((run / 'identifier-map.json').exists(), 'canonical identifier map was lost')
+        self.assertEqual((run / 'identifier-map.json').read_bytes(), original)
+        self.assertEqual(packet.manifest['hashes']['identifier-map.json'], hashlib.sha256(original).hexdigest())
+        self.assertEqual(packet.manifest['extensions']['conversion_map'], {'status': 'available', 'source_id': 'conversion-map'})
+        retained = next(s for s in packet.sources if s['source_id'] == 'conversion-map')
+        self.assertEqual((run / retained['local_path']).read_bytes(), original)
+        self.assertEqual(retained['parents'], ['src'])
+
+    def test_review_conversion_map_conflicting_policy_or_provenance_fails(self):
+        for scenario in ('policy-hash', 'unlinked', 'wrong-source', 'not-policy-pinned'):
+            with self.subTest(scenario=scenario):
+                base = self.base / scenario
+                base.mkdir()
+                source = self.review_map(make_packet(base))
+                if scenario in ('policy-hash', 'not-policy-pinned'):
+                    policy = json.loads((source / 'protocol.json').read_text())
+                    policy['conversion_map_sha256'] = '0' * 64 if scenario == 'policy-hash' else None
+                    write_json(source / 'protocol.json', policy)
+                elif scenario == 'unlinked':
+                    inventory = json.loads((source / 'sources.json').read_text())
+                    inventory['sources'] = inventory['sources'][:1]
+                    write_json(source / 'sources.json', inventory)
+                else:
+                    manifest = json.loads((source / 'packet.json').read_text())
+                    manifest['extensions'] = {'conversion_map': {'status': 'available', 'source_id': 'src'}}
+                    write_json(source / 'packet.json', manifest)
+                rehash(source)
+                self.fault('CONVERSION_MAP_INTEGRITY_MISMATCH', lambda: self.freeze_canonical(source, base / 'run'))
+
+    def test_review_required_map_explicitly_unavailable_is_missing_evidence(self):
+        source = make_packet(self.base)
+        policy = json.loads((source / 'protocol.json').read_text())
+        policy['conversion_map_sha256'] = '1' * 64
+        write_json(source / 'protocol.json', policy)
+        manifest = json.loads((source / 'packet.json').read_text())
+        manifest['extensions'] = {'conversion_map': {'status': 'unavailable', 'source_id': None,
+                                                      'reason': 'Historical PMC-to-PMID conversion cache was not archived'}}
+        write_json(source / 'packet.json', manifest)
+        rehash(source)
+        packet = ingest.verify_run(self.freeze_canonical(source))
+        diagnostics = [d for d in packet.diagnostics if d['code'] == 'MISSING_MATCH_EVIDENCE']
+        self.assertEqual(len(diagnostics), 1)
+        self.assertEqual(diagnostics[0]['severity'], 'block')
+        self.assertEqual(diagnostics[0]['scope'], 'conversion_map')
+        self.assertEqual(len(packet.outcomes), 4)
+        self.assertFalse((packet.root / 'identifier-map.json').exists())
+
+    def test_review_frozen_available_map_removal_is_integrity_failure(self):
+        run = self.freeze_canonical(self.review_map())
+        self.assertTrue((run / 'identifier-map.json').exists(), 'canonical identifier map was lost')
+        (run / 'identifier-map.json').unlink()
+        # Even rehashing the remaining bytes cannot downgrade available to unavailable.
+        rehash(run)
+        self.fault('CONVERSION_MAP_INTEGRITY_MISMATCH', lambda: ingest.verify_run(run))
+
+    def test_review_initial_required_map_without_explicit_absence_fails(self):
+        source = make_packet(self.base)
+        policy = json.loads((source / 'protocol.json').read_text())
+        policy['conversion_map_sha256'] = '1' * 64
+        write_json(source / 'protocol.json', policy)
+        rehash(source)
+        self.fault('CONVERSION_MAP_INTEGRITY_MISMATCH', lambda: self.freeze_canonical(source))
+
+    def test_review_explicit_map_source_may_supply_original_bytes_outside_canonical_location(self):
+        source = self.review_map()
+        original = (source / 'identifier-map.json').read_bytes()
+        (source / 'identifier-map.json').rename(source / 'raw/original-map.json')
+        inventory = json.loads((source / 'sources.json').read_text())
+        inventory['sources'][-1]['local_path'] = 'raw/original-map.json'
+        write_json(source / 'sources.json', inventory)
+        manifest = json.loads((source / 'packet.json').read_text())
+        manifest['extensions'] = {'conversion_map': {'status': 'available', 'source_id': 'conversion-map'}}
+        write_json(source / 'packet.json', manifest)
+        rehash(source)
+        run = self.freeze_canonical(source)
+        self.assertEqual((run / 'identifier-map.json').read_bytes(), original)
+        self.assertEqual(ingest.verify_run(run).manifest['extensions']['conversion_map']['source_id'], 'conversion-map')
+
+    def test_review_archive_can_select_provenanced_map_with_explicit_config(self):
+        config = json.loads((ROOT / 'fixtures/config/packet-a.json').read_text())
+        config['auxiliary_source_ids'] = []
+        config['baseline_source_ids'] = {}
+        config['conversion_map'] = {'status': 'available', 'source_id': 'conversion-map'}
+        map_path = self.base / 'provided-map.json'
+        map_path.write_bytes(b'{"pmc_to_pmid":{"PMC123":"456"}}\n')
+        registry = json.loads((ROOT / 'sources.json').read_text())
+        parent = registry['sources'][0]
+        registry['sources'].append({**parent, 'source_id': 'conversion-map', 'local_path': 'provided-map.json',
+                                     'role': 'identifier-conversion-map', 'parents': ['packet-a-gold'],
+                                     'bytes': map_path.stat().st_size, 'sha256': hashlib.sha256(map_path.read_bytes()).hexdigest()})
+        policy = json.loads((ROOT / 'protocol.json').read_text())
+        policy['conversion_map_sha256'] = hashlib.sha256(map_path.read_bytes()).hexdigest()
+        for name, value in [('config', config), ('sources', registry), ('protocol', policy)]:
+            write_json(self.base / (name + '.json'), value)
+        run = ingest.freeze(ROOT / 'fixtures/real/packet-a', adapter='needle-scholar',
+                            config_path=self.base / 'config.json', protocol_path=self.base / 'protocol.json',
+                            sources_path=self.base / 'sources.json', out=self.base / 'run')
+        packet = ingest.verify_run(run)
+        self.assertEqual((run / 'identifier-map.json').read_bytes(), map_path.read_bytes())
+        self.assertEqual(packet.manifest['extensions']['conversion_map'], config['conversion_map'])
+        self.assertEqual(len(packet.tasks), 324)

@@ -257,3 +257,46 @@ provenanced B sidecars are available. The generic mapping can select them
 without product code changes. `extensions.native_profile` names the replayed
 denominator profile; `extensions.exclusions_source_id` identifies the retained
 excluded-task manifest; `extensions.selection` records cohort ID and selector.
+
+## Review corrections: pre-dispatch intent and conversion-map evidence
+
+A retained pre-dispatch assignment manifest is parsed as strict UTF-8 JSONL,
+and its complete assignment objects must match the canonical assignment set.
+This includes assignment/task/arm/settings IDs, source evidence and extensions.
+Row order, JSON object key order and formatting may differ; missing, extra,
+duplicate or changed rows fail `MANIFEST_CONTENT_MISMATCH`. A genuine SHA256
+of unrelated bytes is insufficient. Both initial canonical import and frozen
+reopen perform this reconciliation as well as byte-hash and timestamp checks.
+
+A supplied conversion map is retained byte-for-byte at `RUN/identifier-map.json`
+and at its inventoried raw source path. Its canonical path participates in the
+content map. `packet.json.extensions.conversion_map` records
+`{"status":"available","source_id":"<inventoried-source-id>"}`;
+canonical bytes, source bytes/length/SHA256 and
+`protocol.conversion_map_sha256` must agree. The source preserves acquisition
+and transformation parents. At initial canonical import, a unique source whose
+local path is `identifier-map.json` supplies this link automatically; a map
+retained at another source path needs the explicit link. For the archive path,
+optional `config.conversion_map` supplies the same explicit link, selecting its
+source and parent closure from the provided registry. No map source/path is
+inferred from repository state.
+
+A required conversion map explicitly unavailable at initial import is a
+supported evidence limitation. It requires
+`extensions.conversion_map = {"status":"unavailable","source_id":null,
+"reason":"<specific absence reason>"}` (or the same archive config object).
+There must be no contradictory supplied map bytes or canonical-map source.
+Import and reopen reproduce one `MISSING_MATCH_EVIDENCE` block diagnostic at
+scope `conversion_map`; all original tasks/outcomes remain intact. Task 5 must
+mark metrics that require that conversion unsupported, with no fabricated
+misses or new identifier lookup. This absence state is part of the authoritative
+manifest binding and frozen content identity.
+
+A claimed/supplied map without policy pinning/provenance, mismatched hashes or
+bytes, or removal of a previously available frozen map is an integrity failure
+(`CONVERSION_MAP_INTEGRITY_MISMATCH`, or an earlier canonical/source hash fault).
+It cannot be downgraded to initial missing evidence by rehashing the remaining
+files. An unmarked missing protocol-pinned map also fails; explicit initial
+unavailability distinguishes incomplete evidence from broken retained evidence.
+The map JSON object is strictly decoded, but conversion interpretation and
+coverage are assigned to scoring; ingestion adds no matching algorithm.

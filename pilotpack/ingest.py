@@ -93,6 +93,70 @@ def _assignment_manifest(packet: Packet) -> bytes:
     return (packet.root / 'assignments.jsonl').read_bytes()
 
 
+def _check_assignment_manifest(packet: Packet) -> None:
+    if packet.manifest['origin'] != 'new_run':
+        return
+    data = _assignment_manifest(packet)
+    if _sha(data) != packet.manifest['assignment_manifest_sha256']:
+        _fail('MANIFEST_HASH_MISMATCH', 'packet.json', 'pre-dispatch assignment hash differs from retained manifest bytes')
+    try:
+        lines = data.decode('utf-8').split('\n')
+        if lines[-1] == '':
+            lines.pop()
+        rows = [_embedded(line, f'assignment-manifest:{n}:$') for n, line in enumerate(lines, 1)]
+    except (UnicodeError, ValidationError) as error:
+        _fail('MANIFEST_CONTENT_MISMATCH', 'assignment-manifest', 'invalid intended assignment JSONL: ' + str(error))
+    if sorted(_bytes(row) for row in rows) != sorted(_bytes(row) for row in packet.assignments):
+        _fail('MANIFEST_CONTENT_MISMATCH', 'assignment-manifest',
+              'retained pre-dispatch assignment records differ from canonical identities, settings or evidence')
+
+
+def _conversion_map(packet: Packet, *, frozen: bool = False,
+                    source_paths: dict[str, Path] | None = None) -> tuple[Packet, bytes | None]:
+    expected = packet.protocol['conversion_map_sha256']
+    linkage = packet.manifest.get('extensions', {}).get('conversion_map')
+    canonical = _safe(packet.root, 'identifier-map.json')
+    exists = canonical.exists()
+    candidates = [s for s in packet.sources if s['local_path'] == 'identifier-map.json']
+    if linkage is None and not exists and expected is None:
+        return packet, None
+    if linkage is None and exists and len(candidates) == 1:
+        linkage = {'status': 'available', 'source_id': candidates[0]['source_id']}
+    if not isinstance(linkage, dict) or linkage.get('status') not in ('available', 'unavailable'):
+        _fail('CONVERSION_MAP_INTEGRITY_MISMATCH', 'conversion_map',
+              'a supplied or protocol-pinned map needs a source link or explicit initial unavailability')
+    if linkage['status'] == 'unavailable':
+        if (set(linkage) != {'status', 'source_id', 'reason'} or linkage['source_id'] is not None
+                or not isinstance(linkage['reason'], str) or not linkage['reason'].strip()):
+            _fail('CONVERSION_MAP_INTEGRITY_MISMATCH', 'conversion_map', 'unavailability requires null source_id and an explicit reason')
+        if exists or candidates:
+            _fail('CONVERSION_MAP_INTEGRITY_MISMATCH', 'conversion_map', 'unavailable map contradicts supplied bytes/provenance')
+        diagnostic = dict(code='MISSING_MATCH_EVIDENCE', severity='block', scope='conversion_map',
+                          source_refs=[], message='Required identifier conversion evidence is unavailable: ' + linkage['reason'])
+        diagnostics = tuple(d for d in packet.diagnostics if not (d['code'] == 'MISSING_MATCH_EVIDENCE' and d['scope'] == 'conversion_map'))
+        return replace(packet, diagnostics=(*diagnostics, diagnostic)), None
+    if set(linkage) != {'status', 'source_id'} or not isinstance(linkage['source_id'], str):
+        _fail('CONVERSION_MAP_INTEGRITY_MISMATCH', 'conversion_map', 'available map requires one explicit source ID')
+    source = next((s for s in packet.sources if s['source_id'] == linkage['source_id']), None)
+    if source is None or expected is None or source['sha256'] != expected:
+        _fail('CONVERSION_MAP_INTEGRITY_MISMATCH', 'conversion_map', 'conversion-map source and protocol hash disagree')
+    if frozen and not exists:
+        _fail('CONVERSION_MAP_INTEGRITY_MISMATCH', 'identifier-map.json', 'previously available frozen map is missing')
+    source_path = source_paths[source['source_id']] if source_paths is not None else _safe(packet.root, source['local_path'])
+    try:
+        data = source_path.read_bytes()
+    except OSError as error:
+        _fail('CONVERSION_MAP_INTEGRITY_MISMATCH', 'conversion_map', str(error))
+    if _sha(data) != expected or len(data) != source['bytes'] or (exists and canonical.read_bytes() != data):
+        _fail('CONVERSION_MAP_INTEGRITY_MISMATCH', 'conversion_map', 'canonical map bytes, provenance and protocol hash disagree')
+    try:
+        _embedded(data.decode('utf-8'), 'identifier-map.json:$')
+    except UnicodeError as error:
+        _fail('INVALID_JSON', 'identifier-map.json', str(error))
+    manifest = {**packet.manifest, 'extensions': {**packet.manifest.get('extensions', {}), 'conversion_map': linkage}}
+    return replace(packet, manifest=manifest), data
+
+
 def import_canonical(input_dir: Path, config: JsonObject) -> Packet:
     """Validate contained canonical evidence without changing source identities."""
     if config.get('adapter_profile') != 'canonical-v1':
@@ -100,9 +164,8 @@ def import_canonical(input_dir: Path, config: JsonObject) -> Packet:
     _preflight(input_dir)
     packet = validate_packet(input_dir)
     _check_counts(packet)
-    if packet.manifest['origin'] == 'new_run':
-        if _sha(_assignment_manifest(packet)) != packet.manifest['assignment_manifest_sha256']:
-            _fail('MANIFEST_HASH_MISMATCH', 'packet.json', 'pre-dispatch assignment hash differs from retained manifest bytes')
+    _check_assignment_manifest(packet)
+    packet, _ = _conversion_map(packet)
     return _reconcile(packet)
 
 
@@ -223,6 +286,12 @@ def _archive(input_dir: Path, config: JsonObject) -> Packet:
     if not isinstance(baselines, dict) or set(baselines) - {'native', 'oracle', 'check'} or any(not isinstance(sid, str) for sid in baselines.values()):
         _fail('INVALID_SCHEMA', 'config.baseline_source_ids', 'expected explicit native/oracle/check source IDs')
     selected_sources = set(paths) | set(config.get('auxiliary_source_ids', [])) | set(baselines.values())
+    conversion = config.get('conversion_map')
+    if isinstance(conversion, dict) and conversion.get('status') == 'available':
+        sid = conversion.get('source_id')
+        if not isinstance(sid, str):
+            _fail('CONVERSION_MAP_INTEGRITY_MISMATCH', 'config.conversion_map', 'available map requires a source ID')
+        selected_sources.add(sid)
     pending = list(selected_sources)
     while pending:
         sid = pending.pop()
@@ -244,13 +313,18 @@ def _archive(input_dir: Path, config: JsonObject) -> Packet:
                     extensions={'selection': {'cohort_id': config['cohort_id'], 'selector': policy['cohort_selector']},
                                 'native_profile': 'needle-scholar-all-rows-v1', 'baseline_source_ids': baselines,
                                 'raw_task_count': len(gold_rows), 'excluded_tasks': excluded})
+    if conversion is not None:
+        manifest['extensions']['conversion_map'] = conversion
     return _reconcile(Packet(input_dir, manifest, protocol, sources, tuple(tasks), tuple(assignments), tuple(outcomes), (), ()))
 
 
 def import_needle_scholar(input_dir: Path, config: JsonObject) -> Packet:
     """Normalize only the documented versioned archive profile; no live lookup."""
     try:
-        return _archive(Path(input_dir), config)
+        packet = _archive(Path(input_dir), config)
+        root = Path(config['_context']['source_root'])
+        paths = {s['source_id']: _safe(root, s['local_path']) for s in packet.sources}
+        return _conversion_map(packet, source_paths=paths)[0]
     except (KeyError, TypeError, IndexError, ValueError) as error:
         if isinstance(error, ValidationError):
             raise
@@ -305,7 +379,7 @@ def _resolve_refs(packet: Packet) -> None:
 
 
 def _preflight(root: Path) -> None:
-    for name in ('packet.json', 'protocol.json', 'sources.json', 'ledger.sqlite', *(n + '.jsonl' for n in _TABLES)):
+    for name in ('packet.json', 'protocol.json', 'sources.json', 'ledger.sqlite', 'identifier-map.json', *(n + '.jsonl' for n in _TABLES)):
         _safe(root, name)
 
 
@@ -351,6 +425,7 @@ def freeze(input_dir: Path, *, adapter: str, config_path: Path, protocol_path: P
                 raw_paths[sid] = _safe(source_root, source['local_path'])
     else:
         _fail('UNSUPPORTED_ADAPTER', 'adapter', adapter)
+    packet, conversion_bytes = _conversion_map(packet, source_paths=raw_paths)
     out.parent.mkdir(parents=True, exist_ok=True)
     staging = Path(tempfile.mkdtemp(prefix='.' + out.name + '.staging-', dir=out.parent))
     reserved = False
@@ -369,6 +444,8 @@ def freeze(input_dir: Path, *, adapter: str, config_path: Path, protocol_path: P
                 _fail('DUPLICATE_SOURCE', sid, 'retained raw filename collision')
             (staging / name).write_bytes(data)
             sources.append({**source, 'local_path': name})
+        if conversion_bytes is not None:
+            (staging / 'identifier-map.json').write_bytes(conversion_bytes)
         manifest = dict(packet.manifest)
         if manifest['origin'] == 'new_run':
             data = _assignment_manifest(packet)
@@ -412,6 +489,7 @@ def freeze(input_dir: Path, *, adapter: str, config_path: Path, protocol_path: P
         manifest['content_id'] = _sha(_bytes(manifest['hashes']))
         (staging / 'packet.json').write_bytes(_bytes(manifest))
         validated = validate_packet(staging)
+        validated, _ = _conversion_map(validated, frozen=True)
         _resolve_refs(validated)
         create_ledger(validated, staging / 'ledger.sqlite')
         manifest['normalized_table_digest'] = normalized_digest(staging / 'ledger.sqlite')
@@ -444,8 +522,8 @@ def verify_run(run: Path) -> Packet:
         _fail('MANIFEST_INTEGRITY_MISMATCH', 'packet.json', 'authoritative manifest differs from hashed normalization input')
     packet = validate_packet(run)
     _check_counts(packet)
-    if packet.manifest['origin'] == 'new_run' and _sha(_assignment_manifest(packet)) != packet.manifest['assignment_manifest_sha256']:
-        _fail('MANIFEST_HASH_MISMATCH', 'packet.json', 'pre-dispatch manifest bytes differ')
+    _check_assignment_manifest(packet)
+    packet, _ = _conversion_map(packet, frozen=True)
     hashes = _hashes(run)
     if hashes != manifest['hashes'] or _sha(_bytes(hashes)) != manifest.get('content_id'):
         _fail('CONTENT_ID_MISMATCH', 'packet.json', 'content map or content identity differs')
