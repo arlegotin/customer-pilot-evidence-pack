@@ -137,6 +137,37 @@ class SchemaTests(unittest.TestCase):
         self.mutate('attempts.jsonl', lambda x: x[0].update(started_at='2026-10-16T01:00:01Z'))
         self.rejects('INVALID_SCHEMA', 'attempts.jsonl')
 
+    def test_run_windows_accept_supported_offsets_without_rewriting_evidence(self):
+        for start, end in [
+                ('2026-10-16T00:00:00Z', '2026-10-16T01:00:00Z'),
+                ('2026-10-16T00:00:00+00:00', '2026-10-16T01:00:00+00:00'),
+                ('2026-10-16T00:00:00-00:00', '2026-10-16T01:00:00-00:00'),
+                ('2026-10-16T02:00:00+02:00', '2026-10-16T01:00:00Z'),
+                ('2026-10-15T20:00:00-04:00', '2026-10-16T01:00:00Z'),
+                ('2026-10-16T00:00:00.125Z', '2026-10-16T01:00:00.250Z')]:
+            with self.subTest(start=start):
+                window = dict(started_at=start, ended_at=end)
+                self.mutate('protocol.json', lambda x: x['arms']['a'].update(run_window=window))
+                self.mutate('packet.json', lambda x: x['actual_settings']['a'].update(run_window=window))
+                packet = validate_packet(self.root)
+                self.assertEqual(packet.protocol['arms']['a']['run_window'], window)
+                self.assertEqual(packet.manifest['actual_settings']['a']['run_window'], window)
+
+    def test_reversed_run_windows_are_rejected_by_instant_order(self):
+        window = dict(started_at='2026-10-16T00:30:00-01:00', ended_at='2026-10-16T01:00:00Z')
+        for file, change in [
+                ('protocol.json', lambda x: x['arms']['a'].update(run_window=window)),
+                ('packet.json', lambda x: x['actual_settings']['a'].update(run_window=window)),
+                ('protocol.json', lambda x: x.update(comparison_window=window))]:
+            with self.subTest(file=file, change=change):
+                original = json.loads((self.root / file).read_text())
+                self.mutate(file, change)
+                try:
+                    self.rejects('INVALID_SCHEMA', file)
+                finally:
+                    write_json(self.root / file, original)
+                    rehash(self.root)
+
     def test_missing_source_id_is_structural(self):
         self.mutate('sources.json', lambda x: x['sources'][0].pop('source_id'))
         self.rejects('INVALID_SCHEMA', 'sources.json')

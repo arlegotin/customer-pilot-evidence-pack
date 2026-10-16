@@ -147,6 +147,21 @@ def _inside_window(window, allowed):
             <= stamp(window['ended_at']) <= stamp(allowed['ended_at']))
 
 
+def _same_setting(key: str, left: object, right: object) -> bool:
+    if key != 'run_window' or not isinstance(left, dict) or not isinstance(right, dict):
+        return left == right
+
+    def stamp(raw: str) -> tuple[datetime, Decimal, bool]:
+        # Retain all accepted fractional digits; datetime stops at microseconds.
+        fraction = raw[19:(-1 if raw.endswith('Z') else -6)]
+        instant = datetime.fromisoformat(raw.replace('Z', '+00:00')).replace(microsecond=0)
+        # RFC3339 -00:00 records an unknown local offset, distinct from known UTC.
+        return instant, Decimal(fraction or '0'), raw.endswith('-00:00')
+
+    return all(stamp(left[endpoint]) == stamp(right[endpoint])
+               for endpoint in ('started_at', 'ended_at'))
+
+
 def _arm_gates(packet, evaluation, arm, cases):
     refs = _arm_refs(packet, arm, cases)
     scope = 'arm:' + arm
@@ -166,7 +181,7 @@ def _arm_gates(packet, evaluation, arm, cases):
                                  'Intended assignments and the H/M/F/U denominator must reconcile.', refs))
     declared, actual = packet.protocol['arms'][arm], packet.manifest['actual_settings'][arm]
     mismatches = [key for key in _SETTINGS if actual[key] is not None
-                  and declared[key] is not None and actual[key] != declared[key]]
+                  and declared[key] is not None and not _same_setting(key, actual[key], declared[key])]
     # A known actual value against an unknown declaration is also undeclared treatment.
     mismatches += [key for key in _SETTINGS if actual[key] is not None and declared[key] is None]
     if mismatches:
@@ -279,7 +294,7 @@ def _pair(packet, evaluation, a, b):
                                      f'Arm {arm}: exact request totals, total cost and request efficiency unavailable; supported retrieval retained.',
                                      refs, severity='limitation'))
     actual_a, actual_b = packet.manifest['actual_settings'][a], packet.manifest['actual_settings'][b]
-    incompatible = [key for key in _COMMON if actual_a[key] != actual_b[key]]
+    incompatible = [key for key in _COMMON if not _same_setting(key, actual_a[key], actual_b[key])]
     if incompatible:
         gates.append(_diagnostic('COMPARISON_CONDITIONS_MISMATCH', scope,
                                  'Common comparison settings differ: ' + ', '.join(incompatible), refs))

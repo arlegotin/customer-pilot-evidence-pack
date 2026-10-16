@@ -1,12 +1,16 @@
 """Comparison eligibility, clustered uncertainty and independent arm decisions."""
 import copy
 from dataclasses import replace
+import hashlib
+import json
 from pathlib import Path
 import random
+import tempfile
 import unittest
 
-from pilotpack import compare
+from pilotpack import compare, ingest, score
 from pilotpack.schema import Packet, ValidationError
+from support import ROOT, apply_mutation, rehash, tree_hash, write_json
 
 
 def control(n=10, a=('H',) * 4 + ('U',) * 3 + ('M',) * 3,
@@ -306,6 +310,140 @@ class CompareTests(unittest.TestCase):
         self.assertEqual(got['pairs'][0]['comparison_status'], 'blocked')
         self.assertEqual(got['decisions']['a']['decision_status'], 'not_evaluable')
 
+
+
+class FrozenWindowTests(unittest.TestCase):
+    """Exercise both setting comparisons with otherwise eligible frozen evidence."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.base = Path(self.tmp.name)
+        self.root = apply_mutation(ROOT / 'fixtures/controls/parent-v2', 'H05', self.base / 'input')
+        self.manifest = json.loads((self.root / 'packet.json').read_text())
+        self.protocol = json.loads((self.root / 'protocol.json').read_text())
+
+    def assess(self, name='run'):
+        write_json(self.root / 'packet.json', self.manifest)
+        write_json(self.root / 'protocol.json', self.protocol)
+        rehash(self.root)
+        source_hash = tree_hash(self.root)
+        protocol_bytes = (self.root / 'protocol.json').read_bytes()
+        run = ingest.freeze(self.root, adapter='canonical', config_path=ROOT / 'fixtures/config/canonical.json',
+                            protocol_path=self.root / 'protocol.json', sources_path=self.root / 'sources.json',
+                            out=self.base / name)
+        frozen_hash = tree_hash(run)
+        packet = ingest.verify_run(run)
+        evaluation = score.score_run(run)
+        got = compare.assess(packet, evaluation)
+        self.assertEqual(tree_hash(self.root), source_hash)
+        self.assertEqual(tree_hash(run), frozen_hash)
+        self.assertEqual((run / 'protocol.json').read_bytes(), protocol_bytes)
+        self.assertEqual(packet.manifest['protocol_sha256'], hashlib.sha256(protocol_bytes).hexdigest())
+        for arm in 'ab':
+            self.assertEqual(got['arms'][arm]['settings']['actual'], self.manifest['actual_settings'][arm])
+            self.assertEqual(got['arms'][arm]['settings']['declared'], self.protocol['arms'][arm])
+        self.assertEqual(got['arms']['a']['N'], 4)
+        self.assertEqual(got['arms']['b']['N'], 4)
+        self.assertTrue(all(check['status'] != 'mismatch' for check in got['reference_checks']))
+        return got
+
+    def set_window(self, window, site):
+        if site == 'actual-declared':
+            for arm in 'ab':
+                self.manifest['actual_settings'][arm]['run_window'] = copy.deepcopy(window)
+        else:
+            self.manifest['actual_settings']['b']['run_window'] = copy.deepcopy(window)
+            self.protocol['arms']['b']['run_window'] = copy.deepcopy(window)
+
+    def test_identical_window_encodings_are_eligible(self):
+        got = self.assess()
+        self.assertEqual(got['pairs'][0]['comparison_status'], 'eligible')
+        self.assertEqual(got['pairs'][0]['gates'], [])
+        self.assertEqual(got['pairs'][0]['delivered_difference'], 0.0)
+
+    def test_equivalent_instants_match_actual_and_declared_windows(self):
+        for index, (start, end) in enumerate([
+                ('2026-10-16T00:00:00+00:00', '2026-10-16T02:00:00+00:00'),
+                ('2026-10-16T02:00:00+02:00', '2026-10-16T04:00:00+02:00'),
+                ('2026-10-15T20:00:00-04:00', '2026-10-15T22:00:00-04:00'),
+                ('2026-10-16T00:00:00.000Z', '2026-10-16T02:00:00.000Z'),
+                ('2026-10-16T00:00:00.000000000Z', '2026-10-16T02:00:00.000000000Z')]):
+            with self.subTest(start=start):
+                self.set_window(dict(started_at=start, ended_at=end), 'actual-declared')
+                got = self.assess('run-' + str(index))
+                self.assertEqual(got['pairs'][0]['comparison_status'], 'eligible', got['pairs'][0]['gates'])
+                self.assertEqual(got['decisions']['a']['decision_status'], 'descriptive_only')
+
+    def test_equivalent_instants_match_common_cross_arm_windows(self):
+        for index, (start, end) in enumerate([
+                ('2026-10-16T00:00:00+00:00', '2026-10-16T02:00:00+00:00'),
+                ('2026-10-16T02:00:00+02:00', '2026-10-16T04:00:00+02:00'),
+                ('2026-10-15T20:00:00-04:00', '2026-10-15T22:00:00-04:00'),
+                ('2026-10-16T00:00:00.000Z', '2026-10-16T02:00:00.000Z'),
+                ('2026-10-16T00:00:00.000000000Z', '2026-10-16T02:00:00.000000000Z')]):
+            with self.subTest(start=start):
+                self.set_window(dict(started_at=start, ended_at=end), 'cross-arm')
+                got = self.assess('run-' + str(index))
+                self.assertEqual(got['pairs'][0]['comparison_status'], 'eligible', got['pairs'][0]['gates'])
+
+    def test_different_intervals_still_block_at_both_comparison_sites(self):
+        original = copy.deepcopy(self.protocol['arms']['a']['run_window'])
+        for site, code in [('actual-declared', 'ACTUAL_SETTINGS_MISMATCH'),
+                           ('cross-arm', 'COMPARISON_CONDITIONS_MISMATCH')]:
+            for endpoint, value in [('started_at', '2026-10-16T00:30:00Z'),
+                                     ('ended_at', '2026-10-16T01:30:00Z'),
+                                     ('started_at', '2026-10-16T00:00:00.0000001Z')]:
+                with self.subTest(site=site, endpoint=endpoint):
+                    # Reset the declaration changed by the preceding cross-arm case.
+                    for arm in 'ab':
+                        self.manifest['actual_settings'][arm]['run_window'] = copy.deepcopy(original)
+                        self.protocol['arms'][arm]['run_window'] = copy.deepcopy(original)
+                    self.set_window(dict(original, **{endpoint: value}), site)
+                    got = self.assess(site + '-' + value.replace(':', '-'))
+                    pair = got['pairs'][0]
+                    self.assertEqual(pair['comparison_status'], 'blocked')
+                    self.assertIn(code, [g['code'] for g in pair['gates']])
+                    self.assertIsNone(pair['delivered_difference'])
+
+    def test_unknown_local_offset_is_distinct_from_known_utc_at_both_sites(self):
+        original = copy.deepcopy(self.protocol['arms']['a']['run_window'])
+        for site, code in [('actual-declared', 'ACTUAL_SETTINGS_MISMATCH'),
+                           ('cross-arm', 'COMPARISON_CONDITIONS_MISMATCH')]:
+            for endpoint in ('started_at', 'ended_at'):
+                with self.subTest(site=site, endpoint=endpoint):
+                    for arm in 'ab':
+                        self.manifest['actual_settings'][arm]['run_window'] = copy.deepcopy(original)
+                        self.protocol['arms'][arm]['run_window'] = copy.deepcopy(original)
+                    self.set_window(dict(original, **{endpoint: original[endpoint].replace('Z', '-00:00')}), site)
+                    got = self.assess(site + '-' + endpoint)
+                    self.assertEqual(got['pairs'][0]['comparison_status'], 'blocked')
+                    self.assertIn(code, [g['code'] for g in got['pairs'][0]['gates']])
+
+    def test_missing_actual_window_still_blocks_comparison(self):
+        for arm in 'ab':
+            self.manifest['actual_settings'][arm]['run_window'] = None
+            self.protocol['arms'][arm]['run_window'] = None
+        got = self.assess()
+        self.assertEqual(got['pairs'][0]['comparison_status'], 'blocked')
+        self.assertIn('UNKNOWN_ACTUAL_SETTINGS', [g['code'] for g in got['pairs'][0]['gates']])
+        self.assertEqual(got['decisions']['a']['decision_status'], 'descriptive_only')
+
+    def test_missing_allowed_window_still_blocks_comparison(self):
+        self.protocol['comparison_window'] = None
+        got = self.assess()
+        self.assertEqual(got['pairs'][0]['comparison_status'], 'blocked')
+        self.assertIn('UNKNOWN_COMPARISON_WINDOW', [g['code'] for g in got['pairs'][0]['gates']])
+
+    def test_outside_allowed_window_still_blocks_comparison(self):
+        outside = dict(started_at='2026-10-17T00:00:00Z', ended_at='2026-10-17T02:00:00Z')
+        for arm in 'ab':
+            self.manifest['actual_settings'][arm]['run_window'] = copy.deepcopy(outside)
+            self.protocol['arms'][arm]['run_window'] = copy.deepcopy(outside)
+        got = self.assess()
+        self.assertEqual(got['pairs'][0]['comparison_status'], 'blocked')
+        self.assertIn('COMPARISON_WINDOW_MISMATCH', [g['code'] for g in got['pairs'][0]['gates']])
+        self.assertIn('TIME_WINDOW_MISMATCH', [g['code'] for g in got['pairs'][0]['gates']])
 
 
 class BootstrapTests(unittest.TestCase):
