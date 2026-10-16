@@ -1,0 +1,17 @@
+{
+  "profile": "needle-scholar-73c7f810",
+  "cases": [
+    {"name":"arxiv-version", "gold":{"arxiv":["2101.00001"]}, "result":{"url":"https://arxiv.org/pdf/2101.00001v3.pdf"}, "rank":1},
+    {"name":"legacy-text", "gold":{"arxiv":["hep-th/9901001"]}, "result":{"snippet":"arXiv: HEP-TH/9901001v2"}, "rank":1},
+    {"name":"arxiv-doi", "gold":{"arxiv":["2202.00002"]}, "result":{"url":"https://doi.org/10.48550/arXiv.2202.00002"}, "rank":1},
+    {"name":"doi-suffix", "gold":{"doi":["10.1000/test"]}, "result":{"url":"https://doi.org/10.1000/TEST/full"}, "rank":1},
+    {"name":"doi-punctuation", "gold":{"doi":["10.1000/test"]}, "result":{"title":"See 10.1000/TEST.)"}, "rank":1},
+    {"name":"pmid-pubmed", "gold":{"pmid":["12345678"]}, "result":{"url":"https://pubmed.ncbi.nlm.nih.gov/12345678/"}, "rank":1},
+    {"name":"pmid-legacy", "gold":{"pmid":["12345678"]}, "result":{"url":"https://ncbi.nlm.nih.gov/pubmed/12345678"}, "rank":1},
+    {"name":"pmid-europe", "gold":{"pmid":["12345678"]}, "result":{"url":"https://europepmc.org/abstract/MED/12345678"}, "rank":1},
+    {"name":"pmid-title", "gold":{"pmid":["12345678"]}, "result":{"title":"PMID:12345678"}, "rank":1},
+    {"name":"bare-id-not-evidence", "gold":{"arxiv":["2101.00001"]}, "result":{"snippet":"2101.00001"}, "rank":null},
+    {"name":"cached-ids-not-evidence", "gold":{"arxiv":["2101.00001"]}, "result":{"returned_ids":{"arxiv":["2101.00001"]},"matched":true}, "rank":null},
+    {"name":"pinned-pubmed-case", "gold":{"pmid":["12345678"]}, "result":{"url":"https://PUBMED.NCBI.NLM.NIH.GOV/12345678"}, "rank":null}
+  ]
+}
