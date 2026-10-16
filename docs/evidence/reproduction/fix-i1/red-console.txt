@@ -1,0 +1,4 @@
+Original workspace native argv: ['/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-fresh-root-57k_wt6k/.cache/native-venv/bin/python', 'reference/needle_replay.py', '--packet', 'fixtures/real/packet-a', '--checkout', '.cache/needle-pinned', '--out', 'build/task9-reference/a/native-replayed.json']
+Expected missing-state failure: FileNotFoundError(2, 'No such file or directory')
+Root native interpreter exists: False
+Root native checkout exists: False

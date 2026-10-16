@@ -80,7 +80,7 @@ for cwd in (root,clean):
         assert retained_fields_match(historical,current)
         if packet=='b': assert ref_oracle.read_bytes()==(cwd/f'docs/evidence/packet-{packet}-oracle.json').read_bytes()
         native_path=checks/'native-replayed.json'
-        run(cwd,[cwd/'.cache/native-venv/bin/python','reference/needle_replay.py','--packet',f'fixtures/real/packet-{packet}','--checkout','.cache/needle-pinned','--out',native_path])
+        run(cwd,[native_python,'reference/needle_replay.py','--packet',f'fixtures/real/packet-{packet}','--checkout',clean/'.cache/needle-pinned','--out',native_path])
         assert native_path.read_bytes()==(cwd/f'docs/evidence/packet-{packet}-native.json').read_bytes()
         facts=compare_supported(cwd,packet,native_path,oracle_path,cwd/out/'evaluation.json')
         snapshot=json.loads(run(cwd,[sys.executable,'-c','import hashlib,json,sys; from pathlib import Path; from pilotpack.ledger import normalized_digest,read_records; p=Path(sys.argv[1]); print(json.dumps({"digest":normalized_digest(p),"normalized_records_sha256":hashlib.sha256(json.dumps(read_records(p),sort_keys=True,separators=(",",":")).encode()).hexdigest()},sort_keys=True))',runpath/'ledger.sqlite']))

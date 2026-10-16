@@ -1,0 +1,12 @@
+{
+  "fresh_root": "/var/folders/q3/tm7kkng56417wgzydc4q8p8r0000gn/T/pilotpack-task9-fresh-root-57k_wt6k",
+  "source_commit": "2156cbf3159aadf7b0ff059d5bdf0465743793db",
+  "copied": "committed git archive plus verified source tar and seven wheels only",
+  "no_previous_state": [
+    "runs",
+    "build",
+    "reference/runs",
+    ".cache/native-venv",
+    ".cache/needle-pinned"
+  ]
+}
