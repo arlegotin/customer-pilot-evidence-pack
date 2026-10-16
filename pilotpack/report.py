@@ -168,6 +168,9 @@ def _publish(out: Path, evaluation: JsonObject, verdict: JsonObject, html: str |
     out = Path(out).absolute()
     _validate(evaluation, verdict)
     _existing(out, evaluation)
+    # Resolve aliases before moving out: lexical 'out/../out' stops resolving
+    # once out is renamed. Check the original final symlink before resolving.
+    out = out.resolve()
     out.parent.mkdir(parents=True, exist_ok=True)
     lock = out.parent / ('.' + out.name + '.publishing')
     lock.mkdir()

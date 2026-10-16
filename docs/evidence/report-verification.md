@@ -74,3 +74,16 @@ from known UTC; missing, genuinely different and out-of-window intervals still
 block. This follows the [RFC3339 offset distinction](https://www.rfc-editor.org/rfc/rfc3339.html#section-4.3)
 and changes no historical A/B meaning because their actual windows are missing.
 No general schema or temporal-policy redesign was performed.
+
+## Publication path correction from final review
+
+A real-process review found an inherited defect in lexical output aliases such
+as `output/../output`: moving `output` to its backup made staging, rollback and
+lock paths depend on the now-absent directory. An ordinary rename failure could
+therefore leave only a recoverable backup. A new failing CLI regression and a
+failing rollback regression reproduced this before the fix. Publication now
+resolves the destination before moving any directory, after rejecting a final
+symlink in the original path. Existing lock and rollback semantics are retained;
+regressions also reject a final symlink pointing at a valid complete report.
+The earlier clean candidate pass is retained as intermediate evidence, followed
+by a fresh committed-candidate replay after this correction.

@@ -242,3 +242,15 @@ class CliTests(unittest.TestCase):
         self.assertEqual(e['arms']['a']['cost']['total'], '0')
         self.assertEqual(e['arms']['a']['cost']['support_status'], 'supported')
         self.assertEqual(e['decisions']['a']['decision_status'], 'fails_criteria')
+
+    def test_existing_output_alias_through_itself_retains_complete_publication(self):
+        self.freeze()
+        self.assertEqual(self.command('evaluate', '--run', self.run, '--out', self.out).returncode, 0)
+        self.assertEqual(self.command('report', '--run', self.run, '--evaluation', self.out / 'evaluation.json',
+                                      '--out', self.out).returncode, 0)
+        before = {p.name: p.read_bytes() for p in self.out.iterdir()}
+        alias = self.out / '..' / self.out.name
+        p = self.command('report', '--run', self.run, '--evaluation', self.out / 'evaluation.json', '--out', alias)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertEqual(before, {p.name: p.read_bytes() for p in self.out.iterdir()})
+        self.assertFalse(list(self.base.glob('.output.*')))

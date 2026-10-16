@@ -240,3 +240,31 @@ class ReportTests(unittest.TestCase):
             report.write_json_artifacts(self.out, run=self.run)
         self.assertEqual((target / 'unrelated.txt').read_text(), 'preserve')
         self.assertTrue(self.out.is_symlink())
+
+    def test_alias_path_rollback_can_restore_old_complete_output_after_backup_rename(self):
+        self.publish()
+        report.write_report(self.run, self.out / 'evaluation.json', self.out)
+        before = {p.name: p.read_bytes() for p in self.out.iterdir()}
+        import os
+        replace = os.replace
+        def interrupted(source, target):
+            if '.staging-' in Path(source).name:
+                raise OSError('injected stage rename interruption')
+            return replace(source, target)
+        alias = self.out / '..' / self.out.name
+        with patch('pilotpack.report.os.replace', side_effect=interrupted):
+            with self.assertRaises(OSError):
+                report.write_report(self.run, self.out / 'evaluation.json', alias)
+        self.assertEqual(before, {p.name: p.read_bytes() for p in self.out.iterdir()})
+        self.assertFalse(list(self.base.glob('.output.*')))
+
+    def test_resolving_output_alias_does_not_allow_final_symlink_to_valid_report(self):
+        self.publish()
+        report.write_report(self.run, self.out / 'evaluation.json', self.out)
+        before = {p.name: p.read_bytes() for p in self.out.iterdir()}
+        link = self.base / 'linked-report'
+        link.symlink_to(self.out, target_is_directory=True)
+        with self.assertRaises(ValidationError):
+            report.write_report(self.run, self.out / 'evaluation.json', link)
+        self.assertEqual(before, {p.name: p.read_bytes() for p in self.out.iterdir()})
+        self.assertTrue(link.is_symlink())
