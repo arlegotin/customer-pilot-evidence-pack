@@ -1,5 +1,28 @@
 # Clean offline reproduction
 
+## Current release recipe
+
+The original experiment below used a 190-test source revision. The current
+release has 202 tests. The runnable procedure now records the actual suite
+count and writes new logs only under ignored `build/reproduction`; it never
+replaces historical transcripts. Original preparation and replay scripts are
+retained as `prepare-clean-historical.py.txt` and `replay-historical.py.txt`
+beside the current scripts.
+
+Start from a fresh checkout with Python 3.11 and the retained native tar/wheels.
+The optional `pilotpack-v0.1.0-offline-baselines.tar.gz` release asset supplies
+those exact files. Extract it into the checkout before replay:
+
+```sh
+tar -xzf /path/to/pilotpack-v0.1.0-offline-baselines.tar.gz -C .
+```
+
+The procedure below rebuilds both packets with networking disabled. Inspect new
+results in `build/reproduction/results.json`. Recorded results below describe
+earlier runs, not the new execution.
+
+## Historical experiment and runnable procedure
+
 The replay exports committed inputs from `9474fdd` (the protected B release)
 with `git archive --format=tar`. Only the SHA-256-checked pinned NEEDLE source
 archive and seven retained dependency wheels are added. The export starts
@@ -8,9 +31,9 @@ or old execution outputs. Raw A/B originals, source metadata and frozen
 baseline sidecars are committed inputs, not a copied prior database or
 verdict. The export inventory is [input-export.json](reproduction/input-export.json).
 
-The three retained text files below contain the preparation, network guard
-and corrected replay handoff procedure. They are documentation of this
-experiment, external to the frozen product/reference/test code. The original
+The retained historical text files contain the preparation and corrected replay
+handoff procedure used in this experiment; the network guard is unchanged.
+They are external to the frozen product/reference/test code. The original
 acceptance transcript is preserved; the later fresh-workspace correction and
 covering execution are identified below. The preparation script
 performs a local Git export, verifies every retained wheel/archive byte count
@@ -37,20 +60,21 @@ freeze and independent exporter intentionally refuse existing run paths.
 
 ```sh
 python --version
-scratch=$(mktemp -d)
-mkdir "$scratch/guard"
-cp docs/evidence/reproduction/sitecustomize.py.txt "$scratch/guard/sitecustomize.py"
-cp docs/evidence/reproduction/prepare-clean.py.txt "$scratch/prepare-clean.py"
-cp docs/evidence/reproduction/replay.py.txt "$scratch/replay.py"
-mkdir -p .superpowers/sdd/2026-10-16-customer-pilot-evidence-pack
-python "$scratch/prepare-clean.py"
-clean=$(cat .superpowers/sdd/2026-10-16-customer-pilot-evidence-pack/task9-clean-path.txt)
-PYTHONPATH="$scratch/guard" python "$scratch/replay.py" "$PWD" "$clean"
+replay_work=$(mktemp -d)
+mkdir "$replay_work/guard"
+cp docs/evidence/reproduction/sitecustomize.py.txt "$replay_work/guard/sitecustomize.py"
+cp docs/evidence/reproduction/prepare-clean.py.txt "$replay_work/prepare-clean.py"
+cp docs/evidence/reproduction/replay.py.txt "$replay_work/replay.py"
+clean=$(python "$replay_work/prepare-clean.py")
+PYTHONPATH="$replay_work/guard" python "$replay_work/replay.py" "$PWD" "$clean"
 ```
 
 `prepare-clean.py` uses current committed `HEAD`; the recorded acceptance
-execution used `9474fdd`. Later evidence-only commits retain the same product,
-profile, suite, protocol, configuration, raw evidence and baseline inputs.
+execution used `9474fdd`. Later final-review fixes add canonical-input validation
+and 12 regressions; their separate [verification](final-verification.json)
+reproduced all six real evaluation/verdict/HTML artifacts byte-for-byte. The
+current recipe targets the checked-out committed revision. Protocol,
+configuration, real raw evidence and historical baseline inputs stay frozen.
 The original expanded commands, stdout, stderr and actual exit statuses are in
 [command-log.json](reproduction/command-log.json). Its successful workspace pass
 used the original workspace's already installed native environment/checkout.

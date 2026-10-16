@@ -1,0 +1,112 @@
+"""One-use evidence replay procedure; run with the Task 9 sitecustomize guard."""
+import hashlib,json,os,platform,shlex,subprocess,sys
+from pathlib import Path
+root=Path(sys.argv[1]).resolve(); clean=Path(sys.argv[2]).resolve()
+evidence=root/'docs/evidence/reproduction'; log=[]
+summary={'environment':{'python':sys.version,'platform':list(os.uname())},'packets':{},'network_guard':'inherited sitecustomize audit hook; network events and non-Python subprocesses denied','sqlite_bytes_compared':False}
+
+def run(cwd,args,expected=0,output=None):
+    args=list(map(str,args))
+    proc=subprocess.run(args,cwd=cwd,capture_output=True,text=True)
+    log.append({'cwd':str(cwd),'argv':args,'expected_exit':expected,'actual_exit':proc.returncode,'stdout':proc.stdout,'stderr':proc.stderr})
+    (evidence/'command-log.json').write_text(json.dumps(log,indent=2)+'\n')
+    print(('workspace' if cwd==root else 'clean')+': '+shlex.join(args)+' -> '+str(proc.returncode),flush=True)
+    if output is not None:
+        output.parent.mkdir(parents=True,exist_ok=True); output.write_text(proc.stdout)
+    assert proc.returncode==expected,(args,proc.returncode,proc.stderr)
+    return proc.stdout
+
+def digest(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def compare_supported(cwd,packet,native_path,oracle_path,evaluation_path):
+    native=json.loads(native_path.read_text()); oracle=json.loads(oracle_path.read_text()); evaluation=json.loads(evaluation_path.read_text())
+    rows=[json.loads(r) for r in (cwd/f'fixtures/real/packet-{packet}/scholar.jsonl').read_text().splitlines()]
+    selected=[r for r in rows if 'arxiv' in json.loads(r['gold'])['ids']]
+    checked=0; max_difference=0.0
+    assert not native['discrepancies']
+    for arm,a in oracle['arms'].items():
+        for metric in ('num_scored','search_errors','recall_at_k','mrr_at_k'):
+            wanted=a['native_metrics'][metric]; got=native['engines'][arm][metric]
+            difference=abs(got-wanted); max_difference=max(max_difference,difference)
+            assert (got==wanted if metric in ('num_scored','search_errors') else difference<=1e-9)
+        for row,rank in zip(selected,native['engines'][arm]['per_query_hit_ranks'],strict=True):
+            assert oracle['assignments'][arm+':'+row['query_id']]['first_hit_rank']==rank
+            checked+=1
+        for key in ('N','H','M','F','U'):
+            assert evaluation['arms'][arm][key]==a[key]
+    assert all(c['status']=='passed' for c in evaluation['reference_checks'])
+    assert evaluation['pairs'][0]['comparison_status']=='blocked'
+    assert all(d['decision_status']=='descriptive_only' for d in evaluation['decisions'].values())
+    return {'tasks':len(selected),'groups':oracle['source_group_count'],'exact_rank_comparisons':checked,'max_native_oracle_metric_difference':max_difference,'all_reference_checks':'passed','requested_pair':'blocked','decisions':'descriptive_only'}
+
+probe="""import os,socket,subprocess,sys
+for name,action in [('dns',lambda:socket.getaddrinfo('example.com',443)),('connect',lambda:socket.create_connection(('127.0.0.1',9))),('external',lambda:subprocess.run(['/usr/bin/curl','https://example.com']))]:
+ try: action()
+ except RuntimeError as e:
+  assert 'Task 9 offline guard' in str(e); print(name+': '+str(e))
+ else: raise AssertionError(name+' escaped guard')
+p=subprocess.run([sys.executable,'-c',\"import socket; socket.getaddrinfo('example.com',443)\"],env={'PATH':os.environ['PATH']},capture_output=True,text=True)
+assert p.returncode!=0 and 'Task 9 offline guard' in p.stderr
+print('nested child with replacement environment: DNS denied')
+"""
+run(clean,[sys.executable,'-c',probe],output=evidence/'network-probes-console.txt')
+run(clean,[sys.executable,'-m','venv','.cache/native-venv'])
+native_python=clean/'.cache/native-venv/bin/python'
+run(clean,[native_python,'-m','pip','install','--no-index','--no-cache-dir','--find-links','.cache/wheels','--require-hashes','-r','reference/native-requirements.txt'],output=evidence/'offline-install-console.txt')
+summary['native_environment']=json.loads(run(clean,[native_python,'-c','import importlib.metadata,json,sys; print(json.dumps({"python":sys.version,"packages":{d.metadata["Name"]:d.version for d in importlib.metadata.distributions()}}))']))
+
+for cwd in (root,clean):
+    label='workspace' if cwd==root else 'clean'
+    for packet in ('a','b'):
+        runpath=Path(f'runs/task9-packet-{packet}'); out=Path(f'build/task9-packet-{packet}')
+        if not (cwd/runpath).exists():
+            run(cwd,[sys.executable,'-m','pilotpack','freeze','--adapter','needle-scholar','--input',f'fixtures/real/packet-{packet}','--config',f'fixtures/config/packet-{packet}.json','--protocol','protocol.json','--sources','sources.json','--out',runpath])
+        run(cwd,[sys.executable,'-m','pilotpack','evaluate','--run',runpath,'--out',out],3)
+        run(cwd,[sys.executable,'-m','pilotpack','report','--run',runpath,'--evaluation',out/'evaluation.json','--out',out],3)
+        checks=cwd/'build/task9-reference'/packet; checks.mkdir(parents=True,exist_ok=True)
+        oracle_path=checks/'oracle-cli.json'
+        run(cwd,[sys.executable,'reference/oracle.py','--run',runpath],output=oracle_path)
+        refpath=Path(f'reference/runs/task9-reproduction-{packet}')
+        run(cwd,[sys.executable,'reference/prepare_packet.py','--input',f'fixtures/real/packet-{packet}','--config',f'fixtures/config/packet-{packet}.json','--out',refpath])
+        ref_oracle=checks/'reference-oracle.json'
+        run(cwd,[sys.executable,'reference/oracle.py','--run',refpath],output=ref_oracle)
+        assert ref_oracle.read_bytes()==oracle_path.read_bytes()
+        historical=json.loads((cwd/f'docs/evidence/packet-{packet}-oracle.json').read_text())
+        current=json.loads(ref_oracle.read_text())
+        def retained_fields_match(old,new):
+            if isinstance(old,dict):
+                return all(k in new and retained_fields_match(v,new[k]) for k,v in old.items())
+            return old==new
+        assert retained_fields_match(historical,current)
+        if packet=='b': assert ref_oracle.read_bytes()==(cwd/f'docs/evidence/packet-{packet}-oracle.json').read_bytes()
+        native_path=checks/'native-replayed.json'
+        run(cwd,[native_python,'reference/needle_replay.py','--packet',f'fixtures/real/packet-{packet}','--checkout',clean/'.cache/needle-pinned','--out',native_path])
+        assert native_path.read_bytes()==(cwd/f'docs/evidence/packet-{packet}-native.json').read_bytes()
+        facts=compare_supported(cwd,packet,native_path,oracle_path,cwd/out/'evaluation.json')
+        snapshot=json.loads(run(cwd,[sys.executable,'-c','import hashlib,json,sys; from pathlib import Path; from pilotpack.ledger import normalized_digest,read_records; p=Path(sys.argv[1]); print(json.dumps({"digest":normalized_digest(p),"normalized_records_sha256":hashlib.sha256(json.dumps(read_records(p),sort_keys=True,separators=(",",":")).encode()).hexdigest()},sort_keys=True))',runpath/'ledger.sqlite']))
+        # Retain only hashes/counts here; canonical source files retain the full records.
+        manifest=json.loads((cwd/runpath/'packet.json').read_text())
+        assert snapshot['digest']==manifest['normalized_table_digest']
+        facts['normalized_table_digest']=snapshot['digest']
+        facts['canonical_file_sha256']={name:digest(cwd/runpath/name) for name in ('tasks.jsonl','assignments.jsonl','outcomes.jsonl','attempts.jsonl','packet.json','sources.json','protocol.json')}
+        facts['output_sha256']={name:digest(cwd/out/name) for name in ('evaluation.json','verdict.json','report.html')}
+        facts['reference_file_sha256']={p.name:digest(p) for p in (oracle_path,ref_oracle,native_path)}
+        facts['content_id']=manifest['content_id']
+        facts['normalized_records_sha256']=snapshot['normalized_records_sha256']
+        summary['packets'].setdefault(packet,{})[label]=facts
+        if label=='clean':
+            assert facts==summary['packets'][packet]['workspace'],packet
+            for p in (cwd/runpath).rglob('*'):
+                if p.is_file() and p.name!='ledger.sqlite':
+                    assert p.read_bytes()==(root/runpath/p.relative_to(cwd/runpath)).read_bytes(),p
+            for name in facts['output_sha256']:
+                assert (cwd/out/name).read_bytes()==(root/out/name).read_bytes(),name
+            summary['packets'][packet]['identical_stable_results']=True
+    if label=='clean':
+        run(cwd,[sys.executable,'-m','unittest','discover','-s','tests','-v'],output=evidence/'clean-suite-stdout.txt')
+        (evidence/'clean-suite-console.txt').write_text(log[-1]['stderr']+log[-1]['stdout'])
+assert 'Ran 190 tests' in log[-1]['stderr'] and '\nOK\n' in log[-1]['stderr'] and 'skipped=' not in log[-1]['stderr']
+summary['full_suite']={'tests':190,'exit':0,'skips':0}
+summary['clean_export_commit']=json.loads((evidence/'input-export.json').read_text())['commit']
+(evidence/'results.json').write_text(json.dumps(summary,indent=2)+'\n')
+print('PASS: all stable records/digests/output bytes reproduced;190 tests; A/B oracle and native checks.',flush=True)

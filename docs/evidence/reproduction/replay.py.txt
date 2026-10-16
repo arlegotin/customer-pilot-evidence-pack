@@ -1,8 +1,8 @@
 """One-use evidence replay procedure; run with the Task 9 sitecustomize guard."""
-import hashlib,json,os,platform,shlex,subprocess,sys
+import hashlib,json,os,platform,re,shlex,subprocess,sys
 from pathlib import Path
 root=Path(sys.argv[1]).resolve(); clean=Path(sys.argv[2]).resolve()
-evidence=root/'docs/evidence/reproduction'; log=[]
+evidence=root/'build/reproduction'; evidence.mkdir(parents=True,exist_ok=True); log=[]
 summary={'environment':{'python':sys.version,'platform':list(os.uname())},'packets':{},'network_guard':'inherited sitecustomize audit hook; network events and non-Python subprocesses denied','sqlite_bytes_compared':False}
 
 def run(cwd,args,expected=0,output=None):
@@ -58,15 +58,15 @@ summary['native_environment']=json.loads(run(clean,[native_python,'-c','import i
 for cwd in (root,clean):
     label='workspace' if cwd==root else 'clean'
     for packet in ('a','b'):
-        runpath=Path(f'runs/task9-packet-{packet}'); out=Path(f'build/task9-packet-{packet}')
+        runpath=Path(f'runs/replay-packet-{packet}'); out=Path(f'build/replay-packet-{packet}')
         if not (cwd/runpath).exists():
             run(cwd,[sys.executable,'-m','pilotpack','freeze','--adapter','needle-scholar','--input',f'fixtures/real/packet-{packet}','--config',f'fixtures/config/packet-{packet}.json','--protocol','protocol.json','--sources','sources.json','--out',runpath])
         run(cwd,[sys.executable,'-m','pilotpack','evaluate','--run',runpath,'--out',out],3)
         run(cwd,[sys.executable,'-m','pilotpack','report','--run',runpath,'--evaluation',out/'evaluation.json','--out',out],3)
-        checks=cwd/'build/task9-reference'/packet; checks.mkdir(parents=True,exist_ok=True)
+        checks=cwd/'build/replay-reference'/packet; checks.mkdir(parents=True,exist_ok=True)
         oracle_path=checks/'oracle-cli.json'
         run(cwd,[sys.executable,'reference/oracle.py','--run',runpath],output=oracle_path)
-        refpath=Path(f'reference/runs/task9-reproduction-{packet}')
+        refpath=Path(f'reference/runs/replay-{packet}')
         run(cwd,[sys.executable,'reference/prepare_packet.py','--input',f'fixtures/real/packet-{packet}','--config',f'fixtures/config/packet-{packet}.json','--out',refpath])
         ref_oracle=checks/'reference-oracle.json'
         run(cwd,[sys.executable,'reference/oracle.py','--run',refpath],output=ref_oracle)
@@ -105,8 +105,9 @@ for cwd in (root,clean):
     if label=='clean':
         run(cwd,[sys.executable,'-m','unittest','discover','-s','tests','-v'],output=evidence/'clean-suite-stdout.txt')
         (evidence/'clean-suite-console.txt').write_text(log[-1]['stderr']+log[-1]['stdout'])
-assert 'Ran 190 tests' in log[-1]['stderr'] and '\nOK\n' in log[-1]['stderr'] and 'skipped=' not in log[-1]['stderr']
-summary['full_suite']={'tests':190,'exit':0,'skips':0}
+suite_match=re.search(r'Ran (\d+) tests? in ',log[-1]['stderr'])
+assert suite_match and '\nOK\n' in log[-1]['stderr'] and 'skipped=' not in log[-1]['stderr']
+summary['full_suite']={'tests':int(suite_match.group(1)),'exit':0,'skips':0}
 summary['clean_export_commit']=json.loads((evidence/'input-export.json').read_text())['commit']
 (evidence/'results.json').write_text(json.dumps(summary,indent=2)+'\n')
-print('PASS: all stable records/digests/output bytes reproduced;190 tests; A/B oracle and native checks.',flush=True)
+print(f"PASS: all stable records/digests/output bytes reproduced;{suite_match.group(1)} tests; A/B oracle and native checks.",flush=True)

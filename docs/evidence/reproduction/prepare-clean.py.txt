@@ -24,6 +24,6 @@ with tarfile.open(clean/source['local_path']) as tar:
   member.name=str(rel); tar.extract(member,checkout)
 manifest=json.loads((root/'reference/native-source-manifest.json').read_text())
 for rel,digest in manifest['files'].items(): assert hashlib.sha256((checkout/rel).read_bytes()).hexdigest()==digest
-(root/'.superpowers/sdd/2026-10-16-customer-pilot-evidence-pack/task9-clean-path.txt').write_text(str(clean)+'\n')
-(root/'docs/evidence/reproduction/input-export.json').write_text(json.dumps({'commit':commit,'clean_directory':str(clean),'method':'git archive --format=tar COMMIT; retained source archive plus seven wheels only','copied_existing_runs_outputs_databases_or_environments':False,'retained_artifacts':records},indent=2)+'\n')
+evidence=root/'build/reproduction'; evidence.mkdir(parents=True,exist_ok=True)
+(evidence/'input-export.json').write_text(json.dumps({'commit':commit,'clean_directory':str(clean),'method':'git archive --format=tar COMMIT; retained source archive plus seven wheels only','copied_existing_runs_outputs_databases_or_environments':False,'retained_artifacts':records},indent=2)+'\n')
 print(clean)

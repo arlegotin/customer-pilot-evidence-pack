@@ -1,0 +1,52 @@
+name: Checks
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Acquire and verify unchanged native baseline source
+        run: |
+          python - <<'PY'
+          import hashlib, io, json, tarfile, urllib.request
+          from pathlib import Path
+          sources = json.loads(Path('sources.json').read_text())['sources']
+          source = next(s for s in sources if s['source_id'] == 'needle-source')
+          raw = urllib.request.urlopen(source['source_uri'], timeout=60).read()
+          assert len(raw) == source['bytes']
+          assert hashlib.sha256(raw).hexdigest() == source['sha256']
+          checkout = Path('.cache/needle-pinned')
+          checkout.mkdir(parents=True)
+          with tarfile.open(fileobj=io.BytesIO(raw)) as archive:
+              prefix = archive.getmembers()[0].name.split('/')[0]
+              for member in archive.getmembers():
+                  relative = Path(member.name).relative_to(prefix)
+                  if str(relative) == '.':
+                      continue
+                  assert not relative.is_absolute() and '..' not in relative.parts
+                  assert member.isfile() or member.isdir()
+                  member.name = str(relative)
+                  archive.extract(member, checkout)
+          manifest = json.loads(Path('reference/native-source-manifest.json').read_text())
+          for relative, expected in manifest['files'].items():
+              assert hashlib.sha256((checkout / relative).read_bytes()).hexdigest() == expected
+          PY
+      - name: Install hash-pinned native replay dependencies
+        run: |
+          python -m venv .cache/native-venv
+          .cache/native-venv/bin/python -m pip install --no-cache-dir --require-hashes -r reference/native-requirements.txt
+      - name: Run software and frozen accounting checks
+        run: python -m unittest discover -s tests -v
