@@ -119,13 +119,18 @@ def create_ledger(packet: Packet, db_path: Path) -> None:
                 for operation in ('UPDATE', 'DELETE'):
                     connection.execute(f'''CREATE TRIGGER {table}_no_{operation.lower()}
                         BEFORE {operation} ON {table} BEGIN SELECT RAISE(ABORT,'immutable evidence'); END''')
-                # REPLACE can delete implicitly without delete triggers on a separate connection.
-                columns = [r[1] for r in connection.execute(f'PRAGMA table_info({table})') if r[5]]
-                if columns:
-                    match = ' AND '.join(f'{column}=NEW.{column}' for column in columns)
-                    connection.execute(f'''CREATE TRIGGER {table}_no_replace BEFORE INSERT ON {table}
-                        WHEN EXISTS(SELECT 1 FROM {table} WHERE {match})
-                        BEGIN SELECT RAISE(ABORT,'immutable evidence'); END''')
+                # REPLACE may delete without DELETE triggers when recursive triggers are off.
+                # Guard every unique index (including primary/alternate keys) and hidden rowid.
+                conflicts = ['rowid=NEW.rowid']
+                indexes = list(connection.execute(f'PRAGMA index_list({table})'))
+                for index in indexes:
+                    if index[2]:  # UNIQUE; current schema has only ordinary column indexes.
+                        columns = [row[2] for row in connection.execute(f'PRAGMA index_info("{index[1]}")')]
+                        conflicts.append('(' + ' AND '.join(f'{column}=NEW.{column}' for column in columns) + ')')
+                match = ' OR '.join(conflicts)
+                connection.execute(f'''CREATE TRIGGER {table}_no_replace BEFORE INSERT ON {table}
+                    WHEN EXISTS(SELECT 1 FROM {table} WHERE {match})
+                    BEGIN SELECT RAISE(ABORT,'immutable evidence'); END''')
             connection.commit()
         # Atomic no-clobber publication; a competing creator cannot overwrite evidence.
         os.link(temporary, db_path)

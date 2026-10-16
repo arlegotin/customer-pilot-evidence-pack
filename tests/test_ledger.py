@@ -95,6 +95,68 @@ class LedgerTests(unittest.TestCase):
                     with self.subTest(sql=sql), self.assertRaises(sqlite3.IntegrityError):
                         connection.execute(sql)
 
+    def test_review_alternate_unique_replacements_are_rejected(self):
+        create_ledger(self.packet, self.db)
+        digest = normalized_digest(self.db)
+        statements = [
+            "INSERT OR REPLACE INTO assignments SELECT 'replacement',task_id,arm_id,settings_id,source_id,payload FROM assignments WHERE assignment_id='a:t1'",
+            "INSERT OR REPLACE INTO attempts SELECT 'replacement',assignment_id,attempt_index,source_id,payload FROM attempts WHERE attempt_id='request1'",
+        ]
+        with sqlite3.connect(self.db) as connection:
+            connection.execute('PRAGMA recursive_triggers=OFF')
+            for sql in statements:
+                with self.subTest(sql=sql):
+                    try:
+                        with self.assertRaises(sqlite3.IntegrityError):
+                            connection.execute(sql)
+                    finally:
+                        connection.rollback()
+        self.assertEqual(normalized_digest(self.db), digest)
+
+    def test_review_explicit_rowid_replacements_are_rejected_in_every_table(self):
+        child = dict(self.packet.sources[0], source_id='derived', parents=['src'])
+        create_ledger(replace(self.packet, sources=self.packet.sources + (child,)), self.db)
+        digest = normalized_digest(self.db)
+        with sqlite3.connect(self.db) as connection:
+            connection.execute('PRAGMA recursive_triggers=OFF')
+            tables = [r[0] for r in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")]
+            for table in tables:
+                info = list(connection.execute(f'PRAGMA table_info({table})'))
+                # Give every declared primary/unique key fresh values, isolating rowid collision.
+                columns = [r[1] for r in info]
+                values = list(connection.execute(f'SELECT rowid,* FROM {table} LIMIT 1').fetchone())
+                for index, column in enumerate(columns, 1):
+                    if column == 'payload':
+                        values[index] = '{}'
+                    elif info[index - 1][2] == 'INTEGER':
+                        values[index] = 900
+                    else:
+                        values[index] = 'new:' + column
+                for alias in ('rowid', '_rowid_', 'oid'):
+                    sql = f'INSERT OR REPLACE INTO {table}({alias},{",".join(columns)}) VALUES ({",".join("?" for _ in values)})'
+                    with self.subTest(table=table, alias=alias):
+                        try:
+                            with self.assertRaises(sqlite3.IntegrityError):
+                                connection.execute(sql, values)
+                        finally:
+                            connection.rollback()
+        self.assertEqual(normalized_digest(self.db), digest)
+
+    def test_review_fresh_rows_and_duplicate_diagnostics_can_append(self):
+        create_ledger(self.packet, self.db)
+        original = normalized_digest(self.db)
+        with sqlite3.connect(self.db) as connection:
+            connection.execute('PRAGMA recursive_triggers=OFF')
+            connection.execute('PRAGMA foreign_keys=ON')
+            connection.execute("INSERT INTO sources SELECT 'appended',payload FROM sources LIMIT 1")
+            connection.execute('INSERT INTO diagnostics SELECT payload FROM diagnostics LIMIT 1')
+            connection.execute("INSERT INTO diagnostics(rowid,payload) VALUES(100,'{}')")
+            connection.execute("INSERT INTO diagnostics(payload) VALUES('{}')")
+        records = read_records(self.db)
+        self.assertEqual(len(records['sources']), 2)
+        self.assertEqual(len(records['diagnostics']), 4)
+        self.assertNotEqual(normalized_digest(self.db), original)
+
     def test_tampered_json_and_relational_columns_are_detected(self):
         create_ledger(self.packet, self.db)
         digest = normalized_digest(self.db)
