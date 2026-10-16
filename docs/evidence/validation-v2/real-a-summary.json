@@ -1,0 +1,81 @@
+{
+  "arms": {
+    "bing": {
+      "F": 0,
+      "H": 157,
+      "M": 167,
+      "N": 324,
+      "U": 0
+    },
+    "keenable": {
+      "F": 0,
+      "H": 293,
+      "M": 31,
+      "N": 324,
+      "U": 0
+    },
+    "perplexity": {
+      "F": 324,
+      "H": 0,
+      "M": 0,
+      "N": 324,
+      "U": 0
+    }
+  },
+  "content_id": "f521cf2886cd16badbaa7ba00a572bccac91d4e5de41becde4e2f0d85da81152",
+  "evaluate_exit": 3,
+  "pairs": [
+    {
+      "arm_a": "bing",
+      "arm_b": "keenable",
+      "comparison_status": "blocked",
+      "gate_codes": [
+        "INCOMPLETE_PHYSICAL_HISTORY",
+        "UNKNOWN_ACTUAL_RETRY_POLICY",
+        "UNKNOWN_ACTUAL_SETTINGS",
+        "UNKNOWN_COMPARISON_WINDOW"
+      ]
+    }
+  ],
+  "protocol_hash": "181528681dd8fa9bf27016bf442bf1f2ff9c8fbb6034d61002b99dc9a0f1431b",
+  "protocol_id": "protected-validation-v2",
+  "reference_checks": [
+    {
+      "absolute_tolerance": 1e-09,
+      "assignment_count": 972,
+      "observed_attempt_rows": 0,
+      "reference": "independent_oracle",
+      "source_group_count": 81,
+      "status": "passed",
+      "task_count": 324
+    },
+    {
+      "absolute_tolerance": 1e-09,
+      "assignment_count": 972,
+      "observed_attempt_rows": 0,
+      "reference": "frozen_oracle",
+      "source_group_count": 81,
+      "status": "passed",
+      "task_count": 324
+    },
+    {
+      "absolute_tolerance": 1e-09,
+      "assignment_count": 972,
+      "observed_attempt_rows": 0,
+      "reference": "native_replay",
+      "source_group_count": 81,
+      "status": "passed",
+      "task_count": 324
+    },
+    {
+      "absolute_tolerance": 1e-09,
+      "assignment_count": 972,
+      "observed_attempt_rows": 0,
+      "reference": "frozen_check",
+      "source_group_count": 81,
+      "status": "passed",
+      "task_count": 324
+    }
+  ],
+  "run_id": "packet-a"
+}

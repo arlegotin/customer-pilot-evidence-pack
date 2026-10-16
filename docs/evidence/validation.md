@@ -30,3 +30,27 @@ The coordinator reserved **a separate v2 evaluation** with a newly authored pare
 `protected-validation-v2` uses `fixtures/controls/parent-v2/`: four newly named tasks `c1`–`c4`, fresh reservation-specific groups, and literal per-arm counts N=4, H=2, M=1, F=1, U=0. The additional `c4` delivery has an explicit matching arXiv URL. Counts are specified directly from these eight literal deliveries before execution. This distinct reservation corrects C05 to b H=1/M=2 after substituted gold, C09 to an empty ranked result list for non-dispatch, and C15 to b observed total `'0'`. All other changes to expected counts are the direct additional-hit/task-identity projections; no IDs are removed or reclassified. H08's hand-derived native ceiling is consequently 0.5.
 
 The v2 freeze commit precedes either protected command. The new reservation will retain results in `validation-v2/`; original v1 definitions stay at freeze commit `69ee79e` and original v1 evidence in `validation-initial/`. There is no claim of v1 success.
+
+## Reserved v2 protected result: accepted
+
+Freeze commit: `fca5ccd`. Both commands completed successfully:
+
+```
+PILOTPACK_VALIDATION_RESULTS=docs/evidence/validation-v2 python -m unittest discover -s tests -p test_corruptions.py -v
+PILOTPACK_VALIDATION_RESULTS=docs/evidence/validation-v2 python -m unittest discover -s tests -p test_controls.py -v
+```
+
+Measured **20/20 detected, 12/12 critical detected, 8/8 healthy, zero controls with unexpected findings**. No undetected cases. Exact cases, codes, owning-stage checks and state errors (all empty) are retained in `validation-v2/{corruptions,controls}.json` and corresponding console files. V2 acceptance passes all frozen thresholds. The frozen manifests/recipes/runner/protocol were byte-compared against `fca5ccd` after evaluation and remain unchanged.
+
+`python -m unittest discover -s tests -v` subsequently passed **190 tests** in 19.461 seconds, including a verification repeat of the frozen suites without changing or overwriting initial protected outputs. Its full console output is retained in `validation-v2/full-suite-console.txt`.
+
+A regenerated real A run exercises the newly declared pair and preserves unknown actual settings:
+
+```
+python -m pilotpack freeze --adapter needle-scholar --input fixtures/real/packet-a --config fixtures/config/packet-a.json --protocol protocol.json --sources sources.json --out /tmp/task8-real-a-v2
+python -m pilotpack evaluate --run /tmp/task8-real-a-v2 --out /tmp/task8-real-a-v2-output
+```
+
+Freeze returned 0; evaluate returned **3**, emitting the expected blocked bing/keenable comparison. Pair findings include `UNKNOWN_ACTUAL_SETTINGS`, `UNKNOWN_ACTUAL_RETRY_POLICY`, `UNKNOWN_COMPARISON_WINDOW`, and the expected physical-history limitation. Counts: bing N324/H157/M167/F0/U0, keenable N324/H293/M31/F0/U0, perplexity N324/H0/M0/F324/U0. Independent/native reference checks passed. `validation-v2/real-a-summary.json` records identity and checks. No provider defaults were invented. The unchanged predeclared B metadata remains protected; no B source was opened.
+
+Scope and limits: this validates local retrieval accounting and evidence handling, not answer quality. Synthetic parent settings/receipts establish semantics only. Initial v1 failed and contained three harness defects; its results are disclosed and are not replaced by the separate v2 claim. V2 mutation metadata retains descriptive v1 `t1`/`t2` names in some change summaries; executable recipes identify the corresponding fresh `c1`/`c2` tasks, and exact frozen state assertions use the v2 counts. This is a descriptive naming erratum, not an expected-state or recipe change. C19 covers lexical traversal; existing ordinary security tests separately cover escaping symlinks.
