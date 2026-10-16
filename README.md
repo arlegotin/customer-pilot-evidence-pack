@@ -18,7 +18,7 @@ Download the retained evidence files once; evaluation and reporting run offline.
 git clone https://github.com/arlegotin/customer-pilot-evidence-pack.git
 cd customer-pilot-evidence-pack
 curl -fL -o /tmp/pilotpack-baselines.tar.gz \
-  https://github.com/arlegotin/customer-pilot-evidence-pack/releases/download/v0.1.0/pilotpack-v0.1.0-offline-baselines.tar.gz
+  https://github.com/arlegotin/customer-pilot-evidence-pack/releases/download/v0.2.0/pilotpack-v0.2.0-offline-baselines.tar.gz
 tar -xzf /tmp/pilotpack-baselines.tar.gz -C .
 python -m pilotpack freeze --adapter needle-scholar \
   --input fixtures/real/packet-a --config fixtures/config/packet-a.json \

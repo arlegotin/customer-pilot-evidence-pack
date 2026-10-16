@@ -1,6 +1,7 @@
 # Publication scope
 
-The first release is `v0.1.0`. Original software is AGPL-3.0-only; original
+The current release is `v0.2.0`; the first release, `v0.1.0`, remains available.
+Original software is AGPL-3.0-only; original
 writing and result presentation are CC BY 4.0. [LICENSING.md](../LICENSING.md)
 and [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) define the boundaries.
 
@@ -40,7 +41,9 @@ is claimed. The existing baseline also handled B through configuration, so
 workflow value remains neutral. No hours or revenue savings were measured.
 
 The historical clean experiment ran 190 tests. Final-review fixes added 12
-ordinary regressions; the release suite has 202 tests. Historical transcripts
+ordinary regressions; v0.1.0 verified 202 tests. The v0.2.0 integrity changes
+verify 233 tests with zero skips; [their evidence](evidence/integrity-2026-10-16.md)
+retains the initial failures, three reviews and clean offline acceptance. Historical transcripts
 remain unchanged. The current replay recipe records its actual discovered test
 count and writes new logs under `build/reproduction`, separate from those
 transcripts. [Final implementation verification](evidence/final-verification.json)
